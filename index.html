@@ -871,7 +871,7 @@
                 const sortedExpenses = [...expenses].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
                 sortedExpenses.forEach((exp, index) => { // Added index here
                     message += `• _${exp.mealType} @ ${exp.restaurant}_: *${exp.currency} ${exp.amount.toFixed(2)}*\n`;
-                    message += `  Paid by: _${exp.payer}_\n`;
+                    message += `  Paid by: *${exp.payer}*\n`;
                     message += `  Shared with: _${exp.participants.join(', ')}_\n`;
                     // Add the separator line after each record, except the last one
                     if (index < sortedExpenses.length - 1) {
