@@ -143,8 +143,14 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-slate-600 mb-1.5">Who participated and paid?</label>
+                        <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-md mb-2">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" class="custom-checkbox" id="select-all-participants">
+                                <span class="text-sm text-slate-700 font-semibold">All</span>
+                            </label>
+                        </div>
                         <div id="combined-participants-payer" class="space-y-2">
-                            </div>
+                        </div>
                     </div>
 
                     <button id="add-expense" class="w-full bg-sky-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-sky-600 active:bg-sky-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2">
@@ -329,6 +335,7 @@
         const expenseFormTitle = document.getElementById('expense-form-title');
         const errorMsgElement = document.getElementById('error');
         const navButtons = document.querySelectorAll('.nav-btn');
+        const selectAllParticipantsCheckbox = document.getElementById('select-all-participants'); // Get the new "All" checkbox
 
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'));
@@ -426,6 +433,11 @@
                 combinedParticipantsPayerContainer.appendChild(combinedItem);
             });
 
+            // Add event listener for the "All" checkbox
+            if (selectAllParticipantsCheckbox) {
+                selectAllParticipantsCheckbox.removeEventListener('change', handleSelectAllParticipants); // Remove previous listener to prevent duplicates
+                selectAllParticipantsCheckbox.addEventListener('change', handleSelectAllParticipants);
+            }
 
             document.querySelectorAll('.edit-participant').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -476,6 +488,14 @@
                         showError(`${personToDelete} has been deleted.`, 3000, 'success');
                     });
                 });
+            });
+        }
+
+        // Handler for the "All" checkbox
+        function handleSelectAllParticipants() {
+            const isChecked = selectAllParticipantsCheckbox.checked;
+            document.querySelectorAll('#combined-participants-payer .participant').forEach(checkbox => {
+                checkbox.checked = isChecked;
             });
         }
 
@@ -660,6 +680,9 @@
             document.querySelectorAll('#combined-participants-payer .participant:checked').forEach(cb => cb.checked = false);
             const payerRadio = document.querySelector('#combined-participants-payer .payer:checked');
             if(payerRadio) payerRadio.checked = false;
+            if (selectAllParticipantsCheckbox) {
+                selectAllParticipantsCheckbox.checked = false; // Uncheck "All" checkbox
+            }
 
             mealButtons.forEach(b => b.classList.remove('active'));
             currencyButtons.forEach(b => b.classList.remove('active'));
