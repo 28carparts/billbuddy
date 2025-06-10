@@ -215,7 +215,6 @@
         <section id="page-debt" class="page p-4 md:p-6 hidden">
             <div class="bg-white rounded-xl shadow-xl p-5 sm:p-6 space-y-6 max-w-4xl mx-auto">
                 <h2 class="text-xl sm:text-2xl font-bold text-slate-700 mb-3 flex items-center gap-2">
-                    <!-- FIX: Added (HKD) to title -->
                     <span class="text-2xl sm:text-3xl">🤝</span>Debt Settlement (HKD)
                 </h2>
                 <div class="overflow-x-auto rounded-lg shadow-sm border border-slate-200">
@@ -799,7 +798,6 @@
                 exp.participants.forEach(person => {
                     const perPersonHKD = exp.perPerson;
                     totals[person] += perPersonHKD;
-                    // FIX: Changed currency format to $XXX
                     details[person].push(`<div class="text-xs"><span class="font-medium">${exp.mealType}</span> at ${exp.restaurant}: $${perPersonHKD.toFixed(2)}</div>`);
                 });
             });
@@ -814,7 +812,6 @@
                 const row = summaryTableBody.insertRow();
                 row.innerHTML = `
                     <td class="py-3 px-2 md:px-4 text-slate-700 font-medium whitespace-normal">${person}</td>
-                    <!-- FIX: Changed currency format to $XXX -->
                     <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">$${totals[person].toFixed(2)}</td>
                     <td class="py-3 px-2 md:px-4 text-slate-700 space-y-1 whitespace-normal">${details[person].join('') || '<span class="text-slate-400">No expenses</span>'}</td>
                 `;
@@ -951,7 +948,6 @@
                 const net = balances[person].net;
                 const colorClass = net < -0.005 ? 'text-red-600 font-semibold' : net > 0.005 ? 'text-green-600 font-semibold' : 'text-slate-700';
                 const row = debtTableBody.insertRow();
-                // FIX: Changed currency format to $XXX
                 row.innerHTML = `
                     <td class="py-3 px-2 md:px-4 text-slate-700 font-medium whitespace-normal">${person}</td>
                     <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">$${balances[person].paid.toFixed(2)}</td>
@@ -1115,11 +1111,11 @@
             message += `*🧾 Meal Records*\n`;
             if (appData.expenses.length > 0) {
                 const total = appData.expenses.reduce((sum, exp) => sum + exp.amountHKD, 0);
-                message += `_Total Spent: HKD ${total.toFixed(2)} | ${appData.expenses.length} transaction${appData.expenses.length !== 1 ? 's' : ''}_\n\n`;
+                message += `Total Spent: *HKD ${total.toFixed(2)}* | ${appData.expenses.length} transaction${appData.expenses.length !== 1 ? 's' : ''}\n\n`;
                 
                 [...appData.expenses].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
                     .forEach((exp, index, arr) => {
-                    message += `• _${exp.mealType} @ ${exp.restaurant}_: *${exp.currency} ${exp.amount.toFixed(2)}*\n`;
+                    message += `• ${exp.mealType} @ ${exp.restaurant}: *${exp.currency} ${exp.amount.toFixed(2)}*\n`;
                     message += `  Paid by: *${exp.payer}*\n`;
                     message += `  Shared with: _${exp.participants.join(', ')}_\n`;
                     if (index < arr.length - 1) {
@@ -1132,14 +1128,29 @@
             message += `\n`;
 
             message += `*🤝 Debt Settlement*\n`;
-            const settlementPlanNode = document.getElementById('settlement-plan');
-            if (settlementPlanNode && settlementPlanNode.textContent.includes("All debts are settled")) {
+            
+            // FIX: Re-calculate settlements for WhatsApp with bold formatting
+            const debtors = appData.participants.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
+            const creditors = appData.participants.filter(p => balances[p].net > 0.005).map(p => ({ name: p, amount: balances[p].net }));
+            const settlements = [];
+
+            let i = 0, j = 0;
+            while (i < debtors.length && j < creditors.length) {
+                const amountToSettle = Math.min(debtors[i].amount, creditors[j].amount);
+                if (amountToSettle > 0.005) {
+                    settlements.push(`• *${debtors[i].name}* pays *${creditors[j].name}* ${amountToSettle.toFixed(2)} HKD`);
+                    debtors[i].amount -= amountToSettle;
+                    creditors[j].amount -= amountToSettle;
+                }
+                if (debtors[i].amount < 0.005) i++;
+                if (creditors[j].amount < 0.005) j++;
+            }
+
+            if (settlements.length === 0) {
                 message += `_🎉 All debts are settled!_\n`;
-            } else if (settlementPlanNode) {
+            } else {
                 message += `_Settlement Plan:_\n`;
-                settlementPlanNode.querySelectorAll('li').forEach(li => {
-                    message += `• ${li.textContent}\n`;
-                });
+                message += settlements.join('\n') + '\n';
             }
             
             if (appData.adjustments.length > 0) {
