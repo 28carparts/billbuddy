@@ -12,69 +12,95 @@
             font-family: 'Inter', sans-serif;
             scroll-behavior: smooth;
         }
-        /* Custom scrollbar for a cleaner look - Optional */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; /* slate-300 */
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; /* slate-500 */
-        }
-        /* Style for active choice buttons (meal/currency) */
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Active choice buttons */
         .choice-btn.active {
             background-color: #0ea5e9 !important; /* sky-500 */
             color: white !important;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            ring-width: 2px;
-            --tw-ring-color: #7dd3fc; /* sky-300 */
         }
-        /* Custom checkbox style if not using @tailwindcss/forms */
+        /* Custom checkbox */
         .custom-checkbox {
-            appearance: none;
-            -webkit-appearance: none;
-            height: 1.25rem; /* h-5 */
-            width: 1.25rem; /* w-5 */
-            border: 1px solid #94a3b8; /* slate-400 */
-            border-radius: 0.25rem; /* rounded */
-            display: inline-block;
-            position: relative;
-            cursor: pointer;
+            appearance: none; -webkit-appearance: none;
+            height: 1.25rem; width: 1.25rem;
+            border: 1px solid #94a3b8;
+            border-radius: 0.25rem;
+            display: inline-block; position: relative; cursor: pointer;
             transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
         }
-        .custom-checkbox:checked {
-            background-color: #0ea5e9; /* sky-500 */
-            border-color: #0ea5e9; /* sky-500 */
-        }
+        .custom-checkbox:checked { background-color: #0ea5e9; border-color: #0ea5e9; }
         .custom-checkbox:checked::after {
-            content: '✔';
-            font-size: 0.8rem;
-            color: white;
-            position: absolute;
-            left: 50%;
-            top: 50%;
+            content: '✔'; font-size: 0.8rem; color: white;
+            position: absolute; left: 50%; top: 50%;
             transform: translate(-50%, -50%);
         }
-        .custom-checkbox:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.5); /* focus:ring-sky-500 with opacity */
-        }
+        .custom-checkbox:focus { outline: none; box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.5); }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-100 to-sky-100 min-h-screen flex flex-col pt-16 pb-20">
 
-    <header class="text-center py-3 px-4 bg-gradient-to-r from-sky-500 to-indigo-600 shadow-lg fixed top-0 left-0 right-0 z-40 h-16 flex items-center justify-center">
-        <h1 class="text-xl md:text-2xl font-bold text-white drop-shadow-sm">💰 Bill Buddy</h1>
+    <header class="text-center py-3 px-4 bg-gradient-to-r from-sky-500 to-indigo-600 shadow-lg fixed top-0 left-0 right-0 z-40 h-16 flex items-center justify-between">
+        <h1 class="text-xl md:text-2xl font-bold text-white drop-shadow-sm ml-4">💰 Bill Buddy</h1>
+        <button id="logout-btn" class="hidden bg-rose-500 text-white font-medium py-2 px-4 rounded-lg shadow hover:bg-rose-600 active:bg-rose-700 transform active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-1.5 shrink-0 mr-4 text-sm">
+            <span class="text-lg">🚪</span>Logout
+        </button>
     </header>
 
-    <main class="flex-grow overflow-y-auto w-full">
+    <!-- Auth Section -->
+    <section id="page-auth" class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
+            <div id="login-container" class="bg-white rounded-xl shadow-xl p-6 sm:p-8 space-y-6">
+                <h2 class="text-2xl font-bold text-center text-slate-700">Welcome Back!</h2>
+                <form id="login-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="login-email" class="block text-sm font-semibold text-slate-600 mb-1.5">Email</label>
+                            <input type="email" id="login-email" autocomplete="username" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" required>
+                        </div>
+                        <div>
+                            <label for="login-password" class="block text-sm font-semibold text-slate-600 mb-1.5">Password</label>
+                            <input type="password" id="login-password" autocomplete="current-password" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full mt-6 bg-sky-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-sky-600 active:bg-sky-700 transform hover:scale-105 active:scale-95 transition-all">Login</button>
+                </form>
+                <p class="text-center text-sm text-slate-500">
+                    Don't have an account? <a href="#" id="show-register" class="font-semibold text-sky-600 hover:underline">Sign Up</a>
+                </p>
+            </div>
+
+            <div id="register-container" class="bg-white rounded-xl shadow-xl p-6 sm:p-8 space-y-6 hidden">
+                <h2 class="text-2xl font-bold text-center text-slate-700">Create Account</h2>
+                <form id="register-form">
+                     <div class="space-y-4">
+                        <div>
+                            <label for="register-email" class="block text-sm font-semibold text-slate-600 mb-1.5">Email</label>
+                            <input type="email" id="register-email" autocomplete="username" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" required>
+                        </div>
+                        <div>
+                            <label for="register-password" class="block text-sm font-semibold text-slate-600 mb-1.5">Password</label>
+                            <input type="password" id="register-password" autocomplete="new-password" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" required>
+                        </div>
+                         <div>
+                            <label for="register-password-confirm" class="block text-sm font-semibold text-slate-600 mb-1.5">Confirm Password</label>
+                            <input type="password" id="register-password-confirm" autocomplete="new-password" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full mt-6 bg-emerald-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-emerald-600 active:bg-emerald-700 transform hover:scale-105 active:scale-95 transition-all">Register</button>
+                </form>
+                <p class="text-center text-sm text-slate-500">
+                    Already have an account? <a href="#" id="show-login" class="font-semibold text-sky-600 hover:underline">Log In</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <main id="app-content" class="flex-grow overflow-y-auto w-full hidden">
         <section id="page-participants" class="page p-4 md:p-6">
             <div class="bg-white rounded-xl shadow-xl p-5 sm:p-6 space-y-6 max-w-2xl mx-auto">
                 <h2 class="text-xl sm:text-2xl font-bold text-slate-700 flex items-center gap-2">
@@ -166,12 +192,12 @@
                     <span class="text-2xl sm:text-3xl">📊</span>Expense Summary (HKD)
                 </h2>
                 <div class="overflow-x-auto rounded-lg shadow-sm border border-slate-200">
-                    <table class="w-full text-left text-sm whitespace-nowrap">
+                    <table class="w-full text-left text-sm">
                         <thead class="bg-slate-100">
                             <tr>
-                                <th class="py-3 px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Person</th>
-                                <th class="py-3 px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Total Owed</th>
-                                <th class="py-3 px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Details</th>
+                                <th class="py-3 px-2 md:px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Person</th>
+                                <th class="py-3 px-2 md:px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Total Owed</th>
+                                <th class="py-3 px-2 md:px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Details</th>
                             </tr>
                         </thead>
                         <tbody id="summary-table" class="divide-y divide-slate-200"></tbody>
@@ -192,13 +218,13 @@
                     <span class="text-2xl sm:text-3xl">🤝</span>Debt Settlement
                 </h2>
                 <div class="overflow-x-auto rounded-lg shadow-sm border border-slate-200">
-                    <table class="w-full text-left text-sm whitespace-nowrap">
+                    <table class="w-full text-left text-sm">
                         <thead class="bg-slate-100">
                             <tr>
-                                <th class="py-3 px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Person</th>
-                                <th class="py-3 px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Paid</th>
-                                <th class="py-3 px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Owed</th>
-                                <th class="py-3 px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Net Balance</th>
+                                <th class="py-3 px-2 md:px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Person</th>
+                                <th class="py-3 px-2 md:px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Paid</th>
+                                <th class="py-3 px-2 md:px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Owed</th>
+                                <th class="py-3 px-2 md:px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Net Balance</th>
                             </tr>
                         </thead>
                         <tbody id="debt-table" class="divide-y divide-slate-200"></tbody>
@@ -208,6 +234,37 @@
                      <h3 class="text-md font-semibold text-slate-600 mb-2">Settlement Plan:</h3>
                      <div id="settlement-plan" class="text-sm space-y-1"></div>
                 </div>
+
+                <div class="mt-6 space-y-4">
+                    <h3 class="text-xl sm:text-2xl font-bold text-slate-700 flex items-center gap-2">
+                        <span class="text-2xl sm:text-3xl">💱</span>Individual Adjustments
+                    </h3>
+                    <div class="bg-slate-50 p-4 rounded-lg shadow-inner space-y-3">
+                        <div>
+                            <label for="adjustment-debtor" class="block text-sm font-semibold text-slate-600 mb-1.5">Who Pays?</label>
+                            <select id="adjustment-debtor" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow">
+                                <option value="">Select Payer</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="adjustment-creditor" class="block text-sm font-semibold text-slate-600 mb-1.5">Who Receives?</label>
+                            <select id="adjustment-creditor" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow">
+                                <option value="">Select Receiver</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="adjustment-amount" class="block text-sm font-semibold text-slate-600 mb-1.5">Amount (HKD)</label>
+                            <input type="number" id="adjustment-amount" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., 50.00" min="0" step="0.01">
+                        </div>
+                        <button id="add-adjustment-btn" class="w-full bg-indigo-500 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-indigo-600 active:bg-indigo-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2">
+                            <span class="text-lg">➕</span>Add Adjustment
+                        </button>
+                    </div>
+                    <div id="current-adjustments" class="space-y-2">
+                        <p class="text-slate-500 text-center py-2">No individual adjustments yet.</p>
+                    </div>
+                </div>
+
                 <button id="copy-whatsapp" class="w-full bg-green-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-green-600 active:bg-green-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
                     <span class="text-lg">📱</span>Copy Data to WhatsApp
                 </button>
@@ -223,7 +280,7 @@
     </div>
 
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-[0_-4px_10px_rgba(0,0,0,0.05)] flex justify-around items-stretch h-20 z-40 border-t border-slate-200/80">
+    <nav id="app-nav" class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-[0_-4px_10px_rgba(0,0,0,0.05)] flex justify-around items-stretch h-20 z-40 border-t border-slate-200/80 hidden">
         <button class="nav-btn flex-1 flex flex-col items-center justify-center text-slate-600 hover:text-sky-500 transition-colors py-2 focus:outline-none" data-page="page-participants">
             <span class="text-2xl">👥</span>
             <span class="text-xs mt-1">Participants</span>
@@ -241,72 +298,241 @@
             <span class="text-xs mt-1">Debt</span>
         </button>
     </nav>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
     <script>
-        // API key for ExchangeRate-API (replace with your own key from https://www.exchangerate-api.com/)
-        const API_KEY = 'c86eace6da908459098e7518'; // Sign up for a free key
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyC_fcgI07cxvP26LVW8W3ZqrWwTa3fmvLw",
+          authDomain: "perrybillbuddy.firebaseapp.com",
+          databaseURL: "https://perrybillbuddy-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "perrybillbuddy",
+          storageBucket: "perrybillbuddy.appspot.com",
+          messagingSenderId: "380690422701",
+          appId: "1:380690422701:web:17da1bb5f55f12f3625f24"
+        };
 
-        // Fallback exchange rates to HKD
-        const fallbackRates = { HKD: 1, CNY: 1.1, JPY: 0.055, USD: 7.8, EUR: 8.5, GBP: 10.0, KRW: 0.0058 }; // Added KRW fallback rate
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        let dbRef;
+        let dataUnsubscribe;
+
+        // --- App State ---
+        let appData = {
+            groupEventName: '',
+            participants: [],
+            expenses: [],
+            adjustments: []
+        };
+        let editingExpenseIndex = -1;
+
+        // --- Exchange Rate State ---
+        const API_KEY = 'c86eace6da908459098e7518';
+        const fallbackRates = { HKD: 1, CNY: 1.1, JPY: 0.055, USD: 7.8, EUR: 8.5, GBP: 10.0, KRW: 0.0058 };
         let exchangeRates = { ...fallbackRates };
+        
+        // --- DOM Elements ---
+        const authPage = document.getElementById('page-auth');
+        const appContent = document.getElementById('app-content');
+        const appNav = document.getElementById('app-nav');
+        const logoutBtn = document.getElementById('logout-btn');
+        const loginContainer = document.getElementById('login-container');
+        const registerContainer = document.getElementById('register-container');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const mealButtons = document.querySelectorAll('.meal-btn');
+        const currencyButtons = document.querySelectorAll('.currency-btn');
+        const addExpenseBtn = document.getElementById('add-expense');
+        const resetBtn = document.getElementById('reset');
+        const copyWhatsappBtn = document.getElementById('copy-whatsapp');
+        const addParticipantBtn = document.getElementById('add-participant');
+        const newParticipantInput = document.getElementById('new-participant');
+        const doneParticipantsBtn = document.getElementById('done-participants');
+        const groupEventNameInput = document.getElementById('group-event-name');
+        const expenseFormTitle = document.getElementById('expense-form-title');
+        const errorMsgElement = document.getElementById('error');
+        const navButtons = document.querySelectorAll('.nav-btn');
+        const selectAllParticipantsCheckbox = document.getElementById('select-all-participants');
+        const adjustmentDebtorSelect = document.getElementById('adjustment-debtor');
+        const adjustmentCreditorSelect = document.getElementById('adjustment-creditor');
 
-        let participants = JSON.parse(localStorage.getItem('participants')) || ['Perry Y', 'Irene K', 'Mandy M', 'Michelle I'];
-        let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-        let groupEventName = localStorage.getItem('groupEventName') || '';
 
-        async function fetchExchangeRates() {
-            if (API_KEY === 'YOUR_API_KEY_HERE') {
-                console.warn('Using fallback exchange rates. Please provide an API key for live rates.');
-                showError('Using fallback exchange rates. Get a free API key for live data.', 5000);
-                // No need to proceed with fetch if API key is not set
-                updateSummary();
-                updateMealRecords();
-                updateDebtSettlement();
+        // --- Authentication Logic ---
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                dbRef = database.ref(`users/${user.uid}`);
+                listenForDataChanges();
+                
+                authPage.classList.add('hidden');
+                appContent.classList.remove('hidden');
+                appNav.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+                
+                fetchExchangeRates(); 
+                showPage('page-participants');
+            } else {
+                if (dbRef && dataUnsubscribe) {
+                    dbRef.off('value', dataUnsubscribe); 
+                }
+                dbRef = null;
+                dataUnsubscribe = null;
+                
+                authPage.classList.remove('hidden');
+                appContent.classList.add('hidden');
+                appNav.classList.add('hidden');
+                logoutBtn.classList.add('hidden');
+                
+                appData = { groupEventName: '', participants: [], expenses: [], adjustments: [] };
+                clearAllUI();
+            }
+        });
+        
+        loginForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(error => showError(`Login Failed: ${error.message}`));
+        });
+
+        registerForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-password-confirm').value;
+
+            if (password !== confirmPassword) {
+                showError("Passwords do not match.");
                 return;
             }
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(userCredential => {
+                    const initialData = {
+                        groupEventName: 'My First Event',
+                        participants: ['Perry Y', 'Irene K', 'Mandy M', 'Michelle I'],
+                        expenses: [],
+                        adjustments: []
+                    };
+                    database.ref(`users/${userCredential.user.uid}`).set(initialData);
+                })
+                .catch(error => showError(`Registration Failed: ${error.message}`));
+        });
+        
+        logoutBtn.addEventListener('click', () => {
+            if (dbRef && dataUnsubscribe) {
+                dbRef.off('value', dataUnsubscribe); 
+                dataUnsubscribe = null;
+            }
+            auth.signOut();
+        });
+
+
+        document.getElementById('show-register').addEventListener('click', e => {
+            e.preventDefault();
+            loginContainer.classList.add('hidden');
+            registerContainer.classList.remove('hidden');
+        });
+
+        document.getElementById('show-login').addEventListener('click', e => {
+            e.preventDefault();
+            registerContainer.classList.add('hidden');
+            loginContainer.classList.remove('hidden');
+        });
+
+        // --- Database Logic ---
+
+        function listenForDataChanges() {
+            if (dbRef) {
+                dataUnsubscribe = dbRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    
+                    if (data) {
+                        appData = {
+                           groupEventName: data.groupEventName || '',
+                           participants: data.participants || [],
+                           expenses: data.expenses || [],
+                           adjustments: data.adjustments || []
+                        };
+                    } else {
+                        appData = {
+                            groupEventName: 'My Event',
+                            participants: ['Perry Y', 'Irene K', 'Mandy M', 'Michelle I'],
+                            expenses: [],
+                            adjustments: []
+                        };
+                        saveDataToFirebase();
+                    }
+                    updateAllUI();
+                }, error => {
+                    console.error("Firebase data listener error:", error);
+                });
+            }
+        }
+
+        function saveDataToFirebase() {
+            if (dbRef) {
+                const dataToSave = { ...appData };
+                dbRef.set(dataToSave)
+                   .catch(err => showError(`Failed to save data: ${err.message}`));
+            }
+        }
+
+        // --- Main App Logic ---
+
+        function updateAllUI() {
+            groupEventNameInput.value = appData.groupEventName;
+            updateFormTitle();
+            updateParticipantList();
+            updateSummary();
+            updateMealRecords();
+            updateDebtSettlement();
+            updateAdjustmentsDisplay();
+        }
+        
+        function clearAllUI() {
+            document.getElementById('participant-list').innerHTML = '';
+            document.getElementById('summary-table').innerHTML = '';
+            document.getElementById('meal-records').innerHTML = '';
+            document.getElementById('debt-table').innerHTML = '';
+            document.getElementById('settlement-plan').innerHTML = '';
+            document.getElementById('current-adjustments').innerHTML = '';
+        }
+
+        async function fetchExchangeRates() {
+            // FIX: Removed the incorrect API key check. The catch block will handle failures.
             try {
                 const response = await fetch(`https://v6.exchangerate-api.com/v6/${API_KEY}/latest/HKD`);
                 if (!response.ok) throw new Error(`API request failed: ${response.status}`);
                 const data = await response.json();
                 if (data.result === 'success' && data.conversion_rates) {
-                    // Ensure all expected currencies are present in the API response
-                    const requiredCurrencies = ['CNY', 'JPY', 'USD', 'EUR', 'GBP', 'KRW']; // Added KRW to required currencies
                     const apiRates = data.conversion_rates;
-                    let ratesComplete = true;
-                    requiredCurrencies.forEach(curr => {
-                        if (!apiRates[curr]) {
-                            ratesComplete = false;
-                            console.warn(`Currency ${curr} not found in API response. Using fallback for ${curr}.`);
-                        }
-                    });
-
-                    if (ratesComplete) {
-                         exchangeRates = {
-                            HKD: 1,
-                            CNY: (apiRates.CNY ? 1 / apiRates.CNY : fallbackRates.CNY),
-                            JPY: (apiRates.JPY ? 1 / apiRates.JPY : fallbackRates.JPY),
-                            USD: (apiRates.USD ? 1 / apiRates.USD : fallbackRates.USD),
-                            EUR: (apiRates.EUR ? 1 / apiRates.EUR : fallbackRates.EUR),
-                            GBP: (apiRates.GBP ? 1 / apiRates.GBP : fallbackRates.GBP),
-                            KRW: (apiRates.KRW ? 1 / apiRates.KRW : fallbackRates.KRW) // Added KRW rate
-                        };
-
-                    } else {
-                         throw new Error('API response missing some currency rates.');
-                    }
+                     exchangeRates = {
+                        HKD: 1,
+                        CNY: (apiRates.CNY ? 1 / apiRates.CNY : fallbackRates.CNY),
+                        JPY: (apiRates.JPY ? 1 / apiRates.JPY : fallbackRates.JPY),
+                        USD: (apiRates.USD ? 1 / apiRates.USD : fallbackRates.USD),
+                        EUR: (apiRates.EUR ? 1 / apiRates.EUR : fallbackRates.EUR),
+                        GBP: (apiRates.GBP ? 1 / apiRates.GBP : fallbackRates.GBP),
+                        KRW: (apiRates.KRW ? 1 / apiRates.KRW : fallbackRates.KRW)
+                    };
                 } else {
                      throw new Error(data['error-type'] || 'API request was not successful');
                 }
             } catch (error) {
                 console.error('Failed to fetch exchange rates:', error);
                 showError(`API Error: ${error.message}. Using fallback rates.`, 5000);
-                exchangeRates = { ...fallbackRates }; // Ensure fallback on error
+                exchangeRates = { ...fallbackRates };
             }
-            updateSummary();
-            updateMealRecords();
-            updateDebtSettlement();
+            updateAllUI();
         }
-
 
         function formatTimestamp(dateString) {
             const date = new Date(dateString);
@@ -323,26 +549,10 @@
             return `${dayName}, ${day} ${month} ${year}, ${hours}:${minutes}${ampm}`;
         }
 
-        const mealButtons = document.querySelectorAll('.meal-btn');
-        const currencyButtons = document.querySelectorAll('.currency-btn');
-        const addExpenseBtn = document.getElementById('add-expense');
-        const resetBtn = document.getElementById('reset');
-        const copyWhatsappBtn = document.getElementById('copy-whatsapp');
-        const addParticipantBtn = document.getElementById('add-participant');
-        const newParticipantInput = document.getElementById('new-participant');
-        const doneParticipantsBtn = document.getElementById('done-participants');
-        const groupEventNameInput = document.getElementById('group-event-name');
-        const expenseFormTitle = document.getElementById('expense-form-title');
-        const errorMsgElement = document.getElementById('error');
-        const navButtons = document.querySelectorAll('.nav-btn');
-        const selectAllParticipantsCheckbox = document.getElementById('select-all-participants'); // Get the new "All" checkbox
-
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'));
             const targetPage = document.getElementById(pageId);
-            if (targetPage) {
-                targetPage.classList.remove('hidden');
-            }
+            if (targetPage) targetPage.classList.remove('hidden');
 
             navButtons.forEach(btn => {
                 const isActive = btn.dataset.page === pageId;
@@ -351,9 +561,7 @@
                 btn.classList.toggle('bg-sky-100', isActive);
                 btn.classList.toggle('rounded-lg', isActive);
                 btn.classList.toggle('text-slate-600', !isActive);
-                if (!isActive) {
-                    btn.classList.remove('bg-sky-100', 'rounded-lg');
-                }
+                if (!isActive) btn.classList.remove('bg-sky-100', 'rounded-lg');
             });
              window.scrollTo(0, 0);
         }
@@ -362,17 +570,14 @@
             btn.addEventListener('click', () => showPage(btn.dataset.page));
         });
 
-        if (participants.length === 0 || !groupEventName) {
-            showPage('page-participants');
-        } else {
-            showPage('page-expense');
-        }
+        groupEventNameInput.addEventListener('change', () => {
+            appData.groupEventName = groupEventNameInput.value.trim();
+            saveDataToFirebase();
+        });
 
-        groupEventNameInput.value = groupEventName;
-        updateFormTitle();
 
         function updateFormTitle() {
-            const titleBase = groupEventName ? `for ${groupEventName}` : '';
+            const titleBase = appData.groupEventName ? `for ${appData.groupEventName}` : '';
             expenseFormTitle.innerHTML = `<span class="text-2xl sm:text-3xl">💸</span>Add New Expense ${titleBase}`;
         }
 
@@ -394,18 +599,14 @@
 
         function updateParticipantList() {
             const participantList = document.getElementById('participant-list');
-            // Reference the new combined container
             const combinedParticipantsPayerContainer = document.getElementById('combined-participants-payer');
-
             if(!participantList || !combinedParticipantsPayerContainer) return;
 
             participantList.innerHTML = '';
-            combinedParticipantsPayerContainer.innerHTML = ''; // Clear the combined container
+            combinedParticipantsPayerContainer.innerHTML = '';
 
-            participants.forEach((person, index) => {
+            appData.participants.forEach((person, index) => {
                 const personId = `person_${index}_${person.replace(/\s+/g, '_')}`;
-
-                // Manage Participants section (remains unchanged)
                 const listItem = document.createElement('div');
                 listItem.className = 'flex items-center justify-between bg-slate-50 p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow';
                 listItem.innerHTML = `
@@ -413,13 +614,11 @@
                     <div class="flex gap-2">
                         <button class="edit-participant bg-amber-400 text-white p-0 rounded-md hover:bg-amber-500 transition-colors text-lg flex items-center justify-center w-9 h-9" data-index="${index}" aria-label="Edit ${person}">✏️</button>
                         <button class="delete-participant bg-rose-500 text-white p-0 rounded-md hover:bg-rose-600 transition-colors text-lg flex items-center justify-center w-9 h-9" data-index="${index}" aria-label="Delete ${person}">🗑️</button>
-                    </div>
-                `;
+                    </div>`;
                 participantList.appendChild(listItem);
 
-                // Combined Participants and Payer section
                 const combinedItem = document.createElement('div');
-                combinedItem.className = 'flex justify-between items-center bg-slate-50 p-2.5 rounded-md'; // Apply background and padding to each row
+                combinedItem.className = 'flex justify-between items-center bg-slate-50 p-2.5 rounded-md';
                 combinedItem.innerHTML = `
                     <label class="flex items-center gap-3 cursor-pointer">
                         <input type="checkbox" class="participant custom-checkbox" value="${person}" id="exp_part_${personId}">
@@ -428,44 +627,39 @@
                     <label class="flex items-center gap-3 cursor-pointer">
                         <input type="radio" name="payer" class="payer custom-checkbox" value="${person}" id="payer_${personId}">
                         <span class="text-sm text-slate-700">Paid</span>
-                    </label>
-                `;
+                    </label>`;
                 combinedParticipantsPayerContainer.appendChild(combinedItem);
             });
 
-            // Add event listener for the "All" checkbox
             if (selectAllParticipantsCheckbox) {
-                selectAllParticipantsCheckbox.removeEventListener('change', handleSelectAllParticipants); // Remove previous listener to prevent duplicates
+                selectAllParticipantsCheckbox.removeEventListener('change', handleSelectAllParticipants);
                 selectAllParticipantsCheckbox.addEventListener('change', handleSelectAllParticipants);
             }
 
             document.querySelectorAll('.edit-participant').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const index = parseInt(btn.dataset.index);
-                    const currentName = participants[index];
+                    const currentName = appData.participants[index];
                     const newName = prompt(`Enter new name for ${currentName}`, currentName);
                     if (newName && newName.trim() && newName.trim() !== currentName) {
-                        if (participants.includes(newName.trim())) {
-                            showError('Participant name already exists.');
-                            return;
+                        if (appData.participants.includes(newName.trim())) {
+                            showError('Participant name already exists.'); return;
                         }
                         if (newName.trim().length > 50) {
-                            showError('Participant name must be 50 characters or less.');
-                            return;
+                            showError('Participant name must be 50 characters or less.'); return;
                         }
-                        const oldName = participants[index];
-                        participants[index] = newName.trim();
-                        expenses.forEach(exp => {
+                        const oldName = appData.participants[index];
+                        appData.participants[index] = newName.trim();
+                        appData.expenses.forEach(exp => {
                             exp.participants = exp.participants.map(p => p === oldName ? newName.trim() : p);
                             if (exp.payer === oldName) exp.payer = newName.trim();
                         });
-                        localStorage.setItem('participants', JSON.stringify(participants));
-                        localStorage.setItem('expenses', JSON.stringify(expenses));
-                        updateParticipantList();
-                        updateSummary();
-                        updateMealRecords();
-                        updateDebtSettlement();
-                         showError(`'${oldName}' renamed to '${newName.trim()}'`, 3000, 'success');
+                        appData.adjustments.forEach(adj => {
+                            if (adj.debtor === oldName) adj.debtor = newName.trim();
+                            if (adj.creditor === oldName) adj.creditor = newName.trim();
+                        });
+                        saveDataToFirebase();
+                        showError(`'${oldName}' renamed to '${newName.trim()}'`, 3000, 'success');
                     }
                 });
             });
@@ -473,74 +667,53 @@
             document.querySelectorAll('.delete-participant').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const index = parseInt(btn.dataset.index);
-                    const personToDelete = participants[index];
-                    if (expenses.some(exp => exp.participants.includes(personToDelete) || exp.payer === personToDelete)) {
-                        showError(`Cannot delete ${personToDelete}. They are part of existing expenses or paid for an item. Please resolve expenses first.`, 5000);
-                        return;
+                    const personToDelete = appData.participants[index];
+                    if (appData.expenses.some(exp => exp.participants.includes(personToDelete) || exp.payer === personToDelete)) {
+                        showError(`Cannot delete ${personToDelete}. They are part of existing expenses.`, 5000); return;
                     }
-                    showConfirmation(`Are you sure you want to delete ${personToDelete}? This action cannot be undone.`, () => {
-                        participants.splice(index, 1);
-                        localStorage.setItem('participants', JSON.stringify(participants));
-                        updateParticipantList();
-                        updateSummary();
-                        updateMealRecords();
-                        updateDebtSettlement();
+                    if (appData.adjustments.some(adj => adj.debtor === personToDelete || adj.creditor === personToDelete)) {
+                        showError(`Cannot delete ${personToDelete}. They are involved in adjustments.`, 5000); return;
+                    }
+                    showConfirmation(`Are you sure you want to delete ${personToDelete}?`, () => {
+                        appData.participants.splice(index, 1);
+                        saveDataToFirebase();
                         showError(`${personToDelete} has been deleted.`, 3000, 'success');
                     });
                 });
             });
         }
-
-        // Handler for the "All" checkbox
+        
         function handleSelectAllParticipants() {
             const isChecked = selectAllParticipantsCheckbox.checked;
-            document.querySelectorAll('#combined-participants-payer .participant').forEach(checkbox => {
-                checkbox.checked = isChecked;
-            });
+            document.querySelectorAll('#combined-participants-payer .participant').forEach(checkbox => checkbox.checked = isChecked);
         }
 
         addParticipantBtn.addEventListener('click', () => {
             const newName = newParticipantInput.value.trim();
-            if (!newName) {
-                showError('Please enter a participant name.');
-                return;
-            }
-            if (participants.includes(newName)) {
-                showError('Participant already exists.');
-                return;
-            }
-            if (newName.length > 50) {
-                showError('Participant name must be 50 characters or less.');
-                return;
-            }
-            participants.push(newName);
-            localStorage.setItem('participants', JSON.stringify(participants));
+            if (!newName) { showError('Please enter a participant name.'); return; }
+            if (appData.participants.includes(newName)) { showError('Participant already exists.'); return; }
+            if (newName.length > 50) { showError('Participant name must be 50 characters or less.'); return; }
+            
+            appData.participants.push(newName);
+            saveDataToFirebase();
+
             newParticipantInput.value = '';
-            updateParticipantList();
-            updateSummary();
-            updateMealRecords();
-            updateDebtSettlement();
             showError(`${newName} added successfully! ✨`, 3000, 'success');
         });
 
         doneParticipantsBtn.addEventListener('click', () => {
             const eventName = groupEventNameInput.value.trim();
-            if (!eventName) {
-                showError('Please enter a group event name.');
-                return;
-            }
-            if (participants.length === 0) {
-                showError('Please add at least one participant.');
-                return;
-            }
-            groupEventName = eventName;
-            localStorage.setItem('groupEventName', groupEventName);
-            updateFormTitle();
+            if (!eventName) { showError('Please enter a group event name.'); return; }
+            if (appData.participants.length === 0) { showError('Please add at least one participant.'); return; }
+            
+            appData.groupEventName = eventName;
+            saveDataToFirebase();
+
             showPage('page-expense');
         });
 
         addExpenseBtn.addEventListener('click', () => {
-            if (!groupEventName) {
+            if (!appData.groupEventName) {
                 showError('Please set a group event name in Participants tab first.');
                 showPage('page-participants');
                 return;
@@ -549,12 +722,9 @@
             const restaurant = document.getElementById('restaurant').value.trim();
             const currency = document.getElementById('currency').value;
             const amount = parseFloat(document.getElementById('amount').value);
-            // Select participants from the combined container
             const selectedParticipants = Array.from(document.querySelectorAll('#combined-participants-payer .participant:checked')).map(cb => cb.value);
-            // Select payer from the combined container
             const selectedPayerRadio = document.querySelector('#combined-participants-payer .payer:checked');
             const selectedPayer = selectedPayerRadio ? selectedPayerRadio.value : null;
-
 
             if (!mealType) { showError('Please select a meal type.'); return; }
             if (!restaurant) { showError('Please enter a place or item name.'); return; }
@@ -563,44 +733,47 @@
             if (selectedParticipants.length === 0) { showError('Please select at least one participant.'); return; }
             if (!selectedPayer) { showError('Please select who paid.'); return; }
             if (!selectedParticipants.includes(selectedPayer)) {
-                showError('The payer must be one of the selected participants.');
-                return;
+                showError('The payer must be one of the selected participants.'); return;
             }
 
             const amountHKD = amount * (exchangeRates[currency] || 1);
             const perPerson = amountHKD / selectedParticipants.length;
 
-            const expense = {
-                mealType, restaurant, eventName: groupEventName, currency, amount, amountHKD,
+            const newExpense = {
+                id: editingExpenseIndex > -1 ? appData.expenses[editingExpenseIndex].id : Date.now(),
+                mealType, restaurant, currency, amount, amountHKD,
                 participants: selectedParticipants, perPerson, payer: selectedPayer,
                 timestamp: new Date().toISOString()
             };
-            expenses.push(expense);
-            localStorage.setItem('expenses', JSON.stringify(expenses));
-            updateSummary();
-            updateMealRecords();
-            updateDebtSettlement();
+
+            if (editingExpenseIndex > -1) {
+                appData.expenses[editingExpenseIndex] = newExpense;
+                showError('Expense updated successfully! ✨', 3000, 'success');
+            } else {
+                appData.expenses.push(newExpense);
+                showError('Expense added successfully! 🎉', 3000, 'success');
+            }
+            editingExpenseIndex = -1;
+            addExpenseBtn.innerHTML = '<span class="text-lg">🎉</span>Add Expense';
+            addExpenseBtn.classList.remove('bg-amber-500', 'hover:bg-amber-600', 'active:bg-amber-700');
+            addExpenseBtn.classList.add('bg-sky-500', 'hover:bg-sky-600', 'active:bg-sky-700');
+            
+            saveDataToFirebase();
             clearForm();
-            showError('Expense added successfully! 🎉', 3000, 'success');
             showPage('page-summary');
         });
 
         resetBtn.addEventListener('click', () => {
-            showConfirmation('Are you sure you want to reset ALL data? This includes participants, event name, and all expenses. This action cannot be undone.', () => {
-                expenses = [];
-                participants = ['Perry Y', 'Irene K', 'Mandy M', 'Michelle I'];
-                groupEventName = '';
-                localStorage.setItem('participants', JSON.stringify(participants));
-                localStorage.setItem('expenses', JSON.stringify(expenses));
-                localStorage.removeItem('groupEventName');
-                groupEventNameInput.value = '';
-                updateFormTitle();
-                updateParticipantList();
-                updateSummary();
-                updateMealRecords();
-                updateDebtSettlement();
+            showConfirmation('Are you sure you want to reset ALL data?', () => {
+                appData = {
+                    groupEventName: 'My Event',
+                    participants: ['Perry Y', 'Irene K', 'Mandy M', 'Michelle I'],
+                    expenses: [],
+                    adjustments: []
+                };
+                saveDataToFirebase();
                 clearForm();
-                showError('All data has been reset. Ready for a fresh start! 🚀', 3000, 'success');
+                showError('All data has been reset. 🚀', 3000, 'success');
                 showPage('page-participants');
             });
         });
@@ -610,84 +783,6 @@
             copyToClipboard(whatsappText);
         });
 
-        let errorTimeout;
-        function showError(message, duration = 3000, type = 'error') {
-            if (!errorMsgElement) return;
-            clearTimeout(errorTimeout);
-            errorMsgElement.textContent = message;
-            errorMsgElement.classList.remove('opacity-0');
-
-            errorMsgElement.classList.remove('bg-red-100', 'text-red-700', 'border-red-300', 'bg-green-100', 'text-green-700', 'border-green-300');
-            if (type === 'success') {
-                errorMsgElement.classList.add('bg-green-100', 'text-green-700', 'border-green-300');
-            } else {
-                errorMsgElement.classList.add('bg-red-100', 'text-red-700', 'border-red-300');
-            }
-
-            errorTimeout = setTimeout(() => {
-                errorMsgElement.classList.add('opacity-0');
-            }, duration);
-        }
-
-        function showConfirmation(message, onConfirm) {
-            const modalId = 'confirmation-modal';
-            let modal = document.getElementById(modalId);
-
-            if (!modal) {
-                modal = document.createElement('div');
-                modal.id = modalId;
-                modal.className = 'fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[200] p-4';
-                modal.innerHTML = `
-                    <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full space-y-4">
-                        <p class="text-lg font-semibold text-slate-800" id="confirmation-message"></p>
-                        <div class="flex justify-end gap-3">
-                            <button id="cancel-btn" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 font-medium transition-colors">Cancel</button>
-                            <button id="confirm-btn" class="px-4 py-2 bg-rose-500 text-white rounded-md hover:bg-rose-600 font-medium transition-colors">Confirm</button>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(modal);
-            }
-
-            document.getElementById('confirmation-message').textContent = message;
-            modal.classList.remove('hidden');
-
-            const confirmBtn = document.getElementById('confirm-btn');
-            const cancelBtn = document.getElementById('cancel-btn');
-
-            const cleanup = () => {
-                confirmBtn.onclick = null;
-                cancelBtn.onclick = null;
-                modal.classList.add('hidden');
-            };
-
-            confirmBtn.onclick = () => {
-                onConfirm();
-                cleanup();
-            };
-
-            cancelBtn.onclick = () => {
-                cleanup();
-            };
-        }
-
-
-        function clearForm() {
-            document.getElementById('meal-type').value = '';
-            document.getElementById('restaurant').value = '';
-            document.getElementById('currency').value = '';
-            document.getElementById('amount').value = '';
-            document.querySelectorAll('#combined-participants-payer .participant:checked').forEach(cb => cb.checked = false);
-            const payerRadio = document.querySelector('#combined-participants-payer .payer:checked');
-            if(payerRadio) payerRadio.checked = false;
-            if (selectAllParticipantsCheckbox) {
-                selectAllParticipantsCheckbox.checked = false; // Uncheck "All" checkbox
-            }
-
-            mealButtons.forEach(b => b.classList.remove('active'));
-            currencyButtons.forEach(b => b.classList.remove('active'));
-        }
-
         function updateSummary() {
             const summaryTableBody = document.getElementById('summary-table');
             if(!summaryTableBody) return;
@@ -695,12 +790,12 @@
             const totals = {};
             const details = {};
 
-            participants.forEach(person => {
+            appData.participants.forEach(person => {
                 totals[person] = 0;
                 details[person] = [];
             });
 
-            expenses.forEach(exp => {
+            appData.expenses.forEach(exp => {
                 exp.participants.forEach(person => {
                     const perPersonHKD = exp.perPerson;
                     totals[person] += perPersonHKD;
@@ -708,84 +803,113 @@
                 });
             });
 
-            if (participants.length === 0) {
+            if (appData.participants.length === 0) {
                 const row = summaryTableBody.insertRow();
-                const cell = row.insertCell();
-                cell.colSpan = 3;
-                cell.className = 'py-4 px-4 text-center text-slate-500';
-                cell.textContent = 'No participants added yet.';
+                row.innerHTML = `<td colspan="3" class="py-4 px-2 md:px-4 text-center text-slate-500">No participants added yet.</td>`;
                 return;
             }
 
-
-            participants.forEach(person => {
+            appData.participants.forEach(person => {
                 const row = summaryTableBody.insertRow();
                 row.innerHTML = `
-                    <td class="py-3 px-4 border-b border-slate-200 text-slate-700 font-medium">${person}</td>
-                    <td class="py-3 px-4 border-b border-slate-200 text-slate-700">${totals[person].toFixed(2)} HKD</td>
-                    <td class="py-3 px-4 border-b border-slate-200 text-slate-700 space-y-1">${details[person].join('') || '<span class="text-slate-400">No expenses</span>'}</td>
+                    <td class="py-3 px-2 md:px-4 text-slate-700 font-medium whitespace-normal">${person}</td>
+                    <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${totals[person].toFixed(2)} HKD</td>
+                    <td class="py-3 px-2 md:px-4 text-slate-700 space-y-1 whitespace-normal">${details[person].join('') || '<span class="text-slate-400">No expenses</span>'}</td>
                 `;
             });
         }
-
+        
         function updateMealRecords() {
             const totalSpentElement = document.getElementById('total-spent');
             const mealRecordsContainer = document.getElementById('meal-records');
             if(!totalSpentElement || !mealRecordsContainer) return;
 
             mealRecordsContainer.innerHTML = '';
-            const total = expenses.reduce((sum, exp) => sum + exp.amountHKD, 0);
-            const count = expenses.length;
+            const total = appData.expenses.reduce((sum, exp) => sum + exp.amountHKD, 0);
+            const count = appData.expenses.length;
             totalSpentElement.textContent = `Total Spent: HKD ${total.toFixed(2)} | ${count} transaction${count !== 1 ? 's' : ''}`;
 
-            if (expenses.length === 0) {
+            if (appData.expenses.length === 0) {
                 mealRecordsContainer.innerHTML = '<p class="text-slate-500 text-center py-4">No meal records yet. Add an expense! 🍽️</p>';
                 return;
             }
-            // Sort expenses by timestamp, newest first
-            const sortedExpenses = [...expenses].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            const sortedExpenses = [...appData.expenses].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
             sortedExpenses.forEach((exp) => {
                 const div = document.createElement('div');
                 div.className = 'relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-xs text-slate-600 leading-relaxed hover:shadow-md transition-shadow';
                 const timestamp = formatTimestamp(exp.timestamp);
-                // Assign data-timestamp to the delete button to correctly identify the expense
                 div.innerHTML = `
-                    <button class="delete-meal-record absolute top-2 right-2 bg-rose-100 text-rose-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-rose-200 transition-colors" data-timestamp="${exp.timestamp}" aria-label="Delete meal record">✖</button>
-                    <div class="flex justify-between items-start mb-1 pr-8"> <span class="font-semibold text-slate-800 text-sm">${exp.mealType} @ ${exp.restaurant}</span>
+                    <div class="absolute top-2 right-2 flex gap-1">
+                        <button class="edit-meal-record bg-sky-100 text-sky-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-sky-200" data-id="${exp.id}" aria-label="Edit meal record">✏️</button>
+                        <button class="delete-meal-record bg-rose-100 text-rose-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-rose-200" data-id="${exp.id}" aria-label="Delete meal record">✖</button>
+                    </div>
+                    <div class="flex justify-between items-start mb-1 pr-14">
+                        <span class="font-semibold text-slate-800 text-sm">${exp.mealType} @ ${exp.restaurant}</span>
                         <span class="text-sky-600 font-bold text-sm">${exp.currency} ${exp.amount.toFixed(2)}</span>
                     </div>
                     <div class="text-xs">Paid by: <strong class="text-slate-700">${exp.payer}</strong></div>
                     <div class="text-xs">Shared with: <em class="text-slate-500">${exp.participants.join(', ')}</em></div>
-                    <div class="text-right text-slate-400 text-[10px] mt-1.5">${timestamp}</div>
-                `;
+                    <div class="text-right text-slate-400 text-[10px] mt-1.5">${timestamp}</div>`;
                 mealRecordsContainer.appendChild(div);
+            });
+
+            document.querySelectorAll('.edit-meal-record').forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    const expenseId = Number(event.currentTarget.dataset.id);
+                    const indexToEdit = appData.expenses.findIndex(exp => exp.id === expenseId);
+                    if (indexToEdit > -1) editExpense(indexToEdit);
+                });
             });
 
             document.querySelectorAll('.delete-meal-record').forEach(btn => {
                 btn.addEventListener('click', (event) => {
-                    // Get the timestamp from the clicked button's data attribute
-                    const timestampToDelete = event.target.dataset.timestamp;
-                    // Find the actual index of the expense in the original 'expenses' array using its timestamp
-                    const originalIndex = expenses.findIndex(exp => exp.timestamp === timestampToDelete);
-
-                    if (originalIndex > -1) {
-                        showConfirmation(`Are you sure you want to delete this expense: "${expenses[originalIndex].mealType} @ ${expenses[originalIndex].restaurant}"? This action cannot be undone.`, () => {
-                            expenses.splice(originalIndex, 1); // Use the found original index to delete
-                            localStorage.setItem('expenses', JSON.stringify(expenses));
-                            updateSummary();
-                            updateMealRecords();
-                            updateDebtSettlement();
+                    const expenseId = Number(event.currentTarget.dataset.id);
+                    const expenseToDelete = appData.expenses.find(exp => exp.id === expenseId);
+                    
+                    if (expenseToDelete) {
+                        const confirmationMessage = `Are you sure you want to delete the '${expenseToDelete.mealType} @ ${expenseToDelete.restaurant}' expense?`;
+                        showConfirmation(confirmationMessage, () => {
+                            appData.expenses = appData.expenses.filter(exp => exp.id !== expenseId);
+                            saveDataToFirebase();
                             showError('Expense deleted successfully!', 3000, 'success');
                         });
-                    } else {
-                        // This case should ideally not be hit if timestamps are unique and consistent
-                        showError('Error: Expense not found for deletion.', 3000, 'error');
                     }
                 });
             });
         }
+        
+        function editExpense(index) {
+            const expense = appData.expenses[index];
+            if (!expense) return;
+            editingExpenseIndex = index;
 
+            document.getElementById('meal-type').value = expense.mealType;
+            mealButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.meal === expense.mealType));
+            document.getElementById('restaurant').value = expense.restaurant;
+            document.getElementById('currency').value = expense.currency;
+            currencyButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.currency === expense.currency));
+            document.getElementById('amount').value = expense.amount;
+            
+            document.querySelectorAll('#combined-participants-payer .participant').forEach(cb => cb.checked = false);
+            document.querySelectorAll('#combined-participants-payer .payer').forEach(radio => radio.checked = false);
+            if (selectAllParticipantsCheckbox) selectAllParticipantsCheckbox.checked = false;
+
+            expense.participants.forEach(p => {
+                const checkbox = document.querySelector(`#combined-participants-payer .participant[value="${p}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+            const payerRadio = document.querySelector(`#combined-participants-payer .payer[value="${expense.payer}"]`);
+            if (payerRadio) payerRadio.checked = true;
+
+            addExpenseBtn.innerHTML = '💾 Update Expense';
+            addExpenseBtn.classList.remove('bg-sky-500', 'hover:bg-sky-600', 'active:bg-sky-700');
+            addExpenseBtn.classList.add('bg-amber-500', 'hover:bg-amber-600', 'active:bg-amber-700');
+
+            showPage('page-expense');
+            window.scrollTo(0, 0);
+        }
+        
         function updateDebtSettlement() {
             const debtTableBody = document.getElementById('debt-table');
             const settlementPlanDiv = document.getElementById('settlement-plan');
@@ -795,46 +919,46 @@
             settlementPlanDiv.innerHTML = '';
 
             const balances = {};
-            participants.forEach(person => {
+            appData.participants.forEach(person => {
                 balances[person] = { paid: 0, owed: 0, net: 0 };
             });
 
-            expenses.forEach(exp => {
-                balances[exp.payer].paid += exp.amountHKD;
+            appData.expenses.forEach(exp => {
+                if (balances[exp.payer]) balances[exp.payer].paid += exp.amountHKD;
                 exp.participants.forEach(person => {
-                    balances[person].owed += exp.perPerson;
+                    if(balances[person]) balances[person].owed += exp.perPerson;
                 });
             });
 
-            participants.forEach(person => {
+            appData.participants.forEach(person => {
                 balances[person].net = balances[person].paid - balances[person].owed;
             });
 
-            if (participants.length === 0) {
-                const row = debtTableBody.insertRow();
-                const cell = row.insertCell();
-                cell.colSpan = 4;
-                cell.className = 'py-4 px-4 text-center text-slate-500';
-                cell.textContent = 'No participants added yet.';
-                settlementPlanDiv.innerHTML = '<p class="text-slate-500 text-center py-2">Add participants and expenses to see settlements.</p>';
+            appData.adjustments.forEach(adj => {
+                if (balances[adj.debtor]) balances[adj.debtor].net -= adj.amount;
+                if (balances[adj.creditor]) balances[adj.creditor].net += adj.amount;
+            });
+
+            if (appData.participants.length === 0) {
+                 debtTableBody.innerHTML = `<tr><td colspan="4" class="py-4 px-2 md:px-4 text-center text-slate-500">No participants yet.</td></tr>`;
+                 settlementPlanDiv.innerHTML = '<p class="text-slate-500 text-center py-2">Add participants and expenses to see settlements.</p>';
                 return;
             }
 
-
-            participants.forEach(person => {
+            appData.participants.forEach(person => {
                 const net = balances[person].net;
                 const colorClass = net < -0.005 ? 'text-red-600 font-semibold' : net > 0.005 ? 'text-green-600 font-semibold' : 'text-slate-700';
                 const row = debtTableBody.insertRow();
                 row.innerHTML = `
-                    <td class="py-3 px-4 border-b border-slate-200 text-slate-700 font-medium">${person}</td>
-                    <td class="py-3 px-4 border-b border-slate-200 text-slate-700">${balances[person].paid.toFixed(2)} HKD</td>
-                    <td class="py-3 px-4 border-b border-slate-200 text-slate-700">${balances[person].owed.toFixed(2)} HKD</td>
-                    <td class="py-3 px-4 border-b border-slate-200 ${colorClass}">${net.toFixed(2)} HKD</td>
+                    <td class="py-3 px-2 md:px-4 text-slate-700 font-medium whitespace-normal">${person}</td>
+                    <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${balances[person].paid.toFixed(2)} HKD</td>
+                    <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${balances[person].owed.toFixed(2)} HKD</td>
+                    <td class="py-3 px-2 md:px-4 whitespace-nowrap ${colorClass}">${net.toFixed(2)} HKD</td>
                 `;
             });
 
-            const debtors = participants.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
-            const creditors = participants.filter(p => balances[p].net > 0.005).map(p => ({ name: p, amount: balances[p].net }));
+            const debtors = appData.participants.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
+            const creditors = appData.participants.filter(p => balances[p].net > 0.005).map(p => ({ name: p, amount: balances[p].net }));
             const settlements = [];
 
             let i = 0, j = 0;
@@ -850,7 +974,7 @@
             }
 
             if (settlements.length === 0) {
-                settlementPlanDiv.innerHTML = '<p class="text-green-600 font-medium text-center py-2">🎉 All debts are settled (or no debts to settle)!</p>';
+                settlementPlanDiv.innerHTML = '<p class="text-green-600 font-medium text-center py-2">🎉 All debts are settled!</p>';
             } else {
                 const ul = document.createElement('ul');
                 ul.className = 'space-y-2';
@@ -863,111 +987,237 @@
                 settlementPlanDiv.appendChild(ul);
             }
         }
+        
+        function updateAdjustmentsDisplay() {
+            const container = document.getElementById('current-adjustments');
+            if (!container || !adjustmentDebtorSelect || !adjustmentCreditorSelect) return;
 
-        function generateWhatsAppMessage() {
-            let message = `*💰 ${groupEventName || 'Group Event'} Spending Recap* \n\n`;
+            container.innerHTML = '';
+            adjustmentDebtorSelect.innerHTML = '<option value="">Select Payer</option>';
+            adjustmentCreditorSelect.innerHTML = '<option value="">Select Receiver</option>';
 
-            message += `*📊 Expense Summary (HKD)*\n`;
-            if (participants.length === 0) {
-                message += `_No participants added yet._\n\n`;
-            } else {
-                const totals = {};
-                participants.forEach(person => totals[person] = 0);
-                expenses.forEach(exp => {
-                    exp.participants.forEach(person => {
-                        totals[person] += exp.perPerson;
-                    });
-                });
+            appData.participants.forEach(p => {
+                adjustmentDebtorSelect.add(new Option(p, p));
+                adjustmentCreditorSelect.add(new Option(p, p));
+            });
 
-                participants.forEach(person => {
-                    message += `• *${person}*: Owed HKD ${totals[person].toFixed(2)}\n`;
-                });
-                message += `\n`;
+            filterCreditorDropdown();
+
+            if (appData.adjustments.length === 0) {
+                container.innerHTML = '<p class="text-slate-500 text-center py-2">No individual adjustments yet.</p>';
+                return;
             }
 
-            message += `*🧾 Meal Records*\n`;
-            if (expenses.length === 0) {
-                message += `_No meal records yet._\n\n`;
+            appData.adjustments.forEach((adj, index) => {
+                const adjDiv = document.createElement('div');
+                adjDiv.className = 'relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-xs flex justify-between items-center';
+                adjDiv.innerHTML = `
+                    <span><strong class="text-rose-600">${adj.debtor}</strong> pays <strong class="text-emerald-600">${adj.creditor}</strong> <strong class="text-sky-700">${adj.amount.toFixed(2)} HKD</strong></span>
+                    <button class="delete-adjustment-btn bg-rose-100 text-rose-600 rounded-full w-6 h-6 flex items-center justify-center font-bold hover:bg-rose-200" data-index="${index}">✖</button>
+                `;
+                container.appendChild(adjDiv);
+            });
+
+            document.querySelectorAll('.delete-adjustment-btn').forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    const indexToDelete = parseInt(event.currentTarget.dataset.index);
+                    const adjToDelete = appData.adjustments[indexToDelete];
+                    if (adjToDelete) {
+                        const confirmationMessage = `Are you sure you want to remove the '${adjToDelete.debtor} pays ${adjToDelete.creditor}' adjustment?`;
+                        showConfirmation(confirmationMessage, () => {
+                            appData.adjustments.splice(indexToDelete, 1);
+                            saveDataToFirebase();
+                            showError('Adjustment removed.', 3000, 'success');
+                        });
+                    }
+                });
+            });
+        }
+        
+        document.getElementById('add-adjustment-btn').addEventListener('click', () => {
+            const debtor = adjustmentDebtorSelect.value;
+            const creditor = adjustmentCreditorSelect.value;
+            const amount = parseFloat(document.getElementById('adjustment-amount').value);
+
+            if (!debtor || !creditor || isNaN(amount) || amount <= 0) {
+                showError('Please select payer, receiver, and a valid amount.'); return;
+            }
+            if (debtor === creditor) {
+                showError('Payer and Receiver cannot be the same person.'); return;
+            }
+
+            appData.adjustments.push({ debtor, creditor, amount });
+            saveDataToFirebase();
+            
+            document.getElementById('adjustment-amount').value = '';
+            adjustmentDebtorSelect.value = '';
+            adjustmentCreditorSelect.value = '';
+            filterCreditorDropdown();
+            showError('Adjustment added successfully!', 3000, 'success');
+        });
+        
+        function filterCreditorDropdown() {
+            const selectedDebtor = adjustmentDebtorSelect.value;
+            const currentCreditor = adjustmentCreditorSelect.value;
+            let creditorIsValid = false;
+
+            Array.from(adjustmentCreditorSelect.options).forEach(option => {
+                option.style.display = (option.value === selectedDebtor && selectedDebtor !== "") ? 'none' : '';
+                if (option.value === currentCreditor && option.style.display !== 'none') {
+                    creditorIsValid = true;
+                }
+            });
+
+            if (!creditorIsValid) adjustmentCreditorSelect.value = "";
+        }
+        
+        adjustmentDebtorSelect.addEventListener('change', filterCreditorDropdown);
+
+        function generateWhatsAppMessage() {
+            let message = `*💰 ${appData.groupEventName || 'Group Event'} Recap* \n\n`;
+
+            const balances = {};
+            appData.participants.forEach(person => {
+                balances[person] = { paid: 0, owed: 0, net: 0 };
+            });
+            appData.expenses.forEach(exp => {
+                if (balances[exp.payer]) balances[exp.payer].paid += exp.amountHKD;
+                exp.participants.forEach(person => {
+                    if(balances[person]) balances[person].owed += exp.perPerson;
+                });
+            });
+            appData.participants.forEach(person => {
+                balances[person].net = balances[person].paid - balances[person].owed;
+            });
+            appData.adjustments.forEach(adj => {
+                if (balances[adj.debtor]) balances[adj.debtor].net -= adj.amount;
+                if (balances[adj.creditor]) balances[adj.creditor].net += adj.amount;
+            });
+
+            message += `*📊 Net Balance Summary (HKD)*\n`;
+            if (appData.participants.length > 0) {
+                appData.participants.forEach(person => {
+                    const netBalance = balances[person].net;
+                    // FIX: Changed terminology to pays/receives
+                    if (netBalance < -0.005) {
+                        message += `• *${person}* pays HKD ${(-netBalance).toFixed(2)}\n`;
+                    } else if (netBalance > 0.005) {
+                        message += `• *${person}* receives HKD ${netBalance.toFixed(2)}\n`;
+                    }
+                });
             } else {
-                const total = expenses.reduce((sum, exp) => sum + exp.amountHKD, 0);
-                message += `_Total Spent: HKD ${total.toFixed(2)} | ${expenses.length} transaction${expenses.length !== 1 ? 's' : ''}_\n\n`;
-                const sortedExpenses = [...expenses].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-                sortedExpenses.forEach((exp, index) => { // Added index here
+                message += `_No participants added yet._\n`;
+            }
+            message += `\n`;
+
+            message += `*🧾 Meal Records*\n`;
+            if (appData.expenses.length > 0) {
+                const total = appData.expenses.reduce((sum, exp) => sum + exp.amountHKD, 0);
+                message += `_Total Spent: HKD ${total.toFixed(2)} | ${appData.expenses.length} transaction${appData.expenses.length !== 1 ? 's' : ''}_\n\n`;
+                
+                [...appData.expenses].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+                    .forEach((exp, index, arr) => {
                     message += `• _${exp.mealType} @ ${exp.restaurant}_: *${exp.currency} ${exp.amount.toFixed(2)}*\n`;
                     message += `  Paid by: *${exp.payer}*\n`;
                     message += `  Shared with: _${exp.participants.join(', ')}_\n`;
-                    // Add the separator line after each record, except the last one
-                    if (index < sortedExpenses.length - 1) {
+                    if (index < arr.length - 1) {
                         message += `--------------------------------------\n`;
                     }
                 });
-                message += `\n`;
+            } else {
+                message += `_No meal records yet._\n`;
             }
+            message += `\n`;
 
             message += `*🤝 Debt Settlement*\n`;
-            const balances = {};
-            participants.forEach(person => {
-                balances[person] = { paid: 0, owed: 0, net: 0 };
-            });
-            expenses.forEach(exp => {
-                balances[exp.payer].paid += exp.amountHKD;
-                exp.participants.forEach(person => {
-                    balances[person].owed += exp.perPerson;
-                });
-            });
-            participants.forEach(person => {
-                balances[person].net = balances[person].paid - balances[person].owed;
-            });
-
-            const debtors = participants.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
-            const creditors = participants.filter(p => balances[p].net > 0.005).map(p => ({ name: p, amount: balances[p].net }));
-            const settlements = [];
-
-            let i = 0, j = 0;
-            while (i < debtors.length && j < creditors.length) {
-                const amountToSettle = Math.min(debtors[i].amount, creditors[j].amount);
-                if (amountToSettle > 0.005) {
-                    settlements.push(`• *${debtors[i].name}* pays *${creditors[j].name}* _HKD ${amountToSettle.toFixed(2)}_\n`);
-                    debtors[i].amount -= amountToSettle;
-                    creditors[j].amount -= amountToSettle;
-                }
-                if (debtors[i].amount < 0.005) i++;
-                if (creditors[j].amount < 0.005) j++;
-            }
-
-            if (settlements.length === 0) {
-                message += `_🎉 All debts are settled (or no debts to settle)!_\n`;
-            } else {
+            const settlementPlanNode = document.getElementById('settlement-plan');
+            if (settlementPlanNode && settlementPlanNode.textContent.includes("All debts are settled")) {
+                message += `_🎉 All debts are settled!_\n`;
+            } else if (settlementPlanNode) {
                 message += `_Settlement Plan:_\n`;
-                settlements.forEach(s => message += s);
+                settlementPlanNode.querySelectorAll('li').forEach(li => {
+                    message += `• ${li.textContent}\n`;
+                });
+            }
+            
+            if (appData.adjustments.length > 0) {
+                message += `\n*💱 Individual Adjustments:*\n`;
+                appData.adjustments.forEach(adj => {
+                    // FIX: Changed terminology to pays
+                    message += `• *${adj.debtor}* pays *${adj.creditor}* _HKD ${adj.amount.toFixed(2)}_\n`;
+                });
             }
 
             message += `\n_Generated by Bill Buddy_`;
             return message;
         }
 
+        // --- Utility Functions ---
+
+        let errorTimeout;
+        function showError(message, duration = 4000, type = 'error') {
+            if (!errorMsgElement) return;
+            clearTimeout(errorTimeout);
+            errorMsgElement.textContent = message;
+            errorMsgElement.classList.remove('opacity-0', 'bg-red-100', 'text-red-700', 'border-red-300', 'bg-green-100', 'text-green-700', 'border-green-300');
+            errorMsgElement.classList.add(type === 'success' ? 'bg-green-100' : 'bg-red-100', type === 'success' ? 'text-green-700' : 'text-red-700', type === 'success' ? 'border-green-300' : 'border-red-300');
+            errorTimeout = setTimeout(() => errorMsgElement.classList.add('opacity-0'), duration);
+        }
+
+        function showConfirmation(message, onConfirm) {
+            const modalId = 'confirmation-modal';
+            let modal = document.getElementById(modalId);
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = modalId;
+                modal.className = 'fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[200] p-4';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full space-y-4">
+                        <p class="text-lg font-semibold text-slate-800" id="confirmation-message"></p>
+                        <div class="flex justify-end gap-3">
+                            <button id="cancel-btn" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 font-medium">Cancel</button>
+                            <button id="confirm-btn" class="px-4 py-2 bg-rose-500 text-white rounded-md hover:bg-rose-600 font-medium">Confirm</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(modal);
+            }
+            document.getElementById('confirmation-message').textContent = message;
+            modal.classList.remove('hidden');
+            const confirmBtn = document.getElementById('confirm-btn');
+            const cancelBtn = document.getElementById('cancel-btn');
+            const cleanup = () => { modal.classList.add('hidden'); confirmBtn.onclick = null; cancelBtn.onclick = null; };
+            confirmBtn.onclick = () => { onConfirm(); cleanup(); };
+            cancelBtn.onclick = cleanup;
+        }
+
+        function clearForm() {
+            document.getElementById('meal-type').value = '';
+            document.getElementById('restaurant').value = '';
+            document.getElementById('currency').value = '';
+            document.getElementById('amount').value = '';
+            document.querySelectorAll('#combined-participants-payer .participant:checked').forEach(cb => cb.checked = false);
+            const payerRadio = document.querySelector('#combined-participants-payer .payer:checked');
+            if(payerRadio) payerRadio.checked = false;
+            if (selectAllParticipantsCheckbox) selectAllParticipantsCheckbox.checked = false;
+            mealButtons.forEach(b => b.classList.remove('active'));
+            currencyButtons.forEach(b => b.classList.remove('active'));
+        }
+
         function copyToClipboard(text) {
             const textarea = document.createElement('textarea');
             textarea.value = text;
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = 0;
+            textarea.style.position = 'fixed'; textarea.style.opacity = 0;
             document.body.appendChild(textarea);
-            textarea.focus();
-            textarea.select();
+            textarea.focus(); textarea.select();
             try {
                 document.execCommand('copy');
                 showError('Data copied to clipboard! Ready to paste into WhatsApp. 📋', 3000, 'success');
             } catch (err) {
-                console.error('Unable to copy to clipboard', err);
-                showError('Failed to copy data. Please try manually.', 3000, 'error');
+                showError('Failed to copy data.', 3000, 'error');
             }
             document.body.removeChild(textarea);
         }
 
-
-        // Initialize on load
-        fetchExchangeRates();
-        updateParticipantList();
     </script>
 </body>
 </html>
