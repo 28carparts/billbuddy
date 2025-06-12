@@ -121,6 +121,23 @@
                     <button id="done-participants" class="w-full bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-emerald-600 active:bg-emerald-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2">
                         <span class="text-lg">✅</span>Done & Proceed
                     </button>
+
+                    <!-- New Share Link Section -->
+                    <div id="share-link-section" class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200 text-slate-700 hidden">
+                        <p class="font-semibold text-sm mb-2 flex items-center gap-2">
+                            <span class="text-xl">🔗</span>Share this Trip:
+                        </p>
+                        <div class="flex items-center space-x-2">
+                            <a id="share-link" href="#" target="_blank" class="flex-grow text-sky-600 hover:underline text-sm truncate font-medium"></a>
+                            <button id="copy-share-link-btn" class="bg-blue-500 text-white font-medium py-1.5 px-3 rounded-md shadow hover:bg-blue-600 active:bg-blue-700 transform active:scale-95 transition-all duration-150 ease-in-out text-xs">
+                                Copy
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2">
+                            (Your friends need to log in to access this link.)
+                        </p>
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -376,6 +393,11 @@
         const adjustmentDebtorSelect = document.getElementById('adjustment-debtor');
         const adjustmentCreditorSelect = document.getElementById('adjustment-creditor');
 
+        // New Share Link DOM Elements
+        const shareLinkSection = document.getElementById('share-link-section');
+        const shareLink = document.getElementById('share-link');
+        const copyShareLinkBtn = document.getElementById('copy-share-link-btn');
+
 
         // --- Authentication Logic ---
 
@@ -424,6 +446,7 @@
                 // Reset app data and UI
                 appData = { tripId: null, groupEventName: '', participants: [], expenses: [], adjustments: [], owner: null };
                 clearAllUI();
+                updateShareLinkUI(); // Hide share link if no trip is active
             }
         });
         
@@ -515,6 +538,7 @@
                         saveDataToFirebase(); // Save initial data
                     }
                     updateAllUI();
+                    updateShareLinkUI(); // Update share link display after data is loaded
                 }, error => {
                     console.error("Firebase data listener error:", error);
                     showError(`Error loading data: ${error.message}`);
@@ -781,14 +805,16 @@
                     if (dataUnsubscribe) {
                         dbRef.off('value', dataUnsubscribe);
                     }
-                    listenForDataChanges();
+                    listenForDataChanges(); // This will trigger updateAllUI and updateShareLinkUI
 
                     // Update URL with the new tripId for sharing
                     const newUrl = new URL(window.location.href);
                     newUrl.searchParams.set('tripId', appData.tripId);
                     history.pushState({}, '', newUrl); // Change URL without reloading
 
-                    showError(`New shared trip created! Share this link: ${newUrl.href}`, 8000, 'success');
+                    // Copy the link to clipboard automatically
+                    copyToClipboard(newUrl.href);
+
                     showPage('page-expense');
                 }).catch(err => showError(`Failed to create shared trip: ${err.message}`));
 
@@ -800,58 +826,31 @@
             }
         });
 
-        addExpenseBtn.addEventListener('click', () => {
-            if (!appData.groupEventName) {
-                showError('Please set a group event name in Participants tab first.');
-                showPage('page-participants');
-                return;
-            }
-            const mealType = document.getElementById('meal-type').value;
-            const restaurant = document.getElementById('restaurant').value.trim();
-            const currency = document.getElementById('currency').value;
-            const amount = parseFloat(document.getElementById('amount').value);
-            const selectedParticipants = Array.from(document.querySelectorAll('#combined-participants-payer .participant:checked')).map(cb => cb.value);
-            const selectedPayerRadio = document.querySelector('#combined-participants-payer .payer:checked');
-            const selectedPayer = selectedPayerRadio ? selectedPayerRadio.value : null;
-
-            if (!mealType) { showError('Please select a meal type.'); return; }
-            if (!restaurant) { showError('Please enter a place or item name.'); return; }
-            if (!currency) { showError('Please select a currency.'); return; }
-            if (isNaN(amount) || amount <= 0) { showError('Please enter a valid amount.'); return; }
-            if (selectedParticipants.length === 0) { showError('Please select at least one participant.'); return; }
-            if (!selectedPayer) { showError('Please select who paid.'); return; }
-            if (!selectedParticipants.includes(selectedPayer)) {
-                showError('The payer must be one of the selected participants.'); return;
-            }
-            // Note: The conversion rate here is incorrect in the original file. The formula should be `amount / rate_from_HKD`.
-            // However, since the API gives rates *from* HKD (e.g., 1 HKD = 0.12 USD), multiplying is correct.
-            const amountHKD = amount / (exchangeRates[currency] || 1); 
-
-            const perPerson = amountHKD / selectedParticipants.length;
-
-            const newExpense = {
-                id: editingExpenseIndex > -1 ? appData.expenses[editingExpenseIndex].id : Date.now(),
-                mealType, restaurant, currency, amount, amountHKD,
-                participants: selectedParticipants, perPerson, payer: selectedPayer,
-                timestamp: new Date().toISOString()
-            };
-
-            if (editingExpenseIndex > -1) {
-                appData.expenses[editingExpenseIndex] = newExpense;
-                showError('Expense updated successfully! ✨', 3000, 'success');
+        // Event listener for the new "Copy" button next to the share link
+        copyShareLinkBtn.addEventListener('click', () => {
+            if (shareLink && shareLink.href) {
+                copyToClipboard(shareLink.href);
             } else {
-                appData.expenses.push(newExpense);
-                showError('Expense added successfully! 🎉', 3000, 'success');
+                showError('No share link available to copy.', 3000);
             }
-            editingExpenseIndex = -1;
-            addExpenseBtn.innerHTML = '<span class="text-lg">🎉</span>Add Expense';
-            addExpenseBtn.classList.remove('bg-amber-500', 'hover:bg-amber-600', 'active:bg-amber-700');
-            addExpenseBtn.classList.add('bg-sky-500', 'hover:bg-sky-600', 'active:bg-sky-700');
-            
-            saveDataToFirebase();
-            clearForm();
-            showPage('page-summary');
         });
+
+        // Function to update the visibility and content of the share link section
+        function updateShareLinkUI() {
+            if (appData.tripId && shareLinkSection && shareLink) {
+                const currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('tripId', appData.tripId);
+                const shareableLink = currentUrl.href;
+
+                shareLink.href = shareableLink;
+                shareLink.textContent = shareableLink;
+                shareLinkSection.classList.remove('hidden');
+            } else if (shareLinkSection) {
+                shareLinkSection.classList.add('hidden');
+                shareLink.href = '#';
+                shareLink.textContent = '';
+            }
+        }
 
         resetBtn.addEventListener('click', () => {
             showConfirmation('Are you sure you want to reset ALL data?', () => {
@@ -874,6 +873,12 @@
                     owner: appData.owner // Preserve owner if available
                 }).then(() => {
                     showError('All data has been reset. 🚀', 3000, 'success');
+                    // After reset, if it was a shared trip, clear the tripId and hide the link
+                    if (appData.tripId) {
+                        appData.tripId = null;
+                        history.pushState({}, '', window.location.origin + window.location.pathname); // Remove tripId from URL
+                        updateShareLinkUI(); // Hide the share link section
+                    }
                     showPage('page-participants');
                 }).catch(err => {
                     showError(`Failed to reset data: ${err.message}`);
@@ -1361,7 +1366,7 @@
             textarea.focus(); textarea.select();
             try {
                 document.execCommand('copy');
-                showError('Data copied to clipboard! Ready to paste into WhatsApp. 📋', 3000, 'success');
+                showError('Link copied to clipboard! Ready to paste. 📋', 3000, 'success'); // Updated message
             } catch (err) {
                 showError('Failed to copy data.', 3000, 'error');
             }
