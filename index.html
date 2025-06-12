@@ -252,9 +252,21 @@
                                 <option value="">Select Receiver</option>
                             </select>
                         </div>
+                        <!-- MODIFIED: Added currency dropdown and updated amount section -->
                         <div>
-                            <label for="adjustment-amount" class="block text-sm font-semibold text-slate-600 mb-1.5">Amount (HKD)</label>
-                            <input type="number" id="adjustment-amount" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., 50.00" min="0" step="0.01">
+                            <label for="adjustment-amount" class="block text-sm font-semibold text-slate-600 mb-1.5">Amount</label>
+                            <div class="flex gap-2">
+                                <select id="adjustment-currency" class="p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white shrink-0">
+                                    <option value="HKD">🇭🇰 HKD</option>
+                                    <option value="CNY">🇨🇳 CNY</option>
+                                    <option value="JPY">🇯🇵 JPY</option>
+                                    <option value="USD">🇺🇸 USD</option>
+                                    <option value="EUR">🇪🇺 EUR</option>
+                                    <option value="GBP">🇬🇧 GBP</option>
+                                    <option value="KRW">🇰🇷 KRW</option>
+                                </select>
+                                <input type="number" id="adjustment-amount" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., 50.00" min="0" step="0.01">
+                            </div>
                         </div>
                         <button id="add-adjustment-btn" class="w-full bg-indigo-500 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-indigo-600 active:bg-indigo-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2">
                             <span class="text-lg">➕</span>Add Adjustment
@@ -512,15 +524,16 @@
                 if (!response.ok) throw new Error(`API request failed: ${response.status}`);
                 const data = await response.json();
                 if (data.result === 'success' && data.conversion_rates) {
+                    // API gives rates FROM base currency (HKD), so we need to use them as multipliers
                     const apiRates = data.conversion_rates;
                      exchangeRates = {
-                        HKD: 1,
-                        CNY: (apiRates.CNY ? 1 / apiRates.CNY : fallbackRates.CNY),
-                        JPY: (apiRates.JPY ? 1 / apiRates.JPY : fallbackRates.JPY),
-                        USD: (apiRates.USD ? 1 / apiRates.USD : fallbackRates.USD),
-                        EUR: (apiRates.EUR ? 1 / apiRates.EUR : fallbackRates.EUR),
-                        GBP: (apiRates.GBP ? 1 / apiRates.GBP : fallbackRates.GBP),
-                        KRW: (apiRates.KRW ? 1 / apiRates.KRW : fallbackRates.KRW)
+                        HKD: apiRates.HKD || 1, // Should be 1
+                        CNY: apiRates.CNY || fallbackRates.CNY,
+                        JPY: apiRates.JPY || fallbackRates.JPY,
+                        USD: apiRates.USD || fallbackRates.USD,
+                        EUR: apiRates.EUR || fallbackRates.EUR,
+                        GBP: apiRates.GBP || fallbackRates.GBP,
+                        KRW: apiRates.KRW || fallbackRates.KRW
                     };
                 } else {
                      throw new Error(data['error-type'] || 'API request was not successful');
@@ -734,8 +747,10 @@
             if (!selectedParticipants.includes(selectedPayer)) {
                 showError('The payer must be one of the selected participants.'); return;
             }
+            // Note: The conversion rate here is incorrect in the original file. The formula should be `amount / rate_from_HKD`.
+            // However, since the API gives rates *from* HKD (e.g., 1 HKD = 0.12 USD), multiplying is correct.
+            const amountHKD = amount / (exchangeRates[currency] || 1); 
 
-            const amountHKD = amount * (exchangeRates[currency] || 1);
             const perPerson = amountHKD / selectedParticipants.length;
 
             const newExpense = {
@@ -1009,10 +1024,18 @@
 
             appData.adjustments.forEach((adj, index) => {
                 const adjDiv = document.createElement('div');
-                adjDiv.className = 'relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-xs flex justify-between items-center';
+                adjDiv.className = 'relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-sm flex justify-between items-center';
+                
+                // MODIFIED: Display original currency and amount if available, otherwise fallback to old format
+                const displayAmount = adj.originalCurrency && adj.originalAmount !== undefined
+                    ? `<strong class="text-sky-700">${adj.originalCurrency} ${adj.originalAmount.toFixed(2)}</strong> <span class="text-slate-500 text-xs">(~${adj.amount.toFixed(2)} HKD)</span>`
+                    : `<strong class="text-sky-700">${adj.amount.toFixed(2)} HKD</strong>`;
+
                 adjDiv.innerHTML = `
-                    <span><strong class="text-rose-600">${adj.debtor}</strong> pays <strong class="text-emerald-600">${adj.creditor}</strong> <strong class="text-sky-700">${adj.amount.toFixed(2)} HKD</strong></span>
-                    <button class="delete-adjustment-btn bg-rose-100 text-rose-600 rounded-full w-6 h-6 flex items-center justify-center font-bold hover:bg-rose-200" data-index="${index}">✖</button>
+                    <span class="flex-grow flex flex-wrap items-center gap-x-2">
+                        <strong class="text-rose-600">${adj.debtor}</strong> pays <strong class="text-emerald-600">${adj.creditor}</strong> ${displayAmount}
+                    </span>
+                    <button class="delete-adjustment-btn bg-rose-100 text-rose-600 rounded-full w-6 h-6 flex items-center justify-center font-bold hover:bg-rose-200 shrink-0 ml-2" data-index="${index}">✖</button>
                 `;
                 container.appendChild(adjDiv);
             });
@@ -1033,22 +1056,28 @@
             });
         }
         
+        // MODIFIED: Added logic to handle currency conversion for adjustments
         document.getElementById('add-adjustment-btn').addEventListener('click', () => {
             const debtor = adjustmentDebtorSelect.value;
             const creditor = adjustmentCreditorSelect.value;
+            const currency = document.getElementById('adjustment-currency').value;
             const amount = parseFloat(document.getElementById('adjustment-amount').value);
 
-            if (!debtor || !creditor || isNaN(amount) || amount <= 0) {
-                showError('Please select payer, receiver, and a valid amount.'); return;
+            if (!debtor || !creditor || !currency || isNaN(amount) || amount <= 0) {
+                showError('Please select payer, receiver, currency, and a valid amount.'); return;
             }
             if (debtor === creditor) {
                 showError('Payer and Receiver cannot be the same person.'); return;
             }
+            
+            // Note: API gives rates FROM HKD (1 HKD = X other currency). So to convert FOREIGN to HKD, we DIVIDE.
+            const amountHKD = amount / (exchangeRates[currency] || 1);
 
-            appData.adjustments.push({ debtor, creditor, amount });
+            appData.adjustments.push({ debtor, creditor, amount: amountHKD, originalAmount: amount, originalCurrency: currency });
             saveDataToFirebase();
             
             document.getElementById('adjustment-amount').value = '';
+            document.getElementById('adjustment-currency').value = 'HKD';
             adjustmentDebtorSelect.value = '';
             adjustmentCreditorSelect.value = '';
             filterCreditorDropdown();
@@ -1129,7 +1158,6 @@
 
             message += `*🤝 Debt Settlement*\n`;
             
-            // FIX: Re-calculate settlements for WhatsApp with bold formatting
             const debtors = appData.participants.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
             const creditors = appData.participants.filter(p => balances[p].net > 0.005).map(p => ({ name: p, amount: balances[p].net }));
             const settlements = [];
@@ -1156,7 +1184,11 @@
             if (appData.adjustments.length > 0) {
                 message += `\n*💱 Individual Adjustments:*\n`;
                 appData.adjustments.forEach(adj => {
-                    message += `• *${adj.debtor}* pays *${adj.creditor}* _HKD ${adj.amount.toFixed(2)}_\n`;
+                    // MODIFIED: Show original currency/amount in WhatsApp message
+                    const adjAmountStr = adj.originalCurrency && adj.originalAmount !== undefined
+                        ? `*${adj.originalCurrency} ${adj.originalAmount.toFixed(2)}* (~${adj.amount.toFixed(2)} HKD)`
+                        : `*HKD ${adj.amount.toFixed(2)}*`;
+                    message += `• *${adj.debtor}* pays *${adj.creditor}* ${adjAmountStr}\n`;
                 });
             }
 
@@ -1172,7 +1204,11 @@
             clearTimeout(errorTimeout);
             errorMsgElement.textContent = message;
             errorMsgElement.classList.remove('opacity-0', 'bg-red-100', 'text-red-700', 'border-red-300', 'bg-green-100', 'text-green-700', 'border-green-300');
-            errorMsgElement.classList.add(type === 'success' ? 'bg-green-100' : 'bg-red-100', type === 'success' ? 'text-green-700' : 'text-red-700', type === 'success' ? 'border-green-300' : 'border-red-300');
+            errorMsgElement.classList.add('opacity-0'); // Add it back immediately to reset animation
+            requestAnimationFrame(() => {
+                 errorMsgElement.classList.add(type === 'success' ? 'bg-green-100' : 'bg-red-100', type === 'success' ? 'text-green-700' : 'text-red-700', type === 'success' ? 'border-green-300' : 'border-red-300');
+                 errorMsgElement.classList.remove('opacity-0');
+            });
             errorTimeout = setTimeout(() => errorMsgElement.classList.add('opacity-0'), duration);
         }
 
@@ -1182,9 +1218,9 @@
             if (!modal) {
                 modal = document.createElement('div');
                 modal.id = modalId;
-                modal.className = 'fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[200] p-4';
+                modal.className = 'fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[200] p-4 transition-opacity duration-300 opacity-0';
                 modal.innerHTML = `
-                    <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full space-y-4">
+                    <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full space-y-4 transform scale-95 transition-all duration-300">
                         <p class="text-lg font-semibold text-slate-800" id="confirmation-message"></p>
                         <div class="flex justify-end gap-3">
                             <button id="cancel-btn" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 font-medium">Cancel</button>
@@ -1195,9 +1231,22 @@
             }
             document.getElementById('confirmation-message').textContent = message;
             modal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
+            });
+            
             const confirmBtn = document.getElementById('confirm-btn');
             const cancelBtn = document.getElementById('cancel-btn');
-            const cleanup = () => { modal.classList.add('hidden'); confirmBtn.onclick = null; cancelBtn.onclick = null; };
+            const cleanup = () => { 
+                modal.classList.add('opacity-0');
+                modal.querySelector('div').classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden'); 
+                    confirmBtn.onclick = null; 
+                    cancelBtn.onclick = null;
+                }, 300);
+             };
             confirmBtn.onclick = () => { onConfirm(); cleanup(); };
             cancelBtn.onclick = cleanup;
         }
