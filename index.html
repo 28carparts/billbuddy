@@ -17,7 +17,7 @@
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }\
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         /* Active choice buttons */
@@ -247,11 +247,8 @@
                         <tbody id="debt-table" class="divide-y divide-slate-200"></tbody>
                     </table>
                 </div>
-                <div id="settlement-plan-container" class="mt-4">
-                     <h3 class="text-md font-semibold text-slate-600 mb-2">Settlement Plan:</h3>
-                     <div id="settlement-plan" class="text-sm space-y-1"></div>
-                </div>
 
+                <!-- Individual Adjustments moved here -->
                 <div class="mt-6 space-y-4">
                     <h3 class="text-xl sm:text-2xl font-bold text-slate-700 flex items-center gap-2">
                         <span class="text-2xl sm:text-3xl">💱</span>Individual Adjustments
@@ -293,6 +290,12 @@
                     </div>
                 </div>
 
+                <!-- Settlement Plan container remains here -->
+                <div id="settlement-plan-container" class="mt-4">
+                     <h3 class="text-md font-semibold text-slate-600 mb-2">Settlement Plan:</h3>
+                     <div id="settlement-plan" class="text-sm space-y-1"></div>
+                </div>
+
                 <button id="copy-whatsapp" class="w-full bg-green-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-green-600 active:bg-green-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
                     <span class="text-lg">📱</span>Copy Data to WhatsApp
                 </button>
@@ -303,7 +306,8 @@
         </section>
     </main>
 
-    <div id="error-container" class="fixed top-20 left-1/2 -translate-x-1/2 transform z-[100] w-auto max-w-[90%] pointer-events-none">
+    <!-- Error/Success message container - Adjusted top position and z-index -->
+    <div id="error-container" class="fixed top-40 left-1/2 -translate-x-1/2 transform z-[201] w-auto max-w-[90%] pointer-events-none">
          <p id="error" class="bg-red-100 text-red-700 border border-red-300 p-3 rounded-lg text-sm shadow-lg opacity-0 transition-opacity duration-300"></p>
     </div>
     
@@ -312,6 +316,10 @@
         <div id="trip-switcher-modal-content" class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full space-y-4 transform scale-95 transition-all duration-300">
             <h2 class="text-lg font-bold text-slate-800 flex justify-between items-center">
                 <span>Your Trips</span>
+                <!-- Close icon added here -->
+                <button id="close-modal-icon-btn" class="text-slate-500 hover:text-slate-700 text-xl" aria-label="Close trip switcher modal">
+                    <i class="fas fa-times"></i>
+                </button>
             </h2>
             <div id="trip-list-menu" class="max-h-60 overflow-y-auto space-y-2">
                 <!-- Trip items will be injected here -->
@@ -420,7 +428,7 @@
         const loggedInInfoDiv = document.getElementById('logged-in-info'); // New div for logged-in info
         const loggedInEmailSpan = document.getElementById('logged-in-email'); // Span to display email
         const logoutLink = document.getElementById('logout-link'); // Logout hyperlink
-
+        const closeIconBtn = document.getElementById('close-modal-icon-btn'); // New close icon button
 
         // --- Authentication Logic ---
 
@@ -701,6 +709,9 @@
             createNewTrip();
         });
         document.getElementById('create-first-trip-btn').addEventListener('click', createNewTrip);
+        if (closeIconBtn) { // Add event listener for the new close icon button
+            closeIconBtn.addEventListener('click', closeTripSwitcherModal);
+        }
 
 
         // --- Database Logic ---
@@ -1385,6 +1396,18 @@
             }
             message += `\n`;
 
+            // Individual Adjustments section (moved before Debt Settlement)
+            if (appData.adjustments.length > 0) {
+                message += `*💱 Individual Adjustments:*\n`;
+                appData.adjustments.forEach(adj => {
+                    const adjAmountStr = adj.originalCurrency && adj.originalAmount !== undefined
+                        ? `*${adj.originalCurrency} ${adj.originalAmount.toFixed(2)}* (~${adj.amount.toFixed(2)} HKD)`
+                        : `*HKD ${adj.amount.toFixed(2)}*`;
+                    message += `• *${adj.debtor}* pays *${adj.creditor}* ${adjAmountStr}\n`;
+                });
+                message += `\n`; // Add a newline after adjustments
+            }
+
             message += `*🤝 Debt Settlement*\n`;
             
             const debtors = appData.participants.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
@@ -1412,16 +1435,6 @@
                 message += settlements.join('\n') + '\n';
             }
             
-            if (appData.adjustments.length > 0) {
-                message += `\n*💱 Individual Adjustments:*\n`;
-                appData.adjustments.forEach(adj => {
-                    const adjAmountStr = adj.originalCurrency && adj.originalAmount !== undefined
-                        ? `*${adj.originalCurrency} ${adj.originalAmount.toFixed(2)}* (~${adj.amount.toFixed(2)} HKD)`
-                        : `*HKD ${adj.amount.toFixed(2)}*`;
-                    message += `• *${adj.debtor}* pays *${adj.creditor}* ${adjAmountStr}\n`;
-                });
-            }
-
             message += `\n_Generated by Bill Buddy_`;
             return message;
         }
