@@ -123,14 +123,17 @@
                     <span class="text-2xl sm:text-3xl">👥</span>Manage Buddies
                 </h2>
                 <div class="space-y-4">
-                    <div class="flex flex-col sm:flex-row gap-3">
+                    <!-- Adjusted layout for Trip Name and Currency -->
+                    <!-- Changed flex-col sm:flex-row to flex flex-wrap for better responsiveness on small screens -->
+                    <div class="flex flex-wrap gap-3 items-end">
                         <div class="flex-grow">
                             <label for="group-event-name" class="block text-sm font-semibold text-slate-600 mb-1.5">Trip Name</label>
                             <input type="text" id="group-event-name" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., Weekend Getaway 🎉" required>
                         </div>
-                        <div class="shrink-0">
-                            <label for="trip-primary-currency" class="block text-sm font-semibold text-slate-600 mb-1.5">Primary Currency</label>
-                             <select id="trip-primary-currency" class="w-full sm:w-auto p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white">
+                        <!-- Ensured the currency select always takes the minimum width needed and stays right -->
+                        <div class="flex-none min-w-[120px]">
+                            <label for="trip-primary-currency" class="block text-sm font-semibold text-slate-600 mb-1.5">Currency</label>
+                            <select id="trip-primary-currency" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white">
                                 <option value="HKD">🇭🇰 HKD</option>
                                 <option value="CNY">🇨🇳 CNY</option>
                                 <option value="JPY">🇯🇵 JPY</option>
@@ -145,7 +148,7 @@
                     <div class="flex gap-3 items-center">
                         <input type="text" id="new-buddy" class="flex-grow p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="Enter buddy name">
                         <button id="add-buddy" class="bg-sky-500 text-white font-medium py-2.5 px-4 rounded-lg shadow hover:bg-sky-600 active:bg-sky-700 transform active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-1.5 shrink-0">
-                            <span class="text-lg">✨</span>Add Buddy
+                            <span class="text-lg">✨</span>Add
                         </button>
                     </div>
                     <button id="done-buddies" class="w-full bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-emerald-600 active:bg-emerald-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2">
@@ -320,7 +323,7 @@
     </main>
 
     <!-- Error/Success message container -->
-    <div id="error-container" class="fixed top-40 left-1/2 -translate-x-1/2 transform z-[201] w-auto max-w-[90%] pointer-events-none">
+    <div id="error-container" class="fixed top-40 left-1/2 -translate-x-1/2 transform z-[201] w-11/12 sm:max-w-sm md:max-w-md pointer-events-none"> <!-- Adjusted width for mobile -->
          <p id="error" class="bg-red-100 text-red-700 border border-red-300 p-3 rounded-lg text-sm shadow-lg opacity-0 transition-opacity duration-300"></p>
     </div>
     
@@ -347,6 +350,17 @@
         </div>
     </div>
 
+    <!-- Generic Input Modal -->
+    <div id="input-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[202] p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full space-y-4 transform scale-95 transition-all duration-300">
+            <h2 id="input-modal-title" class="text-xl font-bold text-slate-700 flex items-center gap-2"></h2>
+            <input type="text" id="input-modal-field" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" placeholder="Enter text here..." autofocus>
+            <div class="flex justify-end gap-3">
+                <button id="input-modal-cancel" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 font-medium">Cancel</button>
+                <button id="input-modal-confirm" class="px-4 py-2 bg-sky-500 text-white rounded-md hover:bg-sky-600 font-medium">Confirm</button>
+            </div>
+        </div>
+    </div>
 
     <nav id="app-nav" class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-[0_-4px_10px_rgba(0,0,0,0.05)] flex justify-around items-stretch h-20 z-40 border-t border-slate-200/80 hidden">
         <button class="nav-btn flex-1 flex flex-col items-center justify-center text-slate-600 hover:text-sky-500 transition-colors py-2 focus:outline-none" data-page="page-buddies">
@@ -357,7 +371,7 @@
             <span class="text-2xl">💸</span>
             <span class="text-xs mt-1">Expense</span>
         </button>
-        <button class="nav-btn flex-1 flex flex-col items-center justify-center text-slate-600 hover:text-sky-500 transition-colors py-2 focus:outline-none" data-page="page-summary">
+        <button class="nav-1 flex-1 flex flex-col items-center justify-center text-slate-600 hover:text-sky-500 transition-colors py-2 focus:outline-none" data-page="page-summary">
             <span class="text-2xl">📊</span>
             <span class="text-xs mt-1">Summary</span>
         </button>
@@ -440,6 +454,14 @@
         const loggedInEmailSpan = document.getElementById('logged-in-email');
         const logoutLink = document.getElementById('logout-link');
         const closeIconBtn = document.getElementById('close-modal-icon-btn');
+
+        // New Input Modal Elements
+        const inputModal = document.getElementById('input-modal');
+        const inputModalTitle = document.getElementById('input-modal-title');
+        const inputModalField = document.getElementById('input-modal-field');
+        const inputModalConfirmBtn = document.getElementById('input-modal-confirm');
+        const inputModalCancelBtn = document.getElementById('input-modal-cancel');
+
 
         // --- Authentication Logic ---
 
@@ -604,12 +626,15 @@
         }
         
         async function createNewTrip() {
-            const tripName = prompt("Please enter a name for your new trip:", "My Awesome Trip");
-            if (!tripName || !tripName.trim()) return;
-
             const currentUser = auth.currentUser;
             if (!currentUser) {
                 showError("You must be logged in to create a trip.");
+                return;
+            }
+
+            const tripName = await showInputModal("🚀 What's your trip name?", "e.g., Weekend Getaway", "My Awesome Trip");
+            if (!tripName || !tripName.trim()) {
+                showError("Trip name cannot be empty.");
                 return;
             }
 
@@ -789,19 +814,6 @@
             });
         }
         
-        async function removeMemberFromTrip(tripId, memberIdToRemove, memberEmail) {
-            try {
-                await database.ref(`trips/${tripId}/members/${memberIdToRemove}`).remove();
-                await database.ref(`users/${memberIdToRemove}/trips/${tripId}`).remove();
-                
-                showError(`${memberEmail} has been removed from the trip.`, 3000, 'success');
-                updateAndPopulateTripSwitcher();
-            } catch(error) {
-                showError(`Failed to remove member: ${error.message}`);
-                console.error("Error removing member:", error);
-            }
-        }
-        
         function openTripSwitcherModal() {
             updateAndPopulateTripSwitcher();
             tripSwitcherModal.classList.remove('hidden');
@@ -883,7 +895,7 @@
         }
 
         function getCurrencySymbol(currencyCode) {
-            const symbols = { 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'HKD': '$', 'CNY': '$', 'KRW': '₩' }; /* Fixed KRW symbol */
+            const symbols = { 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'HKD': '$', 'CNY': '¥', 'KRW': '₩' }; /* Fixed KRW symbol */
             return symbols[currencyCode] || currencyCode;
         }
         
@@ -1021,10 +1033,11 @@
             }
 
             document.querySelectorAll('.edit-buddy').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', async () => {
                     const index = parseInt(btn.dataset.index);
                     const currentName = appData.buddies[index];
-                    const newName = prompt(`Enter new name for ${currentName}`, currentName);
+                    const newName = await showInputModal(`✏️ Edit buddy name for ${currentName}`, "Enter new name", currentName);
+                    
                     if (newName && newName.trim() && newName.trim() !== currentName) {
                         if (appData.buddies.includes(newName.trim())) {
                             showError('Buddy name already exists.'); return;
@@ -1044,6 +1057,8 @@
                         });
                         saveDataToFirebase();
                         showError(`'${oldName}' renamed to '${newName.trim()}'`, 3000, 'success');
+                    } else if (newName !== null) { // If user cancelled, newName is null. If empty string, it's a validation error.
+                        showError('Buddy name cannot be empty.');
                     }
                 });
             });
@@ -1371,6 +1386,22 @@
             }
         }
         
+        // --- Utility function for filtering creditor dropdown ---
+        function filterCreditorDropdown() {
+            const selectedDebtor = adjustmentDebtorSelect.value;
+            const currentCreditor = adjustmentCreditorSelect.value;
+            let creditorIsValid = false;
+
+            Array.from(adjustmentCreditorSelect.options).forEach(option => {
+                option.style.display = (option.value === selectedDebtor && selectedDebtor !== "") ? 'none' : '';
+                if (option.value === currentCreditor && option.style.display !== 'none') {
+                    creditorIsValid = true;
+                }
+            });
+
+            if (!creditorIsValid) adjustmentCreditorSelect.value = "";
+        }
+
         function updateAdjustmentsDisplay() {
             const container = document.getElementById('current-adjustments');
             if (!container || !adjustmentDebtorSelect || !adjustmentCreditorSelect) return;
@@ -1384,7 +1415,7 @@
                 adjustmentCreditorSelect.add(new Option(p, p));
             });
 
-            filterCreditorDropdown();
+            filterCreditorDropdown(); // Call after populating to ensure initial filtering
 
             if (appData.adjustments.length === 0) {
                 container.innerHTML = '<p class="text-slate-500 text-center py-2">No individual adjustments yet.</p>';
@@ -1446,21 +1477,6 @@
             filterCreditorDropdown();
             showError('Adjustment added successfully!', 3000, 'success');
         });
-        
-        function filterCreditorDropdown() {
-            const selectedDebtor = adjustmentDebtorSelect.value;
-            const currentCreditor = adjustmentCreditorSelect.value;
-            let creditorIsValid = false;
-
-            Array.from(adjustmentCreditorSelect.options).forEach(option => {
-                option.style.display = (option.value === selectedDebtor && selectedDebtor !== "") ? 'none' : '';
-                if (option.value === currentCreditor && option.style.display !== 'none') {
-                    creditorIsValid = true;
-                }
-            });
-
-            if (!creditorIsValid) adjustmentCreditorSelect.value = "";
-        }
         
         adjustmentDebtorSelect.addEventListener('change', filterCreditorDropdown);
 
@@ -1614,6 +1630,45 @@
             confirmBtn.onclick = () => { onConfirm(); cleanup(); };
             cancelBtn.onclick = cleanup;
         }
+
+        // --- Generic Input Modal Function ---
+        function showInputModal(title, placeholder, defaultValue = '') {
+            return new Promise((resolve) => {
+                inputModalTitle.innerHTML = title;
+                inputModalField.placeholder = placeholder;
+                inputModalField.value = defaultValue;
+                inputModalField.focus(); // Focus the input field
+
+                inputModal.classList.remove('hidden');
+                requestAnimationFrame(() => {
+                    inputModal.classList.remove('opacity-0');
+                    inputModal.querySelector('div').classList.remove('scale-95');
+                });
+
+                const cleanup = (value = null) => {
+                    inputModal.classList.add('opacity-0');
+                    inputModal.querySelector('div').classList.add('scale-95');
+                    setTimeout(() => {
+                        inputModal.classList.add('hidden');
+                        inputModalConfirmBtn.onclick = null;
+                        inputModalCancelBtn.onclick = null;
+                        inputModalField.onkeydown = null; // Remove keydown listener
+                        resolve(value);
+                    }, 300);
+                };
+
+                inputModalConfirmBtn.onclick = () => cleanup(inputModalField.value);
+                inputModalCancelBtn.onclick = () => cleanup(null); // Resolve with null if cancelled
+
+                inputModalField.onkeydown = (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault(); // Prevent default form submission behavior
+                        cleanup(inputModalField.value);
+                    }
+                };
+            });
+        }
+
 
         function clearForm() {
             document.getElementById('meal-type').value = '';
