@@ -124,31 +124,31 @@
                 </h2>
                 <div class="space-y-4">
                     <!-- Adjusted layout for Trip Name and Currency -->
-                    <!-- Changed flex-col sm:flex-row to flex flex-wrap for better responsiveness on small screens -->
-                    <div class="flex flex-wrap gap-3 items-end">
+                    <div class="flex flex-col sm:flex-row gap-3">
                         <div class="flex-grow">
                             <label for="group-event-name" class="block text-sm font-semibold text-slate-600 mb-1.5">Trip Name</label>
                             <input type="text" id="group-event-name" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., Weekend Getaway 🎉" required>
                         </div>
-                        <!-- Ensured the currency select always takes the minimum width needed and stays right -->
-                        <div class="flex-none min-w-[120px]">
-                            <label for="trip-primary-currency" class="block text-sm font-semibold text-slate-600 mb-1.5">Currency</label>
-                            <select id="trip-primary-currency" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white">
-                                <option value="HKD">🇭🇰 HKD</option>
-                                <option value="CNY">🇨🇳 CNY</option>
-                                <option value="JPY">🇯🇵 JPY</option>
-                                <option value="USD">🇺🇸 USD</option>
-                                <option value="EUR">🇪🇺 EUR</option>
-                                <option value="GBP">🇬🇧 GBP</option>
-                                <option value="KRW">🇰🇷 KRW</option>
-                            </select>
+                        <div class="shrink-0 flex items-end"> <!-- Added flex items-end for alignment -->
+                            <div class="w-full"> <!-- Added a wrapper div for full width on smaller screens -->
+                                <label for="trip-primary-currency" class="block text-sm font-semibold text-slate-600 mb-1.5">Currency</label> <!-- Renamed label -->
+                                <select id="trip-primary-currency" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white">
+                                    <option value="HKD">🇭🇰 HKD</option>
+                                    <option value="CNY">🇨🇳 CNY</option>
+                                    <option value="JPY">🇯🇵 JPY</option>
+                                    <option value="USD">🇺🇸 USD</option>
+                                    <option value="EUR">🇪🇺 EUR</option>
+                                    <option value="GBP">🇬🇧 GBP</option>
+                                    <option value="KRW">🇰🇷 KRW</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div id="buddy-list" class="flex flex-col gap-3"></div>
                     <div class="flex gap-3 items-center">
                         <input type="text" id="new-buddy" class="flex-grow p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="Enter buddy name">
                         <button id="add-buddy" class="bg-sky-500 text-white font-medium py-2.5 px-4 rounded-lg shadow hover:bg-sky-600 active:bg-sky-700 transform active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-1.5 shrink-0">
-                            <span class="text-lg">✨</span>Add
+                            <span class="text-lg">✨</span>Add <!-- Renamed button -->
                         </button>
                     </div>
                     <button id="done-buddies" class="w-full bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-emerald-600 active:bg-emerald-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2">
@@ -1386,22 +1386,6 @@
             }
         }
         
-        // --- Utility function for filtering creditor dropdown ---
-        function filterCreditorDropdown() {
-            const selectedDebtor = adjustmentDebtorSelect.value;
-            const currentCreditor = adjustmentCreditorSelect.value;
-            let creditorIsValid = false;
-
-            Array.from(adjustmentCreditorSelect.options).forEach(option => {
-                option.style.display = (option.value === selectedDebtor && selectedDebtor !== "") ? 'none' : '';
-                if (option.value === currentCreditor && option.style.display !== 'none') {
-                    creditorIsValid = true;
-                }
-            });
-
-            if (!creditorIsValid) adjustmentCreditorSelect.value = "";
-        }
-
         function updateAdjustmentsDisplay() {
             const container = document.getElementById('current-adjustments');
             if (!container || !adjustmentDebtorSelect || !adjustmentCreditorSelect) return;
@@ -1415,7 +1399,7 @@
                 adjustmentCreditorSelect.add(new Option(p, p));
             });
 
-            filterCreditorDropdown(); // Call after populating to ensure initial filtering
+            filterCreditorDropdown();
 
             if (appData.adjustments.length === 0) {
                 container.innerHTML = '<p class="text-slate-500 text-center py-2">No individual adjustments yet.</p>';
@@ -1477,6 +1461,21 @@
             filterCreditorDropdown();
             showError('Adjustment added successfully!', 3000, 'success');
         });
+        
+        function filterCreditorDropdown() {
+            const selectedDebtor = adjustmentDebtorSelect.value;
+            const currentCreditor = adjustmentCreditorSelect.value;
+            let creditorIsValid = false;
+
+            Array.from(adjustmentCreditorSelect.options).forEach(option => {
+                option.style.display = (option.value === selectedDebtor && selectedDebtor !== "") ? 'none' : '';
+                if (option.value === currentCreditor && option.style.display !== 'none') {
+                    creditorIsValid = true;
+                }
+            });
+
+            if (!creditorIsValid) adjustmentCreditorSelect.value = "";
+        }
         
         adjustmentDebtorSelect.addEventListener('change', filterCreditorDropdown);
 
