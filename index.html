@@ -123,32 +123,29 @@
                     <span class="text-2xl sm:text-3xl">👥</span>Manage Buddies
                 </h2>
                 <div class="space-y-4">
-                    <!-- Adjusted layout for Trip Name and Currency -->
                     <div class="flex flex-col sm:flex-row gap-3">
                         <div class="flex-grow">
                             <label for="group-event-name" class="block text-sm font-semibold text-slate-600 mb-1.5">Trip Name</label>
                             <input type="text" id="group-event-name" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., Weekend Getaway 🎉" required>
                         </div>
-                        <div class="shrink-0 flex items-end"> <!-- Added flex items-end for alignment -->
-                            <div class="w-full"> <!-- Added a wrapper div for full width on smaller screens -->
-                                <label for="trip-primary-currency" class="block text-sm font-semibold text-slate-600 mb-1.5">Currency</label> <!-- Renamed label -->
-                                <select id="trip-primary-currency" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white">
-                                    <option value="HKD">🇭🇰 HKD</option>
-                                    <option value="CNY">🇨🇳 CNY</option>
-                                    <option value="JPY">🇯🇵 JPY</option>
-                                    <option value="USD">🇺🇸 USD</option>
-                                    <option value="EUR">🇪🇺 EUR</option>
-                                    <option value="GBP">🇬🇧 GBP</option>
-                                    <option value="KRW">🇰🇷 KRW</option>
-                                </select>
-                            </div>
+                        <div class="shrink-0">
+                            <label for="trip-primary-currency" class="block text-sm font-semibold text-slate-600 mb-1.5">Currency</label>
+                             <select id="trip-primary-currency" class="w-full sm:w-auto p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white">
+                                <option value="HKD">🇭🇰 HKD</option>
+                                <option value="CNY">🇨🇳 CNY</option>
+                                <option value="JPY">🇯🇵 JPY</option>
+                                <option value="USD">🇺🇸 USD</option>
+                                <option value="EUR">🇪🇺 EUR</option>
+                                <option value="GBP">🇬🇧 GBP</option>
+                                <option value="KRW">🇰🇷 KRW</option>
+                            </select>
                         </div>
                     </div>
                     <div id="buddy-list" class="flex flex-col gap-3"></div>
                     <div class="flex gap-3 items-center">
                         <input type="text" id="new-buddy" class="flex-grow p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="Enter buddy name">
                         <button id="add-buddy" class="bg-sky-500 text-white font-medium py-2.5 px-4 rounded-lg shadow hover:bg-sky-600 active:bg-sky-700 transform active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-1.5 shrink-0">
-                            <span class="text-lg">✨</span>Add <!-- Renamed button -->
+                            <span class="text-lg">✨</span>Add
                         </button>
                     </div>
                     <button id="done-buddies" class="w-full bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-emerald-600 active:bg-emerald-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2">
@@ -323,7 +320,7 @@
     </main>
 
     <!-- Error/Success message container -->
-    <div id="error-container" class="fixed top-40 left-1/2 -translate-x-1/2 transform z-[201] w-11/12 sm:max-w-sm md:max-w-md pointer-events-none"> <!-- Adjusted width for mobile -->
+    <div id="error-container" class="fixed top-40 left-1/2 -translate-x-1/2 transform z-[201] w-[90%] md:w-auto max-w-[90%] pointer-events-none">
          <p id="error" class="bg-red-100 text-red-700 border border-red-300 p-3 rounded-lg text-sm shadow-lg opacity-0 transition-opacity duration-300"></p>
     </div>
     
@@ -350,17 +347,19 @@
         </div>
     </div>
 
-    <!-- Generic Input Modal -->
-    <div id="input-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[202] p-4 transition-opacity duration-300 opacity-0">
-        <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full space-y-4 transform scale-95 transition-all duration-300">
-            <h2 id="input-modal-title" class="text-xl font-bold text-slate-700 flex items-center gap-2"></h2>
-            <input type="text" id="input-modal-field" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" placeholder="Enter text here..." autofocus>
-            <div class="flex justify-end gap-3">
-                <button id="input-modal-cancel" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 font-medium">Cancel</button>
-                <button id="input-modal-confirm" class="px-4 py-2 bg-sky-500 text-white rounded-md hover:bg-sky-600 font-medium">Confirm</button>
+    <!-- Universal Modern Prompt/Confirmation Modal -->
+    <div id="universal-prompt-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[200] p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white rounded-xl shadow-xl p-6 sm:p-8 space-y-6 w-full max-w-sm transform scale-95 transition-all duration-300">
+            <h3 class="text-xl font-bold text-center text-slate-700 flex items-center justify-center gap-2" id="modal-prompt-title"></h3>
+            <p class="text-slate-600 text-center text-sm" id="modal-prompt-message"></p>
+            <input type="text" id="modal-prompt-input" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" placeholder="Enter name here" required>
+            <div class="flex justify-end gap-3 mt-4">
+                <button id="modal-cancel-btn" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium transition-colors">Cancel</button>
+                <button id="modal-confirm-btn" class="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 font-medium transition-colors">Confirm</button>
             </div>
         </div>
     </div>
+
 
     <nav id="app-nav" class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-[0_-4px_10px_rgba(0,0,0,0.05)] flex justify-around items-stretch h-20 z-40 border-t border-slate-200/80 hidden">
         <button class="nav-btn flex-1 flex flex-col items-center justify-center text-slate-600 hover:text-sky-500 transition-colors py-2 focus:outline-none" data-page="page-buddies">
@@ -371,7 +370,7 @@
             <span class="text-2xl">💸</span>
             <span class="text-xs mt-1">Expense</span>
         </button>
-        <button class="nav-1 flex-1 flex flex-col items-center justify-center text-slate-600 hover:text-sky-500 transition-colors py-2 focus:outline-none" data-page="page-summary">
+        <button class="nav-btn flex-1 flex flex-col items-center justify-center text-slate-600 hover:text-sky-500 transition-colors py-2 focus:outline-none" data-page="page-summary">
             <span class="text-2xl">📊</span>
             <span class="text-xs mt-1">Summary</span>
         </button>
@@ -455,13 +454,13 @@
         const logoutLink = document.getElementById('logout-link');
         const closeIconBtn = document.getElementById('close-modal-icon-btn');
 
-        // New Input Modal Elements
-        const inputModal = document.getElementById('input-modal');
-        const inputModalTitle = document.getElementById('input-modal-title');
-        const inputModalField = document.getElementById('input-modal-field');
-        const inputModalConfirmBtn = document.getElementById('input-modal-confirm');
-        const inputModalCancelBtn = document.getElementById('input-modal-cancel');
-
+        // Universal Prompt/Confirmation Modal Elements
+        const universalPromptModal = document.getElementById('universal-prompt-modal');
+        const modalPromptTitle = document.getElementById('modal-prompt-title');
+        const modalPromptMessage = document.getElementById('modal-prompt-message');
+        const modalPromptInput = document.getElementById('modal-prompt-input');
+        const modalCancelBtn = document.getElementById('modal-cancel-btn');
+        const modalConfirmBtn = document.getElementById('modal-confirm-btn');
 
         // --- Authentication Logic ---
 
@@ -626,15 +625,12 @@
         }
         
         async function createNewTrip() {
+            const tripName = await showPromptModal("🚀 Trip Name", "What should we call your new adventure?", "My Awesome Trip");
+            if (!tripName || !tripName.trim()) return;
+
             const currentUser = auth.currentUser;
             if (!currentUser) {
                 showError("You must be logged in to create a trip.");
-                return;
-            }
-
-            const tripName = await showInputModal("🚀 What's your trip name?", "e.g., Weekend Getaway", "My Awesome Trip");
-            if (!tripName || !tripName.trim()) {
-                showError("Trip name cannot be empty.");
                 return;
             }
 
@@ -812,6 +808,19 @@
                     });
                 });
             });
+        }
+        
+        async function removeMemberFromTrip(tripId, memberIdToRemove, memberEmail) {
+            try {
+                await database.ref(`trips/${tripId}/members/${memberIdToRemove}`).remove();
+                await database.ref(`users/${memberIdToRemove}/trips/${tripId}`).remove();
+                
+                showError(`${memberEmail} has been removed from the trip.`, 3000, 'success');
+                updateAndPopulateTripSwitcher();
+            } catch(error) {
+                showError(`Failed to remove member: ${error.message}`);
+                console.error("Error removing member:", error);
+            }
         }
         
         function openTripSwitcherModal() {
@@ -1036,8 +1045,8 @@
                 btn.addEventListener('click', async () => {
                     const index = parseInt(btn.dataset.index);
                     const currentName = appData.buddies[index];
-                    const newName = await showInputModal(`✏️ Edit buddy name for ${currentName}`, "Enter new name", currentName);
-                    
+                    const newName = await showPromptModal(`✏️ Edit Buddy`, `Rename buddy "${currentName}" to:`, currentName);
+
                     if (newName && newName.trim() && newName.trim() !== currentName) {
                         if (appData.buddies.includes(newName.trim())) {
                             showError('Buddy name already exists.'); return;
@@ -1057,8 +1066,6 @@
                         });
                         saveDataToFirebase();
                         showError(`'${oldName}' renamed to '${newName.trim()}'`, 3000, 'success');
-                    } else if (newName !== null) { // If user cancelled, newName is null. If empty string, it's a validation error.
-                        showError('Buddy name cannot be empty.');
                     }
                 });
             });
@@ -1630,39 +1637,36 @@
             cancelBtn.onclick = cleanup;
         }
 
-        // --- Generic Input Modal Function ---
-        function showInputModal(title, placeholder, defaultValue = '') {
-            return new Promise((resolve) => {
-                inputModalTitle.innerHTML = title;
-                inputModalField.placeholder = placeholder;
-                inputModalField.value = defaultValue;
-                inputModalField.focus(); // Focus the input field
-
-                inputModal.classList.remove('hidden');
+        // New Universal Prompt Modal Function
+        function showPromptModal(title, message, defaultValue = '') {
+            return new Promise(resolve => {
+                modalPromptTitle.innerHTML = title;
+                modalPromptMessage.textContent = message;
+                modalPromptInput.value = defaultValue;
+                universalPromptModal.classList.remove('hidden');
                 requestAnimationFrame(() => {
-                    inputModal.classList.remove('opacity-0');
-                    inputModal.querySelector('div').classList.remove('scale-95');
+                    universalPromptModal.classList.remove('opacity-0');
+                    universalPromptModal.querySelector('div').classList.remove('scale-95');
+                    modalPromptInput.focus();
                 });
 
-                const cleanup = (value = null) => {
-                    inputModal.classList.add('opacity-0');
-                    inputModal.querySelector('div').classList.add('scale-95');
+                const cleanup = (value) => {
+                    universalPromptModal.classList.add('opacity-0');
+                    universalPromptModal.querySelector('div').classList.add('scale-95');
                     setTimeout(() => {
-                        inputModal.classList.add('hidden');
-                        inputModalConfirmBtn.onclick = null;
-                        inputModalCancelBtn.onclick = null;
-                        inputModalField.onkeydown = null; // Remove keydown listener
+                        universalPromptModal.classList.add('hidden');
+                        modalConfirmBtn.onclick = null;
+                        modalCancelBtn.onclick = null;
                         resolve(value);
                     }, 300);
                 };
 
-                inputModalConfirmBtn.onclick = () => cleanup(inputModalField.value);
-                inputModalCancelBtn.onclick = () => cleanup(null); // Resolve with null if cancelled
-
-                inputModalField.onkeydown = (event) => {
+                modalConfirmBtn.onclick = () => cleanup(modalPromptInput.value.trim());
+                modalCancelBtn.onclick = () => cleanup(null); // Resolve with null on cancel
+                modalPromptInput.onkeydown = (event) => {
                     if (event.key === 'Enter') {
-                        event.preventDefault(); // Prevent default form submission behavior
-                        cleanup(inputModalField.value);
+                        event.preventDefault();
+                        cleanup(modalPromptInput.value.trim());
                     }
                 };
             });
