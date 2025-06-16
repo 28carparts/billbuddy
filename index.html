@@ -1769,9 +1769,6 @@
                     isCalculating = false; // Release lock
                     return;
                 }
-                
-                // Immediately clear the input field to prevent visual artifacts on mobile keyboards
-                calculatorInput.innerHTML = ''; 
 
                 const result = safeEvaluate(expression);
 
