@@ -123,13 +123,12 @@
                     <span class="text-2xl sm:text-3xl">👥</span>Manage Buddies
                 </h2>
                 <div class="space-y-4">
-                    <!-- MODIFIED: Changed flex-col sm:flex-row to flex flex-row flex-nowrap to keep elements on one line -->
                     <div class="flex flex-row flex-nowrap gap-3 items-end">
                         <div class="flex-grow">
                             <label for="group-event-name" class="block text-sm font-semibold text-slate-600 mb-1.5">Trip Name</label>
-                            <!-- MODIFIED: Added a wrapper and a clear button for the input -->
                             <div class="relative">
-                                <input type="text" id="group-event-name" class="w-full p-2.5 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., Weekend Getaway 🎉" required>
+                                <!-- MODIFIED: Added h-11 for consistent height -->
+                                <input type="text" id="group-event-name" class="w-full h-11 p-2.5 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., Weekend Getaway 🎉" required>
                                 <button id="clear-trip-name-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Clear trip name">
                                     <i class="fas fa-times-circle"></i>
                                 </button>
@@ -137,7 +136,8 @@
                         </div>
                         <div class="shrink-0">
                             <label for="trip-primary-currency" class="block text-sm font-semibold text-slate-600 mb-1.5">Currency</label>
-                             <select id="trip-primary-currency" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white">
+                             <!-- MODIFIED: Added h-11 for consistent height -->
+                             <select id="trip-primary-currency" class="w-full h-11 p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white">
                                 <option value="HKD">🇭🇰 HKD</option>
                                 <option value="CNY">🇨🇳 CNY</option>
                                 <option value="JPY">🇯🇵 JPY</option>
@@ -201,7 +201,6 @@
 
                     <div>
                         <label for="amount" class="block text-sm font-semibold text-slate-600 mb-1.5">Total Amount</label>
-                        <!-- MODIFIED: Added inputmode="decimal" to trigger numeric keyboard -->
                         <input type="number" inputmode="decimal" id="amount" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="Enter amount" min="0" step="0.01" required>
                     </div>
 
@@ -299,7 +298,6 @@
                                     <option value="GBP">🇬🇧 GBP</option>
                                     <option value="KRW">🇰🇷 KRW</option>
                                 </select>
-                                <!-- MODIFIED: Added inputmode="decimal" to trigger numeric keyboard -->
                                 <input type="number" inputmode="decimal" id="adjustment-amount" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., 50.00" min="0" step="0.01">
                             </div>
                         </div>
@@ -361,7 +359,13 @@
         <div class="bg-white rounded-xl shadow-xl p-6 sm:p-8 space-y-6 w-full max-w-sm transform scale-95 transition-all duration-300">
             <h3 class="text-xl font-bold text-center text-slate-700 flex items-center justify-center gap-2" id="modal-prompt-title"></h3>
             <p class="text-slate-600 text-center text-sm" id="modal-prompt-message"></p>
-            <input type="text" id="modal-prompt-input" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" placeholder="Enter name here" required>
+            <!-- MODIFIED: Wrapped input and added a clear button -->
+            <div class="relative">
+                <input type="text" id="modal-prompt-input" class="w-full p-2.5 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" placeholder="Enter name here" required>
+                <button id="modal-clear-input-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Clear input">
+                    <i class="fas fa-times-circle"></i>
+                </button>
+            </div>
             <div class="flex justify-end gap-3 mt-4">
                 <button id="modal-cancel-btn" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium transition-colors">Cancel</button>
                 <button id="modal-confirm-btn" class="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 font-medium transition-colors">Confirm</button>
@@ -450,7 +454,7 @@
         const newBuddyInput = document.getElementById('new-buddy');
         const doneBuddiesBtn = document.getElementById('done-buddies');
         const groupEventNameInput = document.getElementById('group-event-name');
-        const clearTripNameBtn = document.getElementById('clear-trip-name-btn'); // New element
+        const clearTripNameBtn = document.getElementById('clear-trip-name-btn');
         const tripPrimaryCurrencySelect = document.getElementById('trip-primary-currency');
         const expenseFormTitle = document.getElementById('expense-form-title');
         const errorMsgElement = document.getElementById('error');
@@ -471,6 +475,8 @@
         const modalPromptInput = document.getElementById('modal-prompt-input');
         const modalCancelBtn = document.getElementById('modal-cancel-btn');
         const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+        // MODIFIED: Added clear button for the modal input
+        const modalClearInputBtn = document.getElementById('modal-clear-input-btn');
 
         // --- Authentication Logic ---
 
@@ -635,7 +641,6 @@
         }
         
         async function createNewTrip() {
-            // MODIFIED: Changed the call to use a placeholder instead of a pre-filled value
             const tripName = await showPromptModal("🚀 Trip Name", "What should we call your new adventure?", "", "My Awesome Trip");
             if (!tripName || !tripName.trim()) return;
 
@@ -860,6 +865,14 @@
             closeIconBtn.addEventListener('click', closeTripSwitcherModal);
         }
 
+        // MODIFIED: Added event listener for the modal's clear button
+        modalClearInputBtn.addEventListener('click', () => {
+            if(modalPromptInput) {
+                modalPromptInput.value = '';
+                modalPromptInput.focus();
+            }
+        });
+
         // --- Database Logic ---
 
         function saveDataToFirebase() {
@@ -992,11 +1005,9 @@
             saveDataToFirebase();
         });
 
-        // MODIFIED: Added event listener for the new clear button
         clearTripNameBtn.addEventListener('click', () => {
             if (groupEventNameInput.value) {
                 groupEventNameInput.value = '';
-                // Manually trigger change to save the cleared value
                 groupEventNameInput.dispatchEvent(new Event('change'));
                 groupEventNameInput.focus();
             }
@@ -1198,7 +1209,6 @@
                 await fetchExchangeRates(); // Fetch new rates immediately for the updated primary currency
                 saveDataToFirebase();
                 showError('Trip data has been reset. 🚀', 3000, 'success');
-                // MODIFIED: Redirect to the Buddies page after resetting
                 showPage('page-buddies');
             });
         });
@@ -1660,13 +1670,12 @@
             cancelBtn.onclick = cleanup;
         }
 
-        // MODIFIED: Universal Prompt Modal Function to handle placeholder text
         function showPromptModal(title, message, defaultValue = '', placeholder = 'Enter name here') {
             return new Promise(resolve => {
                 modalPromptTitle.innerHTML = title;
                 modalPromptMessage.textContent = message;
                 modalPromptInput.value = defaultValue;
-                modalPromptInput.placeholder = placeholder; // Set placeholder dynamically
+                modalPromptInput.placeholder = placeholder;
                 universalPromptModal.classList.remove('hidden');
                 requestAnimationFrame(() => {
                     universalPromptModal.classList.remove('opacity-0');
@@ -1686,7 +1695,7 @@
                 };
 
                 modalConfirmBtn.onclick = () => cleanup(modalPromptInput.value.trim());
-                modalCancelBtn.onclick = () => cleanup(null); // Resolve with null on cancel
+                modalCancelBtn.onclick = () => cleanup(null);
                 modalPromptInput.onkeydown = (event) => {
                     if (event.key === 'Enter') {
                         event.preventDefault();
