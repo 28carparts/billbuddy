@@ -43,6 +43,7 @@
         }
         .custom-checkbox:focus { outline: none; box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.5); }
         
+        /* MODIFIED: Added placeholder for contenteditable div */
         [contenteditable][data-placeholder]:empty:before {
             content: attr(data-placeholder);
             color: #94a3b8; /* slate-400 */
@@ -291,6 +292,7 @@
                                 <option value="">Select Receiver</option>
                             </select>
                         </div>
+                        <!-- MODIFIED: Added Calculator Input -->
                         <div>
                             <label for="calculator-input" class="block text-sm font-semibold text-slate-600 mb-1.5">Calculator (optional, press '=' to solve)</label>
                             <div id="calculator-input" contenteditable="true" data-placeholder="e.g., 8 + 28" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white"></div>
@@ -437,9 +439,8 @@
             primaryCurrency: 'HKD'
         };
         let editingExpenseIndex = -1;
+        // MODIFIED: Added state for calculator
         let isCalculatorResultShown = false;
-        // MODIFIED: Added flag to prevent re-entrant calls in calculator
-        let isCalculating = false;
 
         // --- Exchange Rate State ---
         const API_KEY = 'c86eace6da908459098e7518';
@@ -479,8 +480,8 @@
         const loggedInEmailSpan = document.getElementById('logged-in-email');
         const logoutLink = document.getElementById('logout-link');
         const closeIconBtn = document.getElementById('close-modal-icon-btn');
-        const calculatorInput = document.getElementById('calculator-input');
-        const adjustmentAmountInput = document.getElementById('adjustment-amount');
+        const calculatorInput = document.getElementById('calculator-input'); // Calculator element
+        const adjustmentAmountInput = document.getElementById('adjustment-amount'); // Adjustment amount input
 
         // Universal Prompt/Confirmation Modal Elements
         const universalPromptModal = document.getElementById('universal-prompt-modal');
@@ -1720,6 +1721,7 @@
             });
         }
 
+        // MODIFIED: Added Calculator Logic
         function safeEvaluate(expression) {
             try {
                 if (!/^[0-9\s\.\+\-\*\/\(\)]+$/.test(expression)) {
@@ -1737,61 +1739,35 @@
             }
         }
         
-        // MODIFIED: Replaced keydown and input listeners with a single, more robust input listener
-        calculatorInput.addEventListener('input', (event) => {
-            if (isCalculating) {
-                return; // Prevent re-entrant calls while the DOM is being updated
-            }
-
-            const currentText = calculatorInput.textContent || '';
-            
-            // If a result was previously shown, this new input means the user wants to start a new calculation.
-            if (isCalculatorResultShown) {
-                isCalculatorResultShown = false;
-                adjustmentAmountInput.value = '';
-            }
-
-            // Check if the input ends with an equals sign, which is our trigger.
-            if (currentText.trim().endsWith('=')) {
-                isCalculating = true; // Set a lock to prevent re-entry
-
-                // Extract the expression, which is everything BEFORE the last '='.
-                const expression = currentText.slice(0, -1).trim();
-
-                if (!expression) {
-                    calculatorInput.innerHTML = '';
-                    isCalculating = false; // Release lock
-                    return;
-                }
-
+        calculatorInput.addEventListener('keydown', (event) => {
+            if (event.key === '=') {
+                event.preventDefault();
+                const expression = calculatorInput.textContent.trim();
+                if (!expression) return;
+                
                 const result = safeEvaluate(expression);
-
+                
                 if (result !== null) {
                     const formattedResult = Number(result.toFixed(2));
                     adjustmentAmountInput.value = formattedResult;
-                    
-                    // Display the full equation and the styled result. This overwrites the input content.
                     calculatorInput.innerHTML = `${expression} = <strong class="text-indigo-600 font-bold">${formattedResult}</strong>`;
                     isCalculatorResultShown = true;
                     
-                    // After updating the DOM, move the cursor to the end.
+                    // Move cursor to the end
                     const range = document.createRange();
                     const sel = window.getSelection();
-                    if (sel) {
-                        range.selectNodeContents(calculatorInput);
-                        range.collapse(false);
-                        sel.removeAllRanges();
-                        sel.addRange(range);
-                    }
-                } else {
-                    // If the calculation is invalid, just remove the trailing '='.
-                    calculatorInput.textContent = expression;
+                    range.selectNodeContents(calculatorInput);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
                 }
+            }
+        });
 
-                // Release the lock after a very short delay to allow the DOM to settle.
-                setTimeout(() => {
-                    isCalculating = false;
-                }, 0);
+        calculatorInput.addEventListener('input', () => {
+            if (isCalculatorResultShown) {
+                adjustmentAmountInput.value = '';
+                isCalculatorResultShown = false;
             }
         });
 
