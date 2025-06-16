@@ -42,6 +42,14 @@
             transform: translate(-50%, -50%);
         }
         .custom-checkbox:focus { outline: none; box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.5); }
+        
+        /* MODIFIED: Added placeholder for contenteditable div */
+        [contenteditable][data-placeholder]:empty:before {
+            content: attr(data-placeholder);
+            color: #94a3b8; /* slate-400 */
+            pointer-events: none;
+            display: block; 
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-100 to-sky-100 min-h-screen flex flex-col pt-16 pb-20">
@@ -127,7 +135,6 @@
                         <div class="flex-grow">
                             <label for="group-event-name" class="block text-sm font-semibold text-slate-600 mb-1.5">Trip Name</label>
                             <div class="relative">
-                                <!-- MODIFIED: Added h-11 for consistent height -->
                                 <input type="text" id="group-event-name" class="w-full h-11 p-2.5 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., Weekend Getaway 🎉" required>
                                 <button id="clear-trip-name-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Clear trip name">
                                     <i class="fas fa-times-circle"></i>
@@ -136,7 +143,6 @@
                         </div>
                         <div class="shrink-0">
                             <label for="trip-primary-currency" class="block text-sm font-semibold text-slate-600 mb-1.5">Currency</label>
-                             <!-- MODIFIED: Added h-11 for consistent height -->
                              <select id="trip-primary-currency" class="w-full h-11 p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white">
                                 <option value="HKD">🇭🇰 HKD</option>
                                 <option value="CNY">🇨🇳 CNY</option>
@@ -286,6 +292,12 @@
                                 <option value="">Select Receiver</option>
                             </select>
                         </div>
+                        <!-- MODIFIED: Added Calculator Input -->
+                        <div>
+                            <label for="calculator-input" class="block text-sm font-semibold text-slate-600 mb-1.5">Calculator (optional, press '=' to solve)</label>
+                            <div id="calculator-input" contenteditable="true" data-placeholder="e.g., 8 + 28" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white"></div>
+                        </div>
+
                         <div>
                             <label for="adjustment-amount" class="block text-sm font-semibold text-slate-600 mb-1.5">Amount</label>
                             <div class="flex gap-2">
@@ -359,7 +371,6 @@
         <div class="bg-white rounded-xl shadow-xl p-6 sm:p-8 space-y-6 w-full max-w-sm transform scale-95 transition-all duration-300">
             <h3 class="text-xl font-bold text-center text-slate-700 flex items-center justify-center gap-2" id="modal-prompt-title"></h3>
             <p class="text-slate-600 text-center text-sm" id="modal-prompt-message"></p>
-            <!-- MODIFIED: Wrapped input and added a clear button -->
             <div class="relative">
                 <input type="text" id="modal-prompt-input" class="w-full p-2.5 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" placeholder="Enter name here" required>
                 <button id="modal-clear-input-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Clear input">
@@ -428,6 +439,8 @@
             primaryCurrency: 'HKD'
         };
         let editingExpenseIndex = -1;
+        // MODIFIED: Added state for calculator
+        let isCalculatorResultShown = false;
 
         // --- Exchange Rate State ---
         const API_KEY = 'c86eace6da908459098e7518';
@@ -467,6 +480,8 @@
         const loggedInEmailSpan = document.getElementById('logged-in-email');
         const logoutLink = document.getElementById('logout-link');
         const closeIconBtn = document.getElementById('close-modal-icon-btn');
+        const calculatorInput = document.getElementById('calculator-input'); // Calculator element
+        const adjustmentAmountInput = document.getElementById('adjustment-amount'); // Adjustment amount input
 
         // Universal Prompt/Confirmation Modal Elements
         const universalPromptModal = document.getElementById('universal-prompt-modal');
@@ -475,7 +490,6 @@
         const modalPromptInput = document.getElementById('modal-prompt-input');
         const modalCancelBtn = document.getElementById('modal-cancel-btn');
         const modalConfirmBtn = document.getElementById('modal-confirm-btn');
-        // MODIFIED: Added clear button for the modal input
         const modalClearInputBtn = document.getElementById('modal-clear-input-btn');
 
         // --- Authentication Logic ---
@@ -865,7 +879,6 @@
             closeIconBtn.addEventListener('click', closeTripSwitcherModal);
         }
 
-        // MODIFIED: Added event listener for the modal's clear button
         modalClearInputBtn.addEventListener('click', () => {
             if(modalPromptInput) {
                 modalPromptInput.value = '';
@@ -1483,7 +1496,7 @@
             const debtor = adjustmentDebtorSelect.value;
             const creditor = adjustmentCreditorSelect.value;
             const currency = document.getElementById('adjustment-currency').value;
-            const amount = parseFloat(document.getElementById('adjustment-amount').value);
+            const amount = parseFloat(adjustmentAmountInput.value);
 
             if (!debtor || !creditor || !currency || isNaN(amount) || amount <= 0) {
                 showError('Please select payer, receiver, currency, and a valid amount.'); return;
@@ -1495,7 +1508,9 @@
             appData.adjustments.push({ debtor, creditor, amount: amount, originalCurrency: currency });
             saveDataToFirebase();
             
-            document.getElementById('adjustment-amount').value = '';
+            adjustmentAmountInput.value = '';
+            calculatorInput.innerHTML = '';
+            isCalculatorResultShown = false;
             adjustmentDebtorSelect.value = '';
             adjustmentCreditorSelect.value = '';
             filterCreditorDropdown();
@@ -1681,6 +1696,7 @@
                     universalPromptModal.classList.remove('opacity-0');
                     universalPromptModal.querySelector('div').classList.remove('scale-95');
                     modalPromptInput.focus();
+                    modalPromptInput.select();
                 });
 
                 const cleanup = (value) => {
@@ -1705,6 +1721,56 @@
             });
         }
 
+        // MODIFIED: Added Calculator Logic
+        function safeEvaluate(expression) {
+            try {
+                if (!/^[0-9\s\.\+\-\*\/\(\)]+$/.test(expression)) {
+                    throw new Error("Invalid characters in expression.");
+                }
+                const result = new Function('return ' + expression)();
+                if (typeof result !== 'number' || !isFinite(result)) {
+                    throw new Error("Invalid calculation result.");
+                }
+                return result;
+            } catch (error) {
+                console.error("Evaluation error:", error);
+                showError(error.message, 3000, 'error');
+                return null;
+            }
+        }
+        
+        calculatorInput.addEventListener('keydown', (event) => {
+            if (event.key === '=') {
+                event.preventDefault();
+                const expression = calculatorInput.textContent.trim();
+                if (!expression) return;
+                
+                const result = safeEvaluate(expression);
+                
+                if (result !== null) {
+                    const formattedResult = Number(result.toFixed(2));
+                    adjustmentAmountInput.value = formattedResult;
+                    calculatorInput.innerHTML = `${expression} = <strong class="text-indigo-600 font-bold">${formattedResult}</strong>`;
+                    isCalculatorResultShown = true;
+                    
+                    // Move cursor to the end
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.selectNodeContents(calculatorInput);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            }
+        });
+
+        calculatorInput.addEventListener('input', () => {
+            if (isCalculatorResultShown) {
+                adjustmentAmountInput.value = '';
+                isCalculatorResultShown = false;
+            }
+        });
+
 
         function clearForm() {
             document.getElementById('meal-type').value = '';
@@ -1717,6 +1783,8 @@
             if (selectAllBuddiesCheckbox) selectAllBuddiesCheckbox.checked = false;
             mealButtons.forEach(b => b.classList.remove('active'));
             currencyButtons.forEach(b => b.classList.remove('active'));
+            if(calculatorInput) calculatorInput.innerHTML = '';
+            isCalculatorResultShown = false;
         }
 
         function copyToClipboard(text, successMessage) {
