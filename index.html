@@ -293,12 +293,7 @@
                         </div>
                         <div>
                             <label for="calculator-input" class="block text-sm font-semibold text-slate-600 mb-1.5">Calculator (optional, press '=' to solve)</label>
-                            <div class="relative">
-                                <div id="calculator-input" contenteditable="true" data-placeholder="e.g., 8 + 28" class="w-full p-2.5 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white"></div>
-                                <button id="clear-calculator-input-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Clear calculator input">
-                                    <i class="fas fa-times-circle"></i>
-                                </button>
-                            </div>
+                            <div id="calculator-input" contenteditable="true" data-placeholder="e.g., 8 + 28" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white"></div>
                         </div>
 
                         <div>
@@ -485,7 +480,6 @@
         const logoutLink = document.getElementById('logout-link');
         const closeIconBtn = document.getElementById('close-modal-icon-btn');
         const calculatorInput = document.getElementById('calculator-input');
-        const clearCalculatorInputBtn = document.getElementById('clear-calculator-input-btn'); // New element
         const adjustmentAmountInput = document.getElementById('adjustment-amount');
 
         // Universal Prompt/Confirmation Modal Elements
@@ -1801,15 +1795,6 @@
             }
         });
 
-        // New event listener for clearing the calculator input
-        clearCalculatorInputBtn.addEventListener('click', () => {
-            if (calculatorInput) {
-                calculatorInput.innerHTML = '';
-                adjustmentAmountInput.value = ''; // Clear the associated amount input
-                isCalculatorResultShown = false;
-                calculatorInput.focus();
-            }
-        });
 
         function clearForm() {
             document.getElementById('meal-type').value = '';
