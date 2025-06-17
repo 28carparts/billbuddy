@@ -302,13 +302,13 @@
                     <div class="bg-slate-50 p-4 rounded-lg shadow-inner space-y-3">
                         <div>
                             <label for="adjustment-debtor" class="block text-sm font-semibold text-slate-600 mb-1.5">Who Pays?</label>
-                            <select id="adjustment-debtor" class="w-full h-11 p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow">
+                            <select id="adjustment-debtor" class="w-full h-11 bg-white p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow">
                                 <option value="">Select Payer</option>
                             </select>
                         </div>
                         <div>
                             <label for="adjustment-creditor" class="block text-sm font-semibold text-slate-600 mb-1.5">Who Receives?</label>
-                            <select id="adjustment-creditor" class="w-full h-11 p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow">
+                            <select id="adjustment-creditor" class="w-full h-11 bg-white p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow">
                                 <option value="">Select Receiver</option>
                             </select>
                         </div>
@@ -355,7 +355,7 @@
                 <button id="copy-whatsapp" class="w-full bg-green-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-green-600 active:bg-green-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
                     <span class="text-lg">📱</span>Copy Data to WhatsApp
                 </button>
-                <button id="reset" class="w-full bg-rose-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-rose-600 active:bg-rose-700 transform active:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
+                <button id="reset" class="w-full bg-rose-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-rose-600 active:bg-rose-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
                     <span class="text-lg">♻️</span>Reset Trip Data
                 </button>
             </div>
@@ -390,7 +390,7 @@
         </div>
     </div>
 
-    <!-- Universal Modern Prompt Modal -->
+    <!-- Universal Modern Prompt/Confirmation Modal -->
     <div id="universal-prompt-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[200] p-4 transition-opacity duration-300 opacity-0">
         <div class="bg-white rounded-xl shadow-xl p-6 sm:p-8 space-y-6 w-full max-w-sm transform scale-95 transition-all duration-300">
             <h3 class="text-xl font-bold text-center text-slate-700 flex items-center justify-center gap-2" id="modal-prompt-title"></h3>
@@ -408,16 +408,6 @@
         </div>
     </div>
 
-    <!-- Universal Confirmation Modal -->
-    <div id="universal-confirmation-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[200] p-4 transition-opacity duration-300 opacity-0">
-        <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full space-y-4 transform scale-95 transition-all duration-300">
-            <p class="text-lg font-semibold text-slate-800" id="confirmation-message"></p>
-            <div class="flex justify-end gap-3">
-                <button id="confirmation-cancel-btn" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 font-medium">Cancel</button>
-                <button id="confirmation-confirm-btn" class="px-4 py-2 bg-rose-500 text-white rounded-md hover:bg-rose-600 font-medium">Confirm</button>
-            </div>
-        </div>
-    </div>
 
     <nav id="app-nav" class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-[0_-4px_10px_rgba(0,0,0,0.05)] flex justify-around items-stretch h-20 z-40 border-t border-slate-200/80 hidden">
         <button class="nav-btn flex-1 flex flex-col items-center justify-center text-slate-600 hover:text-sky-500 transition-colors py-2 focus:outline-none" data-page="page-buddies">
@@ -520,7 +510,7 @@
         const adjustmentAmountInput = document.getElementById('adjustment-amount');
         const clearCalculatorBtn = document.getElementById('clear-calculator-btn');
 
-        // Modal Elements
+        // Universal Prompt/Confirmation Modal Elements
         const universalPromptModal = document.getElementById('universal-prompt-modal');
         const modalPromptTitle = document.getElementById('modal-prompt-title');
         const modalPromptMessage = document.getElementById('modal-prompt-message');
@@ -528,10 +518,6 @@
         const modalCancelBtn = document.getElementById('modal-cancel-btn');
         const modalConfirmBtn = document.getElementById('modal-confirm-btn');
         const modalClearInputBtn = document.getElementById('modal-clear-input-btn');
-        const universalConfirmationModal = document.getElementById('universal-confirmation-modal');
-        const confirmationMessageElement = document.getElementById('confirmation-message');
-        const confirmationConfirmBtn = document.getElementById('confirmation-confirm-btn');
-        const confirmationCancelBtn = document.getElementById('confirmation-cancel-btn');
         
         // --- Initialize Swipers ---
         function initSwipers() {
@@ -547,6 +533,9 @@
             });
         }
         
+        // Call initSwipers when the page loads
+        window.onload = initSwipers;
+
         // --- Authentication Logic ---
         auth.onAuthStateChanged(async user => {
             if (user) {
@@ -854,177 +843,55 @@
                 itemContainer.appendChild(membersPanel);
                 menu.appendChild(itemContainer);
             });
+            attachTripSwitcherListeners();
         }
 
-        // --- Event Delegation Setup ---
-        function setupEventListeners() {
-            // Main navigation
-            appNav.addEventListener('click', (event) => {
-                const navBtn = event.target.closest('.nav-btn');
-                if (navBtn) {
-                    showPage(navBtn.dataset.page);
-                }
-            });
-
-            // Trip list in modal (event delegation)
-            const tripListMenu = document.getElementById('trip-list-menu');
-            if (tripListMenu) {
-                tripListMenu.addEventListener('click', async (event) => {
-                    const copyBtn = event.target.closest('.copy-trip-link-btn');
-                    const toggleBtn = event.target.closest('.toggle-members-btn');
-                    const kickBtn = event.target.closest('.kick-member-btn');
-
-                    if (copyBtn) {
-                        event.stopPropagation();
-                        const tripId = copyBtn.dataset.tripId;
-                        const shareLink = `${window.location.origin}${window.location.pathname}?shared=${tripId}`;
-                        copyToClipboard(shareLink, "Trip invitation link copied! 🔗");
-                    } else if (toggleBtn) {
-                        event.stopPropagation();
-                        const panel = toggleBtn.closest('.trip-list-item-container').querySelector('.members-panel');
-                        const icon = toggleBtn.querySelector('i');
-                        if (panel && icon) {
-                            panel.classList.toggle('hidden');
-                            icon.classList.toggle('rotate-180');
-                        }
-                    } else if (kickBtn) {
-                        event.stopPropagation();
-                        const { tripId, memberId, memberEmail } = kickBtn.dataset;
-                        showConfirmation(`Are you sure you want to remove ${memberEmail}?`, () => {
-                            removeMemberFromTrip(tripId, memberId, memberEmail);
-                        });
+        function attachTripSwitcherListeners() {
+            document.querySelectorAll('.copy-trip-link-btn').forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const tripIdToCopy = event.currentTarget.dataset.tripId;
+                    if (tripIdToCopy) {
+                        const shareLink = `${window.location.origin}${window.location.pathname}?shared=${tripIdToCopy}`;
+                        copyToClipboard(shareLink, "Trip invitation link copied to clipboard! 🔗");
                     }
                 });
-            }
+            });
 
-            // Buddy list actions (event delegation)
-            const buddyList = document.getElementById('buddy-list');
-            if (buddyList) {
-                buddyList.addEventListener('click', async (event) => {
-                    const editBtn = event.target.closest('.edit-buddy');
-                    const deleteBtn = event.target.closest('.delete-buddy');
-                    if (editBtn) {
-                        const index = parseInt(editBtn.dataset.index);
-                        const currentName = appData.buddies[index];
-                        const newName = await showPromptModal(`✏️ Edit Buddy`, `Rename buddy "${currentName}" to:`, currentName);
-                        if (newName && newName.trim() && newName.trim() !== currentName) {
-                            if (appData.buddies.includes(newName.trim())) { showError('Buddy name already exists.'); return; }
-                            if (newName.trim().length > 50) { showError('Buddy name must be 50 characters or less.'); return; }
-                            const oldName = appData.buddies[index];
-                            appData.buddies[index] = newName.trim();
-                            appData.expenses.forEach(exp => {
-                                exp.buddies = exp.buddies.map(p => p === oldName ? newName.trim() : p);
-                                if (exp.payer === oldName) exp.payer = newName.trim();
-                            });
-                            appData.adjustments.forEach(adj => {
-                                if (adj.debtor === oldName) adj.debtor = newName.trim();
-                                if (adj.creditor === oldName) adj.creditor = newName.trim();
-                            });
-                            saveDataToFirebase();
-                            showError(`'${oldName}' renamed to '${newName.trim()}'`, 3000, 'success');
-                        }
-                    } else if (deleteBtn) {
-                        const index = parseInt(deleteBtn.dataset.index);
-                        const buddyToDelete = appData.buddies[index];
-                        if (appData.expenses.some(exp => exp.buddies.includes(buddyToDelete) || exp.payer === buddyToDelete)) {
-                            showError(`Cannot delete ${buddyToDelete}. They are part of existing expenses.`, 5000); return;
-                        }
-                        if (appData.adjustments.some(adj => adj.debtor === buddyToDelete || adj.creditor === buddyToDelete)) {
-                            showError(`Cannot delete ${buddyToDelete}. They are involved in adjustments.`, 5000); return;
-                        }
-                        showConfirmation(`Are you sure you want to delete ${buddyToDelete}?`, () => {
-                            appData.buddies.splice(index, 1);
-                            saveDataToFirebase();
-                            showError(`${buddyToDelete} has been deleted.`, 3000, 'success');
-                        });
+            document.querySelectorAll('.toggle-members-btn').forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const itemContainer = btn.closest('.trip-list-item-container');
+                    const panel = itemContainer.querySelector('.members-panel');
+                    const icon = btn.querySelector('i');
+                    if (panel && icon) {
+                        panel.classList.toggle('hidden');
+                        icon.classList.toggle('rotate-180');
                     }
                 });
-            }
+            });
 
-            // Meal records actions (event delegation)
-            const mealRecords = document.getElementById('meal-records');
-            if (mealRecords) {
-                mealRecords.addEventListener('click', (event) => {
-                    const editBtn = event.target.closest('.edit-meal-record');
-                    const deleteBtn = event.target.closest('.delete-meal-record');
-
-                    if (editBtn) {
-                        const expenseId = Number(editBtn.dataset.id);
-                        const indexToEdit = appData.expenses.findIndex(exp => exp.id === expenseId);
-                        if (indexToEdit > -1) editExpense(indexToEdit);
-                    } else if (deleteBtn) {
-                         const expenseId = Number(deleteBtn.dataset.id);
-                        const expenseToDelete = appData.expenses.find(exp => exp.id === expenseId);
-                        if (expenseToDelete) {
-                            const confirmationMessage = `Delete '${expenseToDelete.mealType} @ ${expenseToDelete.restaurant}'?`;
-                            showConfirmation(confirmationMessage, () => {
-                                appData.expenses = appData.expenses.filter(exp => exp.id !== expenseId);
-                                saveDataToFirebase();
-                                showError('Expense deleted!', 3000, 'success');
-                            });
-                        }
-                    }
+            document.querySelectorAll('.kick-member-btn').forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const { tripId, memberId, memberEmail } = event.currentTarget.dataset;
+                    showConfirmation(`Are you sure you want to remove ${memberEmail} from this trip?`, () => {
+                        removeMemberFromTrip(tripId, memberId, memberEmail);
+                    });
                 });
-            }
-
-            // Other general event listeners
-            document.getElementById('add-adjustment-btn').addEventListener('click', addAdjustment);
-            document.getElementById('add-buddy').addEventListener('click', addBuddy);
-            adjustmentDebtorSelect.addEventListener('change', filterCreditorDropdown);
-            groupEventNameInput.addEventListener('change', () => {
-                appData.groupEventName = groupEventNameInput.value.trim();
-                saveDataToFirebase();
             });
-            clearTripNameBtn.addEventListener('click', () => {
-                if (groupEventNameInput.value) {
-                    groupEventNameInput.value = '';
-                    groupEventNameInput.dispatchEvent(new Event('change'));
-                    groupEventNameInput.focus();
-                }
-            });
-            tripPrimaryCurrencySelect.addEventListener('change', () => {
-                currentTripRef.update({ primaryCurrency: tripPrimaryCurrencySelect.value });
-            });
-            doneBuddiesBtn.addEventListener('click', () => {
-                if (!groupEventNameInput.value.trim()) { showError('Please enter a trip name.'); return; }
-                if (appData.buddies.length === 0) { showError('Please add at least one buddy.'); return; }
-                appData.groupEventName = groupEventNameInput.value.trim();
-                saveDataToFirebase();
-                showPage('page-expense');
-            });
-            addExpenseBtn.addEventListener('click', handleAddOrUpdateExpense);
-            resetBtn.addEventListener('click', handleResetTrip);
-            copyWhatsappBtn.addEventListener('click', () => copyToClipboard(generateWhatsAppMessage(), "Data copied!"));
-            selectAllBuddiesCheckbox.addEventListener('change', handleSelectAllBuddies);
-            tripSwitcherBtn.addEventListener('click', openTripSwitcherModal);
-            document.getElementById('close-trip-switcher-btn').addEventListener('click', closeTripSwitcherModal);
-            document.getElementById('create-new-trip-btn').addEventListener('click', () => { closeTripSwitcherModal(); createNewTrip(); });
-            document.getElementById('create-first-trip-btn').addEventListener('click', createNewTrip);
-            if (closeIconBtn) closeIconBtn.addEventListener('click', closeTripSwitcherModal);
-            if(modalClearInputBtn) modalClearInputBtn.addEventListener('click', () => { if(modalPromptInput) { modalPromptInput.value = ''; modalPromptInput.focus(); } });
-
-            // Calculator listeners
-            if(calculatorInput) {
-                calculatorInput.addEventListener('keydown', handleCalculatorKeydown);
-                calculatorInput.addEventListener('input', () => { if (isCalculatorResultShown) { adjustmentAmountInput.value = ''; isCalculatorResultShown = false; }});
-            }
-            if(clearCalculatorBtn) clearCalculatorBtn.addEventListener('click', () => { calculatorInput.innerHTML = ''; adjustmentAmountInput.value = ''; isCalculatorResultShown = false; calculatorInput.focus(); });
-
-            // Choice/Selection button listeners
-            const mealTypeInput = document.getElementById('meal-type');
-            document.getElementById('meal-swiper').addEventListener('click', (e) => handleChoiceButtonClick(e, '.meal-btn', mealButtons, mealTypeInput));
-            const currencyInput = document.getElementById('currency');
-            document.getElementById('currency-swiper').addEventListener('click', (e) => handleChoiceButtonClick(e, '.currency-btn', currencyButtons, currencyInput));
         }
         
         async function removeMemberFromTrip(tripId, memberIdToRemove, memberEmail) {
             try {
                 await database.ref(`trips/${tripId}/members/${memberIdToRemove}`).remove();
                 await database.ref(`users/${memberIdToRemove}/trips/${tripId}`).remove();
-                showError(`${memberEmail} has been removed.`, 3000, 'success');
+                
+                showError(`${memberEmail} has been removed from the trip.`, 3000, 'success');
                 updateAndPopulateTripSwitcher();
             } catch(error) {
                 showError(`Failed to remove member: ${error.message}`);
+                console.error("Error removing member:", error);
             }
         }
         
@@ -1042,6 +909,24 @@
             tripSwitcherModal.querySelector('#trip-switcher-modal-content').classList.add('scale-95');
             setTimeout(() => tripSwitcherModal.classList.add('hidden'), 300);
         }
+
+        tripSwitcherBtn.addEventListener('click', openTripSwitcherModal);
+        document.getElementById('close-trip-switcher-btn').addEventListener('click', closeTripSwitcherModal);
+        document.getElementById('create-new-trip-btn').addEventListener('click', () => {
+            closeTripSwitcherModal();
+            createNewTrip();
+        });
+        document.getElementById('create-first-trip-btn').addEventListener('click', createNewTrip);
+        if (closeIconBtn) { 
+            closeIconBtn.addEventListener('click', closeTripSwitcherModal);
+        }
+
+        modalClearInputBtn.addEventListener('click', () => {
+            if(modalPromptInput) {
+                modalPromptInput.value = '';
+                modalPromptInput.focus();
+            }
+        });
 
         // --- Database Logic ---
         function saveDataToFirebase() {
@@ -1067,14 +952,17 @@
         // --- Main App Logic ---
         function updateAllUI() {
             if (!currentTripId) return;
+            
             groupEventNameInput.value = appData.groupEventName;
             tripPrimaryCurrencySelect.value = appData.primaryCurrency;
             currentTripNameEl.textContent = appData.groupEventName || 'Untitled Trip';
             updateCurrencyDisplays();
             updateBuddyList();
-            updateSummaryAndDebt();
+            updateSummary();
             updateMealRecords();
+            updateDebtSettlement();
             updateAdjustmentsDisplay();
+            
             const isOwner = auth.currentUser && auth.currentUser.uid === appData.owner;
             resetBtn.style.display = isOwner ? 'flex' : 'none';
         }
@@ -1083,10 +971,12 @@
             const currency = appData.primaryCurrency;
             document.getElementById('summary-title').innerHTML = `<span class="text-2xl sm:text-3xl">📊</span>Expense Summary (${currency})`;
             document.getElementById('debt-title').innerHTML = `<span class="text-2xl sm:text-3xl">🤝</span>Debt Settlement (${currency})`;
+            
             document.getElementById('summary-total-owed-header').textContent = 'Total Owed';
             document.getElementById('debt-paid-header').textContent = 'Paid';
             document.getElementById('debt-owed-header').textContent = 'Owed';
             document.getElementById('debt-net-header').textContent = 'Net Balance';
+
             expenseFormTitle.innerHTML = `<span class="text-2xl sm:text-3xl">💸</span>Add New Expense`;
         }
 
@@ -1129,8 +1019,17 @@
 
         function formatTimestamp(dateString) {
             const date = new Date(dateString);
-            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true };
-            return date.toLocaleString('en-US', options);
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const dayName = days[date.getDay()];
+            const day = date.getDate();
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            let hours = date.getHours();
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            return `${dayName}, ${day} ${month} ${year}, ${hours}:${minutes}${ampm}`;
         }
 
         function showPage(pageId) {
@@ -1150,13 +1049,43 @@
              window.scrollTo(0, 0);
         }
 
-        function handleChoiceButtonClick(event, buttonSelector, buttonNodeList, hiddenInput) {
-            const button = event.target.closest(buttonSelector);
-            if (!button) return;
-            buttonNodeList.forEach(b => b.classList.remove('active'));
-            button.classList.add('active');
-            hiddenInput.value = button.dataset.meal || button.dataset.currency;
-        }
+        navButtons.forEach(btn => {
+            btn.addEventListener('click', () => showPage(btn.dataset.page));
+        });
+
+        groupEventNameInput.addEventListener('change', () => {
+            appData.groupEventName = groupEventNameInput.value.trim();
+            saveDataToFirebase();
+        });
+
+        clearTripNameBtn.addEventListener('click', () => {
+            if (groupEventNameInput.value) {
+                groupEventNameInput.value = '';
+                groupEventNameInput.dispatchEvent(new Event('change'));
+                groupEventNameInput.focus();
+            }
+        });
+
+        tripPrimaryCurrencySelect.addEventListener('change', () => {
+            currentTripRef.update({ primaryCurrency: tripPrimaryCurrencySelect.value });
+        });
+
+
+        mealButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                mealButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('meal-type').value = btn.dataset.meal;
+            });
+        });
+
+        currencyButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                currencyButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('currency').value = btn.dataset.currency;
+            });
+        });
 
         function updateBuddyList() {
             const buddyList = document.getElementById('buddy-list');
@@ -1191,55 +1120,129 @@
                     </label>`;
                 combinedBuddiesPayerContainer.appendChild(combinedItem);
             });
+
+            if (selectAllBuddiesCheckbox) {
+                selectAllBuddiesCheckbox.removeEventListener('change', handleSelectAllBuddies);
+                selectAllBuddiesCheckbox.addEventListener('change', handleSelectAllBuddies);
+            }
+
+            document.querySelectorAll('.edit-buddy').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const index = parseInt(btn.dataset.index);
+                    const currentName = appData.buddies[index];
+                    const newName = await showPromptModal(`✏️ Edit Buddy`, `Rename buddy "${currentName}" to:`, currentName);
+
+                    if (newName && newName.trim() && newName.trim() !== currentName) {
+                        if (appData.buddies.includes(newName.trim())) {
+                            showError('Buddy name already exists.'); return;
+                        }
+                        if (newName.trim().length > 50) {
+                            showError('Buddy name must be 50 characters or less.'); return;
+                        }
+                        const oldName = appData.buddies[index];
+                        appData.buddies[index] = newName.trim();
+                        appData.expenses.forEach(exp => {
+                            exp.buddies = exp.buddies.map(p => p === oldName ? newName.trim() : p);
+                            if (exp.payer === oldName) exp.payer = newName.trim();
+                        });
+                        appData.adjustments.forEach(adj => {
+                            if (adj.debtor === oldName) adj.debtor = newName.trim();
+                            if (adj.creditor === oldName) adj.creditor = newName.trim();
+                        });
+                        saveDataToFirebase();
+                        showError(`'${oldName}' renamed to '${newName.trim()}'`, 3000, 'success');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-buddy').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const index = parseInt(btn.dataset.index);
+                    const buddyToDelete = appData.buddies[index];
+                    if (appData.expenses.some(exp => exp.buddies.includes(buddyToDelete) || exp.payer === buddyToDelete)) {
+                        showError(`Cannot delete ${buddyToDelete}. They are part of existing expenses.`, 5000); return;
+                    }
+                    if (appData.adjustments.some(adj => adj.debtor === buddyToDelete || adj.creditor === buddyToDelete)) {
+                        showError(`Cannot delete ${buddyToDelete}. They are involved in adjustments.`, 5000); return;
+                    }
+                    showConfirmation(`Are you sure you want to delete ${buddyToDelete}?`, () => {
+                        appData.buddies.splice(index, 1);
+                        saveDataToFirebase();
+                        showError(`${buddyToDelete} has been deleted.`, 3000, 'success');
+                    });
+                });
+            });
         }
         
         function handleSelectAllBuddies() {
-            document.querySelectorAll('#combined-buddies-payer .buddy').forEach(cb => cb.checked = selectAllBuddiesCheckbox.checked);
+            const isChecked = selectAllBuddiesCheckbox.checked;
+            document.querySelectorAll('#combined-buddies-payer .buddy').forEach(checkbox => checkbox.checked = isChecked);
         }
 
-        function addBuddy() {
+        addBuddyBtn.addEventListener('click', () => {
             const newName = newBuddyInput.value.trim();
             if (!newName) { showError('Please enter a buddy name.'); return; }
             if (appData.buddies.includes(newName)) { showError('Buddy already exists.'); return; }
             if (newName.length > 50) { showError('Buddy name must be 50 characters or less.'); return; }
+            
             appData.buddies.push(newName);
             saveDataToFirebase();
+
             newBuddyInput.value = '';
-            showError(`${newName} added! ✨`, 3000, 'success');
-        }
-        
-        function handleAddOrUpdateExpense() {
-            if (!appData.groupEventName) { showError('Please set a trip name on the Buddies tab first.'); showPage('page-buddies'); return; }
+            showError(`${newName} added successfully! ✨`, 3000, 'success');
+        });
+
+        doneBuddiesBtn.addEventListener('click', () => {
+            const eventName = groupEventNameInput.value.trim();
+            if (!eventName) { showError('Please enter a trip name.'); return; }
+            if (appData.buddies.length === 0) { showError('Please add at least one buddy.'); return; }
+            
+            appData.groupEventName = eventName;
+            saveDataToFirebase();
+
+            showPage('page-expense');
+        });
+
+        addExpenseBtn.addEventListener('click', () => {
+            if (!appData.groupEventName) {
+                showError('Please set a trip name on the Buddies tab first.');
+                showPage('page-buddies');
+                return;
+            }
             const mealType = document.getElementById('meal-type').value;
             const restaurant = document.getElementById('restaurant').value.trim();
             const currency = document.getElementById('currency').value;
             const amount = parseFloat(document.getElementById('amount').value);
             const selectedBuddies = Array.from(document.querySelectorAll('#combined-buddies-payer .buddy:checked')).map(cb => cb.value);
-            const payerRadio = document.querySelector('#combined-buddies-payer .payer:checked');
+            const selectedPayerRadio = document.querySelector('#combined-buddies-payer .payer:checked');
+            const selectedPayer = selectedPayerRadio ? selectedPayerRadio.value : null;
+
             if (!mealType) { showError('Please select a meal type.'); return; }
             if (!restaurant) { showError('Please enter a place or item name.'); return; }
             if (!currency) { showError('Please select a currency.'); return; }
             if (isNaN(amount) || amount <= 0) { showError('Please enter a valid amount.'); return; }
             if (selectedBuddies.length === 0) { showError('Please select at least one buddy.'); return; }
-            if (!payerRadio) { showError('Please select who paid.'); return; }
-            if (!selectedBuddies.includes(payerRadio.value)) { showError('The payer must be one of the selected buddies.'); return; }
+            if (!selectedPayer) { showError('Please select who paid.'); return; }
+            if (!selectedBuddies.includes(selectedPayer)) {
+                showError('The payer must be one of the selected buddies.'); return;
+            }
+            const amountInPrimaryCurrency = amount / (exchangeRates[currency] || 1); 
 
-            const amountInPrimaryCurrency = amount / (exchangeRates[currency] || 1);
+            const perBuddy = amountInPrimaryCurrency / selectedBuddies.length;
+
             const newExpense = {
                 id: editingExpenseIndex > -1 ? appData.expenses[editingExpenseIndex].id : Date.now(),
                 mealType, restaurant, currency, amount, amountInPrimaryCurrency,
-                buddies: selectedBuddies,
-                perBuddy: amountInPrimaryCurrency / selectedBuddies.length,
-                payer: payerRadio.value,
+                buddies: selectedBuddies, perBuddy, payer: selectedPayer,
                 timestamp: new Date().toISOString()
             };
 
             if (editingExpenseIndex > -1) {
                 appData.expenses[editingExpenseIndex] = newExpense;
-                showError('Expense updated! ✨', 3000, 'success');
+                showError('Expense updated successfully! ✨', 3000, 'success');
             } else {
                 appData.expenses.push(newExpense);
-                showError('Expense added! 🎉', 3000, 'success');
+                showError('Expense added successfully! 🎉', 3000, 'success');
             }
             editingExpenseIndex = -1;
             addExpenseBtn.innerHTML = '<span class="text-lg">🎉</span>Add Expense';
@@ -1249,115 +1252,60 @@
             saveDataToFirebase();
             clearForm();
             showPage('page-summary');
-        }
+        });
 
-        function handleResetTrip() {
-            showConfirmation('Reset all expenses and adjustments for this trip?', async () => {
+        resetBtn.addEventListener('click', () => {
+            showConfirmation('Are you sure you want to reset all expenses and adjustments for this trip? Buddies and trip name will not be changed.', async () => {
                 appData.expenses = [];
                 appData.adjustments = [];
-                appData.primaryCurrency = 'HKD';
+                appData.primaryCurrency = 'HKD'; 
                 await fetchExchangeRates();
                 saveDataToFirebase();
                 showError('Trip data has been reset. 🚀', 3000, 'success');
                 showPage('page-buddies');
             });
-        }
-        
-        // --- Calculation and Rendering ---
-        function calculateBalances() {
-            const balances = {};
-            appData.buddies.forEach(buddy => {
-                balances[buddy] = { paid: 0, owed: 0, net: 0 };
-            });
+        });
 
-            appData.expenses.forEach(exp => {
-                if (balances[exp.payer]) balances[exp.payer].paid += exp.amountInPrimaryCurrency;
-                exp.buddies.forEach(buddy => {
-                    if (balances[buddy]) balances[buddy].owed += exp.perBuddy;
-                });
-            });
+        copyWhatsappBtn.addEventListener('click', () => {
+            const whatsappText = generateWhatsAppMessage();
+            copyToClipboard(whatsappText, "Data copied to clipboard! Ready to paste into WhatsApp. 📋");
+        });
 
-            appData.adjustments.forEach(adj => {
-                const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
-                if (balances[adj.debtor]) balances[adj.debtor].net -= amountInPrimary;
-                if (balances[adj.creditor]) balances[adj.creditor].net += amountInPrimary;
-            });
-
-            appData.buddies.forEach(buddy => {
-                balances[buddy].net = (balances[buddy].paid - balances[buddy].owed) + balances[buddy].net;
-            });
-            return balances;
-        }
-        
-        function updateSummaryAndDebt() {
+        function updateSummary() {
             const summaryTableBody = document.getElementById('summary-table');
-            const debtTableBody = document.getElementById('debt-table');
-            const settlementPlanDiv = document.getElementById('settlement-plan');
-            if (!summaryTableBody || !debtTableBody || !settlementPlanDiv) return;
-
+            if(!summaryTableBody) return;
             summaryTableBody.innerHTML = '';
-            debtTableBody.innerHTML = '';
-            settlementPlanDiv.innerHTML = '';
-
-            const balances = calculateBalances();
+            const totals = {};
+            const details = {};
             const currencySymbol = getCurrencySymbol(appData.primaryCurrency);
-            const buddyDetails = {};
-            appData.buddies.forEach(buddy => buddyDetails[buddy] = []);
+
+            appData.buddies.forEach(buddy => {
+                totals[buddy] = 0;
+                details[buddy] = [];
+            });
+
             appData.expenses.forEach(exp => {
                 exp.buddies.forEach(buddy => {
-                    buddyDetails[buddy].push(`<div class="text-xs"><span class="font-medium">${exp.mealType}</span> at ${exp.restaurant}: ${currencySymbol}${exp.perBuddy.toFixed(2)}</div>`);
+                    const perBuddyConverted = exp.perBuddy;
+                    totals[buddy] += perBuddyConverted;
+                    details[buddy].push(`<div class="text-xs"><span class="font-medium">${exp.mealType}</span> at ${exp.restaurant}: ${currencySymbol}${perBuddyConverted.toFixed(2)}</div>`);
                 });
             });
 
             if (appData.buddies.length === 0) {
-                const noDataRow = (cols) => `<tr><td colspan="${cols}" class="py-4 px-4 text-center text-slate-500">No data yet.</td></tr>`;
-                summaryTableBody.innerHTML = noDataRow(3);
-                debtTableBody.innerHTML = noDataRow(4);
-                settlementPlanDiv.innerHTML = '<p class="text-slate-500 text-center py-2">Add buddies and expenses.</p>';
+                const row = summaryTableBody.insertRow();
+                row.innerHTML = `<td colspan="3" class="py-4 px-2 md:px-4 text-center text-slate-500">No buddies added yet.</td>`;
                 return;
             }
 
             appData.buddies.forEach(buddy => {
-                // Summary Row
-                const summaryRow = summaryTableBody.insertRow();
-                summaryRow.innerHTML = `
+                const row = summaryTableBody.insertRow();
+                row.innerHTML = `
                     <td class="py-3 px-2 md:px-4 text-slate-700 font-medium whitespace-normal">${buddy}</td>
-                    <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${currencySymbol}${balances[buddy].owed.toFixed(2)}</td>
-                    <td class="py-3 px-2 md:px-4 text-slate-700 space-y-1 whitespace-normal">${buddyDetails[buddy].join('') || '<span class="text-slate-400">No expenses</span>'}</td>
-                `;
-                // Debt Row
-                const net = balances[buddy].net;
-                const colorClass = net < -0.005 ? 'text-red-600 font-semibold' : net > 0.005 ? 'text-green-600 font-semibold' : 'text-slate-700';
-                const debtRow = debtTableBody.insertRow();
-                debtRow.innerHTML = `
-                    <td class="py-3 px-2 md:px-4 text-slate-700 font-medium whitespace-normal">${buddy}</td>
-                    <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${currencySymbol}${balances[buddy].paid.toFixed(2)}</td>
-                    <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${currencySymbol}${balances[buddy].owed.toFixed(2)}</td>
-                    <td class="py-3 px-2 md:px-4 whitespace-nowrap ${colorClass}">${currencySymbol}${net.toFixed(2)}</td>
+                    <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${currencySymbol}${totals[buddy].toFixed(2)}</td>
+                    <td class="py-3 px-2 md:px-4 text-slate-700 space-y-1 whitespace-normal">${details[buddy].join('') || '<span class="text-slate-400">No expenses</span>'}</td>
                 `;
             });
-            
-            // Settlement Plan
-            const debtors = appData.buddies.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
-            const creditors = appData.buddies.filter(p => balances[p].net > 0.005).map(p => ({ name: p, amount: balances[p].net }));
-            const settlements = [];
-            let i = 0, j = 0;
-            while (i < debtors.length && j < creditors.length) {
-                const amount = Math.min(debtors[i].amount, creditors[j].amount);
-                if (amount > 0.005) {
-                    settlements.push(`<span class="font-medium text-rose-600">${debtors[i].name}</span> pays <span class="font-medium text-emerald-600">${creditors[j].name}</span> <strong class="text-sky-700">${amount.toFixed(2)} ${appData.primaryCurrency}</strong>`);
-                    debtors[i].amount -= amount;
-                    creditors[j].amount -= amount;
-                }
-                if (debtors[i].amount < 0.005) i++;
-                if (creditors[j].amount < 0.005) j++;
-            }
-
-            if (settlements.length === 0) {
-                settlementPlanDiv.innerHTML = '<p class="text-green-600 font-medium text-center py-2">🎉 All debts are settled!</p>';
-            } else {
-                settlementPlanDiv.innerHTML = `<ul class="space-y-2">${settlements.map(s => `<li class="bg-sky-50 p-2.5 rounded-md text-sm shadow-sm border border-sky-100">${s}</li>`).join('')}</ul>`;
-            }
         }
         
         function updateMealRecords() {
@@ -1365,16 +1313,22 @@
             const mealRecordsContainer = document.getElementById('meal-records');
             if(!totalSpentElement || !mealRecordsContainer) return;
 
+            mealRecordsContainer.innerHTML = '';
             const total = appData.expenses.reduce((sum, exp) => sum + exp.amountInPrimaryCurrency, 0);
-            totalSpentElement.textContent = `Total Spent: ${appData.primaryCurrency} ${total.toFixed(2)} | ${appData.expenses.length} transaction${appData.expenses.length !== 1 ? 's' : ''}`;
+            const count = appData.expenses.length;
+            totalSpentElement.textContent = `Total Spent: ${appData.primaryCurrency} ${total.toFixed(2)} | ${count} transaction${count !== 1 ? 's' : ''}`;
 
             if (appData.expenses.length === 0) {
-                mealRecordsContainer.innerHTML = '<p class="text-slate-500 text-center py-4">No meal records yet. 🍽️</p>';
+                mealRecordsContainer.innerHTML = '<p class="text-slate-500 text-center py-4">No meal records yet. Add an expense! 🍽️</p>';
                 return;
             }
             const sortedExpenses = [...appData.expenses].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            mealRecordsContainer.innerHTML = sortedExpenses.map(exp => `
-                <div class="relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-xs text-slate-600 leading-relaxed hover:shadow-md transition-shadow">
+
+            sortedExpenses.forEach((exp) => {
+                const div = document.createElement('div');
+                div.className = 'relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-xs text-slate-600 leading-relaxed hover:shadow-md transition-shadow';
+                const timestamp = formatTimestamp(exp.timestamp);
+                div.innerHTML = `
                     <div class="absolute top-2 right-2 flex gap-1">
                         <button class="edit-meal-record bg-sky-100 text-sky-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-sky-200" data-id="${exp.id}" aria-label="Edit meal record">✏️</button>
                         <button class="delete-meal-record bg-rose-100 text-rose-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-rose-200" data-id="${exp.id}" aria-label="Delete meal record">✖</button>
@@ -1385,9 +1339,33 @@
                     </div>
                     <div class="text-xs">Paid by: <strong class="text-slate-700">${exp.payer}</strong></div>
                     <div class="text-xs">Shared with: <em class="text-slate-500">${exp.buddies.join(', ')}</em></div>
-                    <div class="text-right text-slate-400 text-[10px] mt-1.5">${formatTimestamp(exp.timestamp)}</div>
-                </div>`
-            ).join('');
+                    <div class="text-right text-slate-400 text-[10px] mt-1.5">${timestamp}</div>`;
+                mealRecordsContainer.appendChild(div);
+            });
+
+            document.querySelectorAll('.edit-meal-record').forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    const expenseId = Number(event.currentTarget.dataset.id);
+                    const indexToEdit = appData.expenses.findIndex(exp => exp.id === expenseId);
+                    if (indexToEdit > -1) editExpense(indexToEdit);
+                });
+            });
+
+            document.querySelectorAll('.delete-meal-record').forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    const expenseId = Number(event.currentTarget.dataset.id);
+                    const expenseToDelete = appData.expenses.find(exp => exp.id === expenseId);
+                    
+                    if (expenseToDelete) {
+                        const confirmationMessage = `Are you sure you want to delete the '${expenseToDelete.mealType} @ ${expenseToDelete.restaurant}' expense?`;
+                        showConfirmation(confirmationMessage, () => {
+                            appData.expenses = appData.expenses.filter(exp => exp.id !== expenseId);
+                            saveDataToFirebase();
+                            showError('Expense deleted successfully!', 3000, 'success');
+                        });
+                    }
+                });
+            });
         }
         
         function editExpense(index) {
@@ -1404,7 +1382,7 @@
             
             document.querySelectorAll('#combined-buddies-payer .buddy').forEach(cb => cb.checked = false);
             document.querySelectorAll('#combined-buddies-payer .payer').forEach(radio => radio.checked = false);
-            selectAllBuddiesCheckbox.checked = false;
+            if (selectAllBuddiesCheckbox) selectAllBuddiesCheckbox.checked = false;
 
             expense.buddies.forEach(p => {
                 const checkbox = document.querySelector(`#combined-buddies-payer .buddy[value="${p}"]`);
@@ -1421,16 +1399,99 @@
             window.scrollTo(0, 0);
         }
         
+        function updateDebtSettlement() {
+            const debtTableBody = document.getElementById('debt-table');
+            const settlementPlanDiv = document.getElementById('settlement-plan');
+            if(!debtTableBody || !settlementPlanDiv) return;
+
+            debtTableBody.innerHTML = '';
+            settlementPlanDiv.innerHTML = '';
+            const currencySymbol = getCurrencySymbol(appData.primaryCurrency);
+
+            const balances = {};
+            appData.buddies.forEach(buddy => {
+                balances[buddy] = { paid: 0, owed: 0, net: 0 };
+            });
+
+            appData.expenses.forEach(exp => {
+                if (balances[exp.payer]) balances[exp.payer].paid += exp.amountInPrimaryCurrency;
+                exp.buddies.forEach(buddy => {
+                    if(balances[buddy]) balances[buddy].owed += exp.perBuddy;
+                });
+            });
+
+            appData.adjustments.forEach(adj => {
+                const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
+                if (balances[adj.debtor]) balances[adj.debtor].net -= amountInPrimary;
+                if (balances[adj.creditor]) balances[adj.creditor].net += amountInPrimary;
+            });
+
+            appData.buddies.forEach(buddy => {
+                balances[buddy].net = (balances[buddy].paid - balances[buddy].owed) + balances[buddy].net;
+            });
+
+            if (appData.buddies.length === 0) {
+                 debtTableBody.innerHTML = `<tr><td colspan="4" class="py-4 px-2 md:px-4 text-center text-slate-500">No buddies yet.</td></tr>`;
+                 settlementPlanDiv.innerHTML = '<p class="text-slate-500 text-center py-2">Add buddies and expenses to see settlements.</p>';
+                return;
+            }
+
+            appData.buddies.forEach(buddy => {
+                const net = balances[buddy].net;
+                const colorClass = net < -0.005 ? 'text-red-600 font-semibold' : net > 0.005 ? 'text-green-600 font-semibold' : 'text-slate-700';
+                const row = debtTableBody.insertRow();
+                row.innerHTML = `
+                    <td class="py-3 px-2 md:px-4 text-slate-700 font-medium whitespace-normal">${buddy}</td>
+                    <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${currencySymbol}${balances[buddy].paid.toFixed(2)}</td>
+                    <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${currencySymbol}${balances[buddy].owed.toFixed(2)}</td>
+                    <td class="py-3 px-2 md:px-4 whitespace-nowrap ${colorClass}">${currencySymbol}${net.toFixed(2)}</td>
+                `;
+            });
+
+            const debtors = appData.buddies.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
+            const creditors = appData.buddies.filter(p => balances[p].net > 0.005).map(p => ({ name: p, amount: balances[p].net }));
+            const settlements = [];
+
+            let i = 0, j = 0;
+            while (i < debtors.length && j < creditors.length) {
+                const amountToSettle = Math.min(debtors[i].amount, creditors[j].amount);
+                if (amountToSettle > 0.005) {
+                    settlements.push(`<span class="font-medium text-rose-600">${debtors[i].name}</span> pays <span class="font-medium text-emerald-600">${creditors[j].name}</span> <strong class="text-sky-700">${amountToSettle.toFixed(2)} ${appData.primaryCurrency}</strong>`);
+                    debtors[i].amount -= amountToSettle;
+                    creditors[j].amount -= amountToSettle;
+                }
+                if (debtors[i].amount < 0.005) i++;
+                if (creditors[j].amount < 0.005) j++;
+            }
+
+            if (settlements.length === 0) {
+                settlementPlanDiv.innerHTML = '<p class="text-green-600 font-medium text-center py-2">🎉 All debts are settled!</p>';
+            } else {
+                const ul = document.createElement('ul');
+                ul.className = 'space-y-2';
+                settlements.forEach(s => {
+                    const li = document.createElement('li');
+                    li.className = 'bg-sky-50 p-2.5 rounded-md text-sm shadow-sm border border-sky-100';
+                    li.innerHTML = s;
+                    ul.appendChild(li);
+                });
+                settlementPlanDiv.appendChild(ul);
+            }
+        }
+        
         function updateAdjustmentsDisplay() {
             const container = document.getElementById('current-adjustments');
             if (!container || !adjustmentDebtorSelect || !adjustmentCreditorSelect) return;
 
+            container.innerHTML = '';
             adjustmentDebtorSelect.innerHTML = '<option value="">Select Payer</option>';
             adjustmentCreditorSelect.innerHTML = '<option value="">Select Receiver</option>';
+
             appData.buddies.forEach(p => {
                 adjustmentDebtorSelect.add(new Option(p, p));
                 adjustmentCreditorSelect.add(new Option(p, p));
             });
+
             filterCreditorDropdown();
 
             if (appData.adjustments.length === 0) {
@@ -1438,41 +1499,53 @@
                 return;
             }
 
-            container.innerHTML = appData.adjustments.map((adj, index) => {
+            appData.adjustments.forEach((adj, index) => {
+                const adjDiv = document.createElement('div');
+                adjDiv.className = 'relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-sm flex justify-between items-center';
                 const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
+                
                 const displayAmount = `<strong class="text-sky-700">${adj.originalCurrency} ${adj.amount.toFixed(2)}</strong> 
                                      <span class="text-slate-500 text-xs">(~${amountInPrimary.toFixed(2)} ${appData.primaryCurrency})</span>`;
-                return `
-                <div class="relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-sm flex justify-between items-center">
+
+                adjDiv.innerHTML = `
                     <span class="flex-grow flex flex-wrap items-center gap-x-2">
                         <strong class="text-rose-600">${adj.debtor}</strong> pays <strong class="text-emerald-600">${adj.creditor}</strong> ${displayAmount}
                     </span>
                     <button class="delete-adjustment-btn bg-rose-100 text-rose-600 rounded-full w-6 h-6 flex items-center justify-center font-bold hover:bg-rose-200 shrink-0 ml-2" data-index="${index}">✖</button>
-                </div>`;
-            }).join('');
+                `;
+                container.appendChild(adjDiv);
+            });
 
-            container.querySelectorAll('.delete-adjustment-btn').forEach(btn => {
+            document.querySelectorAll('.delete-adjustment-btn').forEach(btn => {
                 btn.addEventListener('click', (event) => {
-                    const index = parseInt(event.currentTarget.dataset.index);
-                    showConfirmation(`Remove this adjustment?`, () => {
-                        appData.adjustments.splice(index, 1);
-                        saveDataToFirebase();
-                        showError('Adjustment removed.', 3000, 'success');
-                    });
+                    const indexToDelete = parseInt(event.currentTarget.dataset.index);
+                    const adjToDelete = appData.adjustments[indexToDelete];
+                    if (adjToDelete) {
+                        const confirmationMessage = `Are you sure you want to remove the '${adjToDelete.debtor} pays ${adjToDelete.creditor}' adjustment?`;
+                        showConfirmation(confirmationMessage, () => {
+                            appData.adjustments.splice(indexToDelete, 1);
+                            saveDataToFirebase();
+                            showError('Adjustment removed.', 3000, 'success');
+                        });
+                    }
                 });
             });
         }
         
-        function addAdjustment() {
+        document.getElementById('add-adjustment-btn').addEventListener('click', () => {
             const debtor = adjustmentDebtorSelect.value;
             const creditor = adjustmentCreditorSelect.value;
             const currency = document.getElementById('adjustment-currency').value;
             const amount = parseFloat(adjustmentAmountInput.value);
 
-            if (!debtor || !creditor || !currency || isNaN(amount) || amount <= 0) { showError('Please fill all adjustment fields.'); return; }
-            if (debtor === creditor) { showError('Payer and Receiver cannot be the same.'); return; }
+            if (!debtor || !creditor || !currency || isNaN(amount) || amount <= 0) {
+                showError('Please select payer, receiver, currency, and a valid amount.'); return;
+            }
+            if (debtor === creditor) {
+                showError('Payer and Receiver cannot be the same buddy.'); return;
+            }
             
-            appData.adjustments.push({ debtor, creditor, amount, originalCurrency: currency });
+            appData.adjustments.push({ debtor, creditor, amount: amount, originalCurrency: currency });
             saveDataToFirebase();
             
             adjustmentAmountInput.value = '';
@@ -1481,53 +1554,116 @@
             adjustmentDebtorSelect.value = '';
             adjustmentCreditorSelect.value = '';
             filterCreditorDropdown();
-            showError('Adjustment added!', 3000, 'success');
-        }
+            showError('Adjustment added successfully!', 3000, 'success');
+        });
         
         function filterCreditorDropdown() {
             const selectedDebtor = adjustmentDebtorSelect.value;
-            Array.from(adjustmentCreditorSelect.options).forEach(opt => {
-                opt.style.display = (opt.value === selectedDebtor && selectedDebtor !== "") ? 'none' : '';
+            const currentCreditor = adjustmentCreditorSelect.value;
+            let creditorIsValid = false;
+
+            Array.from(adjustmentCreditorSelect.options).forEach(option => {
+                option.style.display = (option.value === selectedDebtor && selectedDebtor !== "") ? 'none' : '';
+                if (option.value === currentCreditor && option.style.display !== 'none') {
+                    creditorIsValid = true;
+                }
             });
-            if (adjustmentCreditorSelect.value === selectedDebtor) adjustmentCreditorSelect.value = "";
+
+            if (!creditorIsValid) adjustmentCreditorSelect.value = "";
         }
+        
+        adjustmentDebtorSelect.addEventListener('change', filterCreditorDropdown);
 
         function generateWhatsAppMessage() {
             let message = `*💰 ${appData.groupEventName || 'Group Event'} Recap* \n\n`;
             const primaryCurrency = appData.primaryCurrency;
-            const balances = calculateBalances();
+
+            const balances = {};
+            appData.buddies.forEach(buddy => {
+                balances[buddy] = { paid: 0, owed: 0, net: 0 };
+            });
+            appData.expenses.forEach(exp => {
+                if (balances[exp.payer]) balances[exp.payer].paid += exp.amountInPrimaryCurrency;
+                exp.buddies.forEach(buddy => {
+                    if(balances[buddy]) balances[buddy].owed += exp.perBuddy;
+                });
+            });
+             appData.adjustments.forEach(adj => {
+                const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
+                if (balances[adj.debtor]) balances[adj.debtor].net -= amountInPrimary;
+                if (balances[adj.creditor]) balances[adj.creditor].net += amountInPrimary;
+            });
+            appData.buddies.forEach(buddy => {
+                balances[buddy].net = (balances[buddy].paid - balances[buddy].owed) + balances[buddy].net;
+            });
 
             message += `*📊 Net Balance Summary (${primaryCurrency})*\n`;
-            appData.buddies.forEach(buddy => {
-                const net = balances[buddy].net;
-                if (net < -0.005) message += `• *${buddy}* pays ${primaryCurrency} ${(-net).toFixed(2)}\n`;
-                else if (net > 0.005) message += `• *${buddy}* receives ${primaryCurrency} ${net.toFixed(2)}\n`;
-            });
-            message += `\n`;
-
-            message += `*🧾 Transaction Records*\n`;
-            if (appData.expenses.length > 0) {
-                appData.expenses.forEach(exp => {
-                    message += `• ${exp.mealType} @ ${exp.restaurant}: *${exp.currency} ${exp.amount.toFixed(2)}* (Paid by ${exp.payer})\n`;
+            if (appData.buddies.length > 0) {
+                appData.buddies.forEach(buddy => {
+                    const netBalance = balances[buddy].net;
+                    if (netBalance < -0.005) {
+                        message += `• *${buddy}* pays ${primaryCurrency} ${(-netBalance).toFixed(2)}\n`;
+                    } else if (netBalance > 0.005) {
+                        message += `• *${buddy}* receives ${primaryCurrency} ${netBalance.toFixed(2)}\n`;
+                    }
                 });
             } else {
-                message += `_No records yet._\n`;
+                message += `_No buddies added yet._\n`;
+            }
+            message += `\n`;
+
+            message += `*🧾 Meal Records*\n`;
+            if (appData.expenses.length > 0) {
+                const total = appData.expenses.reduce((sum, exp) => sum + exp.amountInPrimaryCurrency, 0);
+                message += `Total Spent: *${primaryCurrency} ${total.toFixed(2)}* | ${appData.expenses.length} transaction${appData.expenses.length !== 1 ? 's' : ''}\n\n`;
+                
+                [...appData.expenses].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+                    .forEach((exp, index, arr) => {
+                    message += `• ${exp.mealType} @ ${exp.restaurant}: *${exp.currency} ${exp.amount.toFixed(2)}*\n`;
+                    message += `  Paid by: *${exp.payer}*\n`;
+                    message += `  Shared with: _${exp.buddies.join(', ')}_\n`;
+                    if (index < arr.length - 1) {
+                        message += `--------------------------------------\n`;
+                    }
+                });
+            } else {
+                message += `_No meal records yet._\n`;
             }
             message += `\n`;
 
             if (appData.adjustments.length > 0) {
-                message += `*💱 Individual Adjustments*\n`;
+                message += `*💱 Individual Adjustments:*\n`;
                 appData.adjustments.forEach(adj => {
-                    message += `• *${adj.debtor}* pays *${adj.creditor}* *${adj.originalCurrency} ${adj.amount.toFixed(2)}*\n`;
+                     const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
+                    const adjAmountStr = `*${adj.originalCurrency} ${adj.amount.toFixed(2)}* (~${amountInPrimary.toFixed(2)} ${primaryCurrency})`;
+                    message += `• *${adj.debtor}* pays *${adj.creditor}* ${adjAmountStr}\n`;
                 });
                 message += `\n`;
             }
 
-            const settlementPlanDiv = document.getElementById('settlement-plan');
-            if (settlementPlanDiv && settlementPlanDiv.textContent !== "🎉 All debts are settled!") {
-                message += `*🤝 Settlement Plan*\n`;
-                const planText = settlementPlanDiv.innerText.replace(/\s+/g, ' ').trim();
-                message += `${planText}\n`;
+            message += `*🤝 Debt Settlement*\n`;
+            
+            const debtors = appData.buddies.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
+            const creditors = appData.buddies.filter(p => balances[p].net > 0.005).map(p => ({ name: p, amount: balances[p].net }));
+            const settlements = [];
+
+            let i = 0, j = 0;
+            while (i < debtors.length && j < creditors.length) {
+                const amountToSettle = Math.min(debtors[i].amount, creditors[j].amount);
+                if (amountToSettle > 0.005) {
+                    settlements.push(`* *${debtors[i].name}* pays *${creditors[j].name}* *${amountToSettle.toFixed(2)} ${primaryCurrency}*`);
+                    debtors[i].amount -= amountToSettle;
+                    creditors[j].amount -= amountToSettle;
+                }
+                if (debtors[i].amount < 0.005) i++;
+                if (creditors[j].amount < 0.005) j++;
+            }
+
+            if (settlements.length === 0) {
+                message += `_🎉 All debts are settled!_\n`;
+            } else {
+                message += `_Settlement Plan:_\n`;
+                message += settlements.join('\n') + '\n';
             }
             
             message += `\n_Generated by Bill Buddy_`;
@@ -1540,30 +1676,52 @@
             if (!errorMsgElement) return;
             clearTimeout(errorTimeout);
             errorMsgElement.textContent = message;
-            errorMsgElement.className = `p-3 rounded-lg text-sm shadow-lg transition-opacity duration-300 ${type === 'success' ? 'bg-green-100 text-green-700 border border-green-300' : 'bg-red-100 text-red-700 border border-red-300'}`;
-            requestAnimationFrame(() => errorMsgElement.classList.remove('opacity-0'));
+            errorMsgElement.classList.remove('opacity-0', 'bg-red-100', 'text-red-700', 'border-red-300', 'bg-green-100', 'text-green-700', 'border-green-300');
+            errorMsgElement.classList.add('opacity-0'); 
+            requestAnimationFrame(() => {
+                 errorMsgElement.classList.add(type === 'success' ? 'bg-green-100' : 'bg-red-100', type === 'success' ? 'text-green-700' : 'text-red-700', type === 'success' ? 'border-green-300' : 'border-red-300');
+                 errorMsgElement.classList.remove('opacity-0');
+            });
             errorTimeout = setTimeout(() => errorMsgElement.classList.add('opacity-0'), duration);
         }
 
         function showConfirmation(message, onConfirm) {
-            confirmationMessageElement.textContent = message;
-            universalConfirmationModal.classList.remove('hidden');
+            const modalId = 'confirmation-modal';
+            let modal = document.getElementById(modalId);
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = modalId;
+                modal.className = 'fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[200] p-4 transition-opacity duration-300 opacity-0';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full space-y-4 transform scale-95 transition-all duration-300">
+                        <p class="text-lg font-semibold text-slate-800" id="confirmation-message"></p>
+                        <div class="flex justify-end gap-3">
+                            <button id="cancel-btn" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-md hover:bg-slate-300 font-medium">Cancel</button>
+                            <button id="confirm-btn" class="px-4 py-2 bg-rose-500 text-white rounded-md hover:bg-rose-600 font-medium">Confirm</button>
+                        </div>
+                    </div>`;
+                document.body.appendChild(modal);
+            }
+            document.getElementById('confirmation-message').textContent = message;
+            modal.classList.remove('hidden');
             requestAnimationFrame(() => {
-                universalConfirmationModal.classList.remove('opacity-0');
-                universalConfirmationModal.querySelector('div').classList.remove('scale-95');
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
             });
             
+            const confirmBtn = document.getElementById('confirm-btn');
+            const cancelBtn = document.getElementById('cancel-btn');
             const cleanup = () => { 
-                universalConfirmationModal.classList.add('opacity-0');
-                universalConfirmationModal.querySelector('div').classList.add('scale-95');
+                modal.classList.add('opacity-0');
+                modal.querySelector('div').classList.add('scale-95');
                 setTimeout(() => {
-                    universalConfirmationModal.classList.add('hidden'); 
-                    confirmationConfirmBtn.onclick = null; 
-                    confirmationCancelBtn.onclick = null;
+                    modal.classList.add('hidden'); 
+                    confirmBtn.onclick = null; 
+                    cancelBtn.onclick = null;
                 }, 300);
              };
-            confirmationConfirmBtn.onclick = () => { onConfirm(); cleanup(); };
-            confirmationCancelBtn.onclick = cleanup;
+            confirmBtn.onclick = () => { onConfirm(); cleanup(); };
+            cancelBtn.onclick = cleanup;
         }
 
         function showPromptModal(title, message, defaultValue = '', placeholder = 'Enter name here') {
@@ -1587,7 +1745,6 @@
                         universalPromptModal.classList.add('hidden');
                         modalConfirmBtn.onclick = null;
                         modalCancelBtn.onclick = null;
-                        modalPromptInput.onkeydown = null;
                         resolve(value);
                     }, 300);
                 };
@@ -1605,35 +1762,59 @@
         
         function safeEvaluate(expression) {
             try {
-                if (!/^[0-9\s\.\+\-\*\/\(\)]+$/.test(expression)) throw new Error("Invalid characters.");
+                if (!/^[0-9\s\.\+\-\*\/\(\)]+$/.test(expression)) {
+                    throw new Error("Invalid characters in expression.");
+                }
                 const result = new Function('return ' + expression)();
-                if (typeof result !== 'number' || !isFinite(result)) throw new Error("Invalid calculation.");
+                if (typeof result !== 'number' || !isFinite(result)) {
+                    throw new Error("Invalid calculation result.");
+                }
                 return result;
             } catch (error) {
+                console.error("Evaluation error:", error);
                 showError(error.message, 3000, 'error');
                 return null;
             }
         }
         
-        function handleCalculatorKeydown(event) {
-            if (event.key !== 'Enter') return;
-            event.preventDefault();
-            const expression = calculatorInput.textContent.trim();
-            if (!expression) return;
-            const result = safeEvaluate(expression);
-            if (result !== null) {
-                const formattedResult = Number(result.toFixed(2));
-                adjustmentAmountInput.value = formattedResult;
-                calculatorInput.innerHTML = `${expression} = <strong class="text-indigo-600 font-bold">${formattedResult}</strong>`;
-                isCalculatorResultShown = true;
-                const range = document.createRange();
-                const sel = window.getSelection();
-                range.selectNodeContents(calculatorInput);
-                range.collapse(false);
-                sel.removeAllRanges();
-                sel.addRange(range);
+        calculatorInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') { 
+                event.preventDefault();
+                const expression = calculatorInput.textContent.trim();
+                if (!expression) return;
+                
+                const result = safeEvaluate(expression);
+                
+                if (result !== null) {
+                    const formattedResult = Number(result.toFixed(2));
+                    adjustmentAmountInput.value = formattedResult;
+                    calculatorInput.innerHTML = `${expression} = <strong class="text-indigo-600 font-bold">${formattedResult}</strong>`;
+                    isCalculatorResultShown = true;
+                    
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.selectNodeContents(calculatorInput);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
             }
-        }
+        });
+
+        calculatorInput.addEventListener('input', () => {
+            if (isCalculatorResultShown) {
+                adjustmentAmountInput.value = '';
+                isCalculatorResultShown = false;
+            }
+        });
+
+        clearCalculatorBtn.addEventListener('click', () => {
+            calculatorInput.innerHTML = '';
+            adjustmentAmountInput.value = '';
+            isCalculatorResultShown = false;
+            calculatorInput.focus();
+        });
+
 
         function clearForm() {
             document.getElementById('meal-type').value = '';
@@ -1643,7 +1824,7 @@
             document.querySelectorAll('#combined-buddies-payer .buddy:checked').forEach(cb => cb.checked = false);
             const payerRadio = document.querySelector('#combined-buddies-payer .payer:checked');
             if(payerRadio) payerRadio.checked = false;
-            selectAllBuddiesCheckbox.checked = false;
+            if (selectAllBuddiesCheckbox) selectAllBuddiesCheckbox.checked = false;
             mealButtons.forEach(b => b.classList.remove('active'));
             currencyButtons.forEach(b => b.classList.remove('active'));
             if(calculatorInput) calculatorInput.innerHTML = '';
@@ -1660,16 +1841,10 @@
                 document.execCommand('copy');
                 showError(successMessage, 3000, 'success');
             } catch (err) {
-                showError('Failed to copy.', 3000, 'error');
+                showError('Failed to copy data.', 3000, 'error');
             }
             document.body.removeChild(textarea);
         }
-
-        // --- Initial Load ---
-        window.onload = () => {
-            initSwipers();
-            setupEventListeners();
-        };
 
     </script>
 </body>
