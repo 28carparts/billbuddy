@@ -17,7 +17,7 @@
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }\
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         /* Active choice buttons */
@@ -49,20 +49,6 @@
             color: #94a3b8; /* slate-400 */
             pointer-events: none;
             display: block; 
-        }
-
-        /* NEW: Styles for horizontal scrollable button containers */
-        .hide-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera*/
-        }
-
-        /* Optional: Add active-dragging class for visual feedback when dragging */
-        .active-dragging {
-            cursor: grabbing;
         }
     </style>
 </head>
@@ -190,13 +176,12 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-slate-600 mb-1.5">Meal Type</label>
-                        <!-- MODIFIED: Added classes for horizontal scrolling and a new ID for JS targeting -->
-                        <div id="meal-buttons-container" class="flex flex-nowrap overflow-x-auto gap-2 py-2 hide-scrollbar scroll-smooth snap-x-mandatory cursor-grab">
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Breakfast"><span class="text-lg">🥞</span>Breakfast</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Lunch"><span class="text-lg">🥪</span>Lunch</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Tea"><span class="text-lg">🍵</span>Tea/Snacks</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Dinner"><span class="text-lg">🍝</span>Dinner</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Other"><span class="text-lg">🛍️</span>Other</button>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-meal="Breakfast"><span class="text-lg">🥞</span>Breakfast</button>
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-meal="Lunch"><span class="text-lg">🥪</span>Lunch</button>
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-meal="Tea"><span class="text-lg">🍵</span>Tea/Snacks</button>
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-meal="Dinner"><span class="text-lg">🍝</span>Dinner</button>
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-meal="Other"><span class="text-lg">🛍️</span>Other</button>
                         </div>
                         <input type="hidden" id="meal-type" name="meal-type">
                     </div>
@@ -208,15 +193,14 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-slate-600 mb-1.5">Currency</label>
-                        <!-- MODIFIED: Added classes for horizontal scrolling and a new ID for JS targeting -->
-                        <div id="currency-buttons-container" class="flex flex-nowrap overflow-x-auto gap-2 py-2 hide-scrollbar scroll-smooth snap-x-mandatory cursor-grab">
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="HKD"><span class="text-lg">🇭🇰</span>HKD</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="CNY"><span class="text-lg">🇨🇳</span>CNY</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="JPY"><span class="text-lg">🇯🇵</span>JPY</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="USD"><span class="text-lg">🇺🇸</span>USD</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="EUR"><span class="text-lg">🇪🇺</span>EUR</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="GBP"><span class="text-lg">🇬🇧</span>GBP</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="KRW"><span class="text-lg">🇰🇷</span>KRW</button>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="HKD"><span class="text-lg">🇭🇰</span>HKD</button>
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="CNY"><span class="text-lg">🇨🇳</span>CNY</button>
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="JPY"><span class="text-lg">🇯🇵</span>JPY</button>
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="USD"><span class="text-lg">🇺🇸</span>USD</button>
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="EUR"><span class="text-lg">🇪🇺</span>EUR</button>
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="GBP"><span class="text-lg">🇬🇧</span>GBP</button>
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="KRW"><span class="text-lg">🇰🇷</span>KRW</button>
                         </div>
                         <input type="hidden" id="currency" name="currency">
                     </div>
@@ -308,7 +292,7 @@
                                 <option value="">Select Receiver</option>
                             </select>
                         </div>
-                        <!-- MODIFIED: Updated Calculator Input label to reflect 'Enter' key -->
+                        <!-- MODIFIED: Added Calculator Input -->
                         <div>
                             <label for="calculator-input" class="block text-sm font-semibold text-slate-600 mb-1.5">Calculator (optional, press 'Enter' to solve)</label>
                             <div id="calculator-input" contenteditable="true" data-placeholder="e.g., 8 + 28" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white"></div>
@@ -347,7 +331,7 @@
                 <button id="copy-whatsapp" class="w-full bg-green-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-green-600 active:bg-green-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
                     <span class="text-lg">📱</span>Copy Data to WhatsApp
                 </button>
-                <button id="reset" class="w-full bg-rose-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-rose-600 active:bg-rose-700 transform active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
+                <button id="reset" class="w-full bg-rose-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-rose-600 active:bg-rose-700 transform active:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
                     <span class="text-lg">♻️</span>Reset Trip Data
                 </button>
             </div>
@@ -498,10 +482,6 @@
         const closeIconBtn = document.getElementById('close-modal-icon-btn');
         const calculatorInput = document.getElementById('calculator-input'); // Calculator element
         const adjustmentAmountInput = document.getElementById('adjustment-amount'); // Adjustment amount input
-
-        // NEW: References to the meal and currency button containers for drag-to-scroll
-        const mealButtonsContainer = document.getElementById('meal-buttons-container');
-        const currencyButtonsContainer = document.getElementById('currency-buttons-container');
 
         // Universal Prompt/Confirmation Modal Elements
         const universalPromptModal = document.getElementById('universal-prompt-modal');
@@ -1741,7 +1721,7 @@
             });
         }
 
-        // MODIFIED: Calculator Logic (remains largely the same, just the label was updated in HTML)
+        // MODIFIED: Added Calculator Logic
         function safeEvaluate(expression) {
             try {
                 if (!/^[0-9\s\.\+\-\*\/\(\)]+$/.test(expression)) {
@@ -1760,6 +1740,7 @@
         }
         
         calculatorInput.addEventListener('keydown', (event) => {
+            // MODIFIED: Changed event.key from '=' to 'Enter'
             if (event.key === 'Enter') { 
                 event.preventDefault();
                 const expression = calculatorInput.textContent.trim();
@@ -1790,60 +1771,6 @@
                 isCalculatorResultShown = false;
             }
         });
-
-        // NEW: Function to make an element horizontally draggable/scrollable
-        function makeDraggableScroll(element) {
-            let isDown = false;
-            let startX;
-            let scrollLeft;
-
-            if (!element) return; // Guard clause
-
-            element.addEventListener('mousedown', (e) => {
-                isDown = true;
-                element.classList.add('active-dragging');
-                startX = e.pageX - element.offsetLeft;
-                scrollLeft = element.scrollLeft;
-            });
-            element.addEventListener('mouseleave', () => {
-                isDown = false;
-                element.classList.remove('active-dragging');
-            });
-            element.addEventListener('mouseup', () => {
-                isDown = false;
-                element.classList.remove('active-dragging');
-            });
-            element.addEventListener('mousemove', (e) => {
-                if (!isDown) return;
-                e.preventDefault(); // Prevent text selection and default scrolling
-                const x = e.pageX - element.offsetLeft;
-                const walk = (x - startX) * 1.5; // Adjust multiplier for desired scroll speed
-                element.scrollLeft = scrollLeft - walk;
-            });
-
-            // Touch events for mobile devices
-            element.addEventListener('touchstart', (e) => {
-                isDown = true;
-                element.classList.add('active-dragging');
-                startX = e.touches[0].pageX - element.offsetLeft;
-                scrollLeft = element.scrollLeft;
-            });
-            element.addEventListener('touchend', () => {
-                isDown = false;
-                element.classList.remove('active-dragging');
-            });
-            element.addEventListener('touchmove', (e) => {
-                if (!isDown) return;
-                e.preventDefault(); // Prevent page scrolling
-                const x = e.touches[0].pageX - element.offsetLeft;
-                const walk = (x - startX) * 1.5; // Adjust multiplier for desired scroll speed
-                element.scrollLeft = scrollLeft - walk;
-            });
-        }
-
-        // Initialize drag-to-scroll for the meal and currency button containers
-        makeDraggableScroll(mealButtonsContainer);
-        makeDraggableScroll(currencyButtonsContainer);
 
 
         function clearForm() {
