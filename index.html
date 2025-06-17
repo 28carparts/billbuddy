@@ -189,16 +189,13 @@
                 </h2>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-600 mb-1.5">Category</label>
-                        <!-- MODIFIED: Updated meal type buttons with new names and order -->
+                        <label class="block text-sm font-semibold text-slate-600 mb-1.5">Meal Type</label>
+                        <!-- MODIFIED: Added classes for horizontal scrolling and a new ID for JS targeting -->
                         <div id="meal-buttons-container" class="flex flex-nowrap overflow-x-auto gap-2 py-2 hide-scrollbar scroll-smooth snap-x-mandatory cursor-grab">
                             <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Breakfast"><span class="text-lg">🥞</span>Breakfast</button>
                             <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Lunch"><span class="text-lg">🥪</span>Lunch</button>
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Tea"><span class="text-lg">🍵</span>Tea/Snacks</button>
                             <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Dinner"><span class="text-lg">🍝</span>Dinner</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Taxi"><span class="text-lg">🚕</span>Taxi</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Drink"><span class="text-lg">🍹</span>Drink</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Tea"><span class="text-lg">🍵</span>Tea</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Dessert"><span class="text-lg">🍰</span>Dessert</button>
                             <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Other"><span class="text-lg">🛍️</span>Other</button>
                         </div>
                         <input type="hidden" id="meal-type" name="meal-type">
@@ -311,15 +308,10 @@
                                 <option value="">Select Receiver</option>
                             </select>
                         </div>
-                        <!-- MODIFIED: Added clear button to calculator input -->
+                        <!-- MODIFIED: Updated Calculator Input label to reflect 'Enter' key -->
                         <div>
                             <label for="calculator-input" class="block text-sm font-semibold text-slate-600 mb-1.5">Calculator (optional, press 'Enter' to solve)</label>
-                            <div class="relative">
-                                <div id="calculator-input" contenteditable="true" data-placeholder="e.g., 8 + 28" class="w-full p-2.5 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white"></div>
-                                <button id="clear-calculator-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Clear calculator">
-                                    <i class="fas fa-times-circle"></i>
-                                </button>
-                            </div>
+                            <div id="calculator-input" contenteditable="true" data-placeholder="e.g., 8 + 28" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white"></div>
                         </div>
 
                         <div>
@@ -355,7 +347,7 @@
                 <button id="copy-whatsapp" class="w-full bg-green-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-green-600 active:bg-green-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
                     <span class="text-lg">📱</span>Copy Data to WhatsApp
                 </button>
-                <button id="reset" class="w-full bg-rose-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-rose-600 active:bg-rose-700 transform active:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
+                <button id="reset" class="w-full bg-rose-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-rose-600 active:bg-rose-700 transform active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
                     <span class="text-lg">♻️</span>Reset Trip Data
                 </button>
             </div>
@@ -506,9 +498,8 @@
         const closeIconBtn = document.getElementById('close-modal-icon-btn');
         const calculatorInput = document.getElementById('calculator-input'); // Calculator element
         const adjustmentAmountInput = document.getElementById('adjustment-amount'); // Adjustment amount input
-        const clearCalculatorBtn = document.getElementById('clear-calculator-btn'); // NEW: Clear calculator button
 
-        // References to the meal and currency button containers for drag-to-scroll
+        // NEW: References to the meal and currency button containers for drag-to-scroll
         const mealButtonsContainer = document.getElementById('meal-buttons-container');
         const currencyButtonsContainer = document.getElementById('currency-buttons-container');
 
@@ -1454,6 +1445,201 @@
             }
 
             if (settlements.length === 0) {
+                settlementPlanDiv.innerHTML = '<p class="text-green-600 font-medium text-center py-2">🎉 All debts are settled!</p>';
+            } else {
+                const ul = document.createElement('ul');
+                ul.className = 'space-y-2';
+                settlements.forEach(s => {
+                    const li = document.createElement('li');
+                    li.className = 'bg-sky-50 p-2.5 rounded-md text-sm shadow-sm border border-sky-100';
+                    li.innerHTML = s;
+                    ul.appendChild(li);
+                });
+                settlementPlanDiv.appendChild(ul);
+            }
+        }
+        
+        function updateAdjustmentsDisplay() {
+            const container = document.getElementById('current-adjustments');
+            if (!container || !adjustmentDebtorSelect || !adjustmentCreditorSelect) return;
+
+            container.innerHTML = '';
+            adjustmentDebtorSelect.innerHTML = '<option value="">Select Payer</option>';
+            adjustmentCreditorSelect.innerHTML = '<option value="">Select Receiver</option>';
+
+            appData.buddies.forEach(p => {
+                adjustmentDebtorSelect.add(new Option(p, p));
+                adjustmentCreditorSelect.add(new Option(p, p));
+            });
+
+            filterCreditorDropdown();
+
+            if (appData.adjustments.length === 0) {
+                container.innerHTML = '<p class="text-slate-500 text-center py-2">No individual adjustments yet.</p>';
+                return;
+            }
+
+            appData.adjustments.forEach((adj, index) => {
+                const adjDiv = document.createElement('div');
+                adjDiv.className = 'relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-sm flex justify-between items-center';
+                const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
+                
+                const displayAmount = `<strong class="text-sky-700">${adj.originalCurrency} ${adj.amount.toFixed(2)}</strong> 
+                                     <span class="text-slate-500 text-xs">(~${amountInPrimary.toFixed(2)} ${appData.primaryCurrency})</span>`;
+
+                adjDiv.innerHTML = `
+                    <span class="flex-grow flex flex-wrap items-center gap-x-2">
+                        <strong class="text-rose-600">${adj.debtor}</strong> pays <strong class="text-emerald-600">${adj.creditor}</strong> ${displayAmount}
+                    </span>
+                    <button class="delete-adjustment-btn bg-rose-100 text-rose-600 rounded-full w-6 h-6 flex items-center justify-center font-bold hover:bg-rose-200 shrink-0 ml-2" data-index="${index}">✖</button>
+                `;
+                container.appendChild(adjDiv);
+            });
+
+            document.querySelectorAll('.delete-adjustment-btn').forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    const indexToDelete = parseInt(event.currentTarget.dataset.index);
+                    const adjToDelete = appData.adjustments[indexToDelete];
+                    if (adjToDelete) {
+                        const confirmationMessage = `Are you sure you want to remove the '${adjToDelete.debtor} pays ${adjToDelete.creditor}' adjustment?`;
+                        showConfirmation(confirmationMessage, () => {
+                            appData.adjustments.splice(indexToDelete, 1);
+                            saveDataToFirebase();
+                            showError('Adjustment removed.', 3000, 'success');
+                        });
+                    }
+                });
+            });
+        }
+        
+        document.getElementById('add-adjustment-btn').addEventListener('click', () => {
+            const debtor = adjustmentDebtorSelect.value;
+            const creditor = adjustmentCreditorSelect.value;
+            const currency = document.getElementById('adjustment-currency').value;
+            const amount = parseFloat(adjustmentAmountInput.value);
+
+            if (!debtor || !creditor || !currency || isNaN(amount) || amount <= 0) {
+                showError('Please select payer, receiver, currency, and a valid amount.'); return;
+            }
+            if (debtor === creditor) {
+                showError('Payer and Receiver cannot be the same buddy.'); return;
+            }
+            
+            appData.adjustments.push({ debtor, creditor, amount: amount, originalCurrency: currency });
+            saveDataToFirebase();
+            
+            adjustmentAmountInput.value = '';
+            calculatorInput.innerHTML = '';
+            isCalculatorResultShown = false;
+            adjustmentDebtorSelect.value = '';
+            adjustmentCreditorSelect.value = '';
+            filterCreditorDropdown();
+            showError('Adjustment added successfully!', 3000, 'success');
+        });
+        
+        function filterCreditorDropdown() {
+            const selectedDebtor = adjustmentDebtorSelect.value;
+            const currentCreditor = adjustmentCreditorSelect.value;
+            let creditorIsValid = false;
+
+            Array.from(adjustmentCreditorSelect.options).forEach(option => {
+                option.style.display = (option.value === selectedDebtor && selectedDebtor !== "") ? 'none' : '';
+                if (option.value === currentCreditor && option.style.display !== 'none') {
+                    creditorIsValid = true;
+                }
+            });
+
+            if (!creditorIsValid) adjustmentCreditorSelect.value = "";
+        }
+        
+        adjustmentDebtorSelect.addEventListener('change', filterCreditorDropdown);
+
+        function generateWhatsAppMessage() {
+            let message = `*💰 ${appData.groupEventName || 'Group Event'} Recap* \n\n`;
+            const primaryCurrency = appData.primaryCurrency;
+
+            const balances = {};
+            appData.buddies.forEach(buddy => {
+                balances[buddy] = { paid: 0, owed: 0, net: 0 };
+            });
+            appData.expenses.forEach(exp => {
+                if (balances[exp.payer]) balances[exp.payer].paid += exp.amountInPrimaryCurrency;
+                exp.buddies.forEach(buddy => {
+                    if(balances[buddy]) balances[buddy].owed += exp.perBuddy;
+                });
+            });
+             appData.adjustments.forEach(adj => {
+                const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
+                if (balances[adj.debtor]) balances[adj.debtor].net -= amountInPrimary;
+                if (balances[adj.creditor]) balances[adj.creditor].net += amountInPrimary;
+            });
+            appData.buddies.forEach(buddy => {
+                balances[buddy].net = (balances[buddy].paid - balances[buddy].owed) + balances[buddy].net;
+            });
+
+            message += `*📊 Net Balance Summary (${primaryCurrency})*\n`;
+            if (appData.buddies.length > 0) {
+                appData.buddies.forEach(buddy => {
+                    const netBalance = balances[buddy].net;
+                    if (netBalance < -0.005) {
+                        message += `• *${buddy}* pays ${primaryCurrency} ${(-netBalance).toFixed(2)}\n`;
+                    } else if (netBalance > 0.005) {
+                        message += `• *${buddy}* receives ${primaryCurrency} ${netBalance.toFixed(2)}\n`;
+                    }
+                });
+            } else {
+                message += `_No buddies added yet._\n`;
+            }
+            message += `\n`;
+
+            message += `*🧾 Meal Records*\n`;
+            if (appData.expenses.length > 0) {
+                const total = appData.expenses.reduce((sum, exp) => sum + exp.amountInPrimaryCurrency, 0);
+                message += `Total Spent: *${primaryCurrency} ${total.toFixed(2)}* | ${appData.expenses.length} transaction${appData.expenses.length !== 1 ? 's' : ''}\n\n`;
+                
+                [...appData.expenses].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+                    .forEach((exp, index, arr) => {
+                    message += `• ${exp.mealType} @ ${exp.restaurant}: *${exp.currency} ${exp.amount.toFixed(2)}*\n`;
+                    message += `  Paid by: *${exp.payer}*\n`;
+                    message += `  Shared with: _${exp.buddies.join(', ')}_\n`;
+                    if (index < arr.length - 1) {
+                        message += `--------------------------------------\n`;
+                    }
+                });
+            } else {
+                message += `_No meal records yet._\n`;
+            }
+            message += `\n`;
+
+            if (appData.adjustments.length > 0) {
+                message += `*💱 Individual Adjustments:*\n`;
+                appData.adjustments.forEach(adj => {
+                     const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
+                    const adjAmountStr = `*${adj.originalCurrency} ${adj.amount.toFixed(2)}* (~${amountInPrimary.toFixed(2)} ${primaryCurrency})`;
+                    message += `• *${adj.debtor}* pays *${adj.creditor}* ${adjAmountStr}\n`;
+                });
+                message += `\n`;
+            }
+
+            message += `*🤝 Debt Settlement*\n`;
+            
+            const debtors = appData.buddies.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
+            const creditors = appData.buddies.filter(p => balances[p].net > 0.005).map(p => ({ name: p, amount: balances[p].net }));
+            const settlements = [];
+
+            let i = 0, j = 0;
+            while (i < debtors.length && j < creditors.length) {
+                const amountToSettle = Math.min(debtors[i].amount, creditors[j].amount);
+                if (amountToSettle > 0.005) {
+                    settlements.push(`* *${debtors[i].name}* pays *${creditors[j].name}* *${amountToSettle.toFixed(2)} ${primaryCurrency}*`);
+                    debtors[i].amount -= amountToSettle;
+                    creditors[j].amount -= amountToSettle;
+                }
+                if (debtors[i].amount < 0.005) i++;
+                if (creditors[j].amount < 0.005) j++;
+            }
+
+            if (settlements.length === 0) {
                 message += `_🎉 All debts are settled!_\n`;
             } else {
                 message += `_Settlement Plan:_\n`;
@@ -1555,7 +1741,7 @@
             });
         }
 
-        // Calculator Logic
+        // MODIFIED: Calculator Logic (remains largely the same, just the label was updated in HTML)
         function safeEvaluate(expression) {
             try {
                 if (!/^[0-9\s\.\+\-\*\/\(\)]+$/.test(expression)) {
@@ -1605,19 +1791,7 @@
             }
         });
 
-        // NEW: Clear calculator input functionality
-        if (clearCalculatorBtn) {
-            clearCalculatorBtn.addEventListener('click', () => {
-                if (calculatorInput) {
-                    calculatorInput.innerHTML = '';
-                    adjustmentAmountInput.value = '';
-                    isCalculatorResultShown = false;
-                    calculatorInput.focus();
-                }
-            });
-        }
-
-        // Function to make an element horizontally draggable/scrollable
+        // NEW: Function to make an element horizontally draggable/scrollable
         function makeDraggableScroll(element) {
             let isDown = false;
             let startX;
