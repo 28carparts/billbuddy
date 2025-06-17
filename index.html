@@ -51,7 +51,7 @@
             display: block; 
         }
 
-        /* NEW: Styles for horizontal scrollable button containers */
+        /* Styles for horizontal scrollable button containers */
         .hide-scrollbar {
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
@@ -191,15 +191,16 @@
                     <div>
                         <label class="block text-sm font-semibold text-slate-600 mb-1.5">Category</label>
                         <!-- MODIFIED: Updated meal type buttons with new names and order -->
-                        <div id="meal-buttons-container" class="flex flex-nowrap overflow-x-auto gap-2 py-2 hide-scrollbar scroll-smooth snap-x-mandatory cursor-grab">
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Breakfast"><span class="text-lg">🥞</span>Breakfast</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Lunch"><span class="text-lg">🥪</span>Lunch</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Dinner"><span class="text-lg">🍝</span>Dinner</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Taxi"><span class="text-lg">🚕</span>Taxi</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Drink"><span class="text-lg">🍹</span>Drink</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Tea"><span class="text-lg">🍵</span>Tea</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Dessert"><span class="text-lg">🍰</span>Dessert</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-meal="Other"><span class="text-lg">🛍️</span>Other</button>
+                        <!-- REMOVED: snap-x-mandatory and snap-align-start for momentum scrolling -->
+                        <div id="meal-buttons-container" class="flex flex-nowrap overflow-x-auto gap-2 py-2 hide-scrollbar scroll-smooth cursor-grab">
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-meal="Breakfast"><span class="text-lg">🥞</span>Breakfast</button>
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-meal="Lunch"><span class="text-lg">🥪</span>Lunch</button>
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-meal="Dinner"><span class="text-lg">🍝</span>Dinner</button>
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-meal="Taxi"><span class="text-lg">🚕</span>Taxi</button>
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-meal="Drink"><span class="text-lg">🍹</span>Drink</button>
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-meal="Tea"><span class="text-lg">🍵</span>Tea</button>
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-meal="Dessert"><span class="text-lg">🍰</span>Dessert</button>
+                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-meal="Other"><span class="text-lg">🛍️</span>Other</button>
                         </div>
                         <input type="hidden" id="meal-type" name="meal-type">
                     </div>
@@ -211,15 +212,15 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-slate-600 mb-1.5">Currency</label>
-                        <!-- MODIFIED: Added classes for horizontal scrolling and a new ID for JS targeting -->
-                        <div id="currency-buttons-container" class="flex flex-nowrap overflow-x-auto gap-2 py-2 hide-scrollbar scroll-smooth snap-x-mandatory cursor-grab">
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="HKD"><span class="text-lg">🇭🇰</span>HKD</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="CNY"><span class="text-lg">🇨🇳</span>CNY</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="JPY"><span class="text-lg">🇯🇵</span>JPY</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="USD"><span class="text-lg">🇺🇸</span>USD</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="EUR"><span class="text-lg">🇪🇺</span>EUR</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="GBP"><span class="text-lg">🇬🇧</span>GBP</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0 snap-align-start" data-currency="KRW"><span class="text-lg">🇰🇷</span>KRW</button>
+                        <!-- REMOVED: snap-x-mandatory and snap-align-start for momentum scrolling -->
+                        <div id="currency-buttons-container" class="flex flex-nowrap overflow-x-auto gap-2 py-2 hide-scrollbar scroll-smooth cursor-grab">
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-currency="HKD"><span class="text-lg">🇭🇰</span>HKD</button>
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-currency="CNY"><span class="text-lg">🇨🇳</span>CNY</button>
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-currency="JPY"><span class="text-lg">🇯🇵</span>JPY</button>
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-currency="USD"><span class="text-lg">🇺🇸</span>USD</button>
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-currency="EUR"><span class="text-lg">🇪🇺</span>EUR</button>
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-currency="GBP"><span class="text-lg">🇬🇧</span>GBP</button>
+                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center flex-shrink-0" data-currency="KRW"><span class="text-lg">🇰🇷</span>KRW</button>
                         </div>
                         <input type="hidden" id="currency" name="currency">
                     </div>
@@ -463,7 +464,6 @@
             primaryCurrency: 'HKD'
         };
         let editingExpenseIndex = -1;
-        // MODIFIED: Added state for calculator
         let isCalculatorResultShown = false;
 
         // --- Exchange Rate State ---
@@ -504,15 +504,13 @@
         const loggedInEmailSpan = document.getElementById('logged-in-email');
         const logoutLink = document.getElementById('logout-link');
         const closeIconBtn = document.getElementById('close-modal-icon-btn');
-        const calculatorInput = document.getElementById('calculator-input'); // Calculator element
-        const adjustmentAmountInput = document.getElementById('adjustment-amount'); // Adjustment amount input
-        const clearCalculatorBtn = document.getElementById('clear-calculator-btn'); // NEW: Clear calculator button
+        const calculatorInput = document.getElementById('calculator-input');
+        const adjustmentAmountInput = document.getElementById('adjustment-amount');
+        const clearCalculatorBtn = document.getElementById('clear-calculator-btn');
 
-        // References to the meal and currency button containers for drag-to-scroll
         const mealButtonsContainer = document.getElementById('meal-buttons-container');
         const currencyButtonsContainer = document.getElementById('currency-buttons-container');
 
-        // Universal Prompt/Confirmation Modal Elements
         const universalPromptModal = document.getElementById('universal-prompt-modal');
         const modalPromptTitle = document.getElementById('modal-prompt-title');
         const modalPromptMessage = document.getElementById('modal-prompt-message');
@@ -1454,6 +1452,201 @@
             }
 
             if (settlements.length === 0) {
+                settlementPlanDiv.innerHTML = '<p class="text-green-600 font-medium text-center py-2">🎉 All debts are settled!</p>';
+            } else {
+                const ul = document.createElement('ul');
+                ul.className = 'space-y-2';
+                settlements.forEach(s => {
+                    const li = document.createElement('li');
+                    li.className = 'bg-sky-50 p-2.5 rounded-md text-sm shadow-sm border border-sky-100';
+                    li.innerHTML = s;
+                    ul.appendChild(li);
+                });
+                settlementPlanDiv.appendChild(ul);
+            }
+        }
+        
+        function updateAdjustmentsDisplay() {
+            const container = document.getElementById('current-adjustments');
+            if (!container || !adjustmentDebtorSelect || !adjustmentCreditorSelect) return;
+
+            container.innerHTML = '';
+            adjustmentDebtorSelect.innerHTML = '<option value="">Select Payer</option>';
+            adjustmentCreditorSelect.innerHTML = '<option value="">Select Receiver</option>';
+
+            appData.buddies.forEach(p => {
+                adjustmentDebtorSelect.add(new Option(p, p));
+                adjustmentCreditorSelect.add(new Option(p, p));
+            });
+
+            filterCreditorDropdown();
+
+            if (appData.adjustments.length === 0) {
+                container.innerHTML = '<p class="text-slate-500 text-center py-2">No individual adjustments yet.</p>';
+                return;
+            }
+
+            appData.adjustments.forEach((adj, index) => {
+                const adjDiv = document.createElement('div');
+                adjDiv.className = 'relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-sm flex justify-between items-center';
+                const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
+                
+                const displayAmount = `<strong class="text-sky-700">${adj.originalCurrency} ${adj.amount.toFixed(2)}</strong> 
+                                     <span class="text-slate-500 text-xs">(~${amountInPrimary.toFixed(2)} ${appData.primaryCurrency})</span>`;
+
+                adjDiv.innerHTML = `
+                    <span class="flex-grow flex flex-wrap items-center gap-x-2">
+                        <strong class="text-rose-600">${adj.debtor}</strong> pays <strong class="text-emerald-600">${adj.creditor}</strong> ${displayAmount}
+                    </span>
+                    <button class="delete-adjustment-btn bg-rose-100 text-rose-600 rounded-full w-6 h-6 flex items-center justify-center font-bold hover:bg-rose-200 shrink-0 ml-2" data-index="${index}">✖</button>
+                `;
+                container.appendChild(adjDiv);
+            });
+
+            document.querySelectorAll('.delete-adjustment-btn').forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    const indexToDelete = parseInt(event.currentTarget.dataset.index);
+                    const adjToDelete = appData.adjustments[indexToDelete];
+                    if (adjToDelete) {
+                        const confirmationMessage = `Are you sure you want to remove the '${adjToDelete.debtor} pays ${adjToDelete.creditor}' adjustment?`;
+                        showConfirmation(confirmationMessage, () => {
+                            appData.adjustments.splice(indexToDelete, 1);
+                            saveDataToFirebase();
+                            showError('Adjustment removed.', 3000, 'success');
+                        });
+                    }
+                });
+            });
+        }
+        
+        document.getElementById('add-adjustment-btn').addEventListener('click', () => {
+            const debtor = adjustmentDebtorSelect.value;
+            const creditor = adjustmentCreditorSelect.value;
+            const currency = document.getElementById('adjustment-currency').value;
+            const amount = parseFloat(adjustmentAmountInput.value);
+
+            if (!debtor || !creditor || !currency || isNaN(amount) || amount <= 0) {
+                showError('Please select payer, receiver, currency, and a valid amount.'); return;
+            }
+            if (debtor === creditor) {
+                showError('Payer and Receiver cannot be the same buddy.'); return;
+            }
+            
+            appData.adjustments.push({ debtor, creditor, amount: amount, originalCurrency: currency });
+            saveDataToFirebase();
+            
+            adjustmentAmountInput.value = '';
+            calculatorInput.innerHTML = '';
+            isCalculatorResultShown = false;
+            adjustmentDebtorSelect.value = '';
+            adjustmentCreditorSelect.value = '';
+            filterCreditorDropdown();
+            showError('Adjustment added successfully!', 3000, 'success');
+        });
+        
+        function filterCreditorDropdown() {
+            const selectedDebtor = adjustmentDebtorSelect.value;
+            const currentCreditor = adjustmentCreditorSelect.value;
+            let creditorIsValid = false;
+
+            Array.from(adjustmentCreditorSelect.options).forEach(option => {
+                option.style.display = (option.value === selectedDebtor && selectedDebtor !== "") ? 'none' : '';
+                if (option.value === currentCreditor && option.style.display !== 'none') {
+                    creditorIsValid = true;
+                }
+            });
+
+            if (!creditorIsValid) adjustmentCreditorSelect.value = "";
+        }
+        
+        adjustmentDebtorSelect.addEventListener('change', filterCreditorDropdown);
+
+        function generateWhatsAppMessage() {
+            let message = `*💰 ${appData.groupEventName || 'Group Event'} Recap* \n\n`;
+            const primaryCurrency = appData.primaryCurrency;
+
+            const balances = {};
+            appData.buddies.forEach(buddy => {
+                balances[buddy] = { paid: 0, owed: 0, net: 0 };
+            });
+            appData.expenses.forEach(exp => {
+                if (balances[exp.payer]) balances[exp.payer].paid += exp.amountInPrimaryCurrency;
+                exp.buddies.forEach(buddy => {
+                    if(balances[buddy]) balances[buddy].owed += exp.perBuddy;
+                });
+            });
+             appData.adjustments.forEach(adj => {
+                const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
+                if (balances[adj.debtor]) balances[adj.debtor].net -= amountInPrimary;
+                if (balances[adj.creditor]) balances[adj.creditor].net += amountInPrimary;
+            });
+            appData.buddies.forEach(buddy => {
+                balances[buddy].net = (balances[buddy].paid - balances[buddy].owed) + balances[buddy].net;
+            });
+
+            message += `*📊 Net Balance Summary (${primaryCurrency})*\n`;
+            if (appData.buddies.length > 0) {
+                appData.buddies.forEach(buddy => {
+                    const netBalance = balances[buddy].net;
+                    if (netBalance < -0.005) {
+                        message += `• *${buddy}* pays ${primaryCurrency} ${(-netBalance).toFixed(2)}\n`;
+                    } else if (netBalance > 0.005) {
+                        message += `• *${buddy}* receives ${primaryCurrency} ${netBalance.toFixed(2)}\n`;
+                    }
+                });
+            } else {
+                message += `_No buddies added yet._\n`;
+            }
+            message += `\n`;
+
+            message += `*🧾 Meal Records*\n`;
+            if (appData.expenses.length > 0) {
+                const total = appData.expenses.reduce((sum, exp) => sum + exp.amountInPrimaryCurrency, 0);
+                message += `Total Spent: *${primaryCurrency} ${total.toFixed(2)}* | ${appData.expenses.length} transaction${appData.expenses.length !== 1 ? 's' : ''}\n\n`;
+                
+                [...appData.expenses].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+                    .forEach((exp, index, arr) => {
+                    message += `• ${exp.mealType} @ ${exp.restaurant}: *${exp.currency} ${exp.amount.toFixed(2)}*\n`;
+                    message += `  Paid by: *${exp.payer}*\n`;
+                    message += `  Shared with: _${exp.buddies.join(', ')}_\n`;
+                    if (index < arr.length - 1) {
+                        message += `--------------------------------------\n`;
+                    }
+                });
+            } else {
+                message += `_No meal records yet._\n`;
+            }
+            message += `\n`;
+
+            if (appData.adjustments.length > 0) {
+                message += `*💱 Individual Adjustments:*\n`;
+                appData.adjustments.forEach(adj => {
+                     const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
+                    const adjAmountStr = `*${adj.originalCurrency} ${adj.amount.toFixed(2)}* (~${amountInPrimary.toFixed(2)} ${primaryCurrency})`;
+                    message += `• *${adj.debtor}* pays *${adj.creditor}* ${adjAmountStr}\n`;
+                });
+                message += `\n`;
+            }
+
+            message += `*🤝 Debt Settlement*\n`;
+            
+            const debtors = appData.buddies.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
+            const creditors = appData.buddies.filter(p => balances[p].net > 0.005).map(p => ({ name: p, amount: balances[p].net }));
+            const settlements = [];
+
+            let i = 0, j = 0;
+            while (i < debtors.length && j < creditors.length) {
+                const amountToSettle = Math.min(debtors[i].amount, creditors[j].amount);
+                if (amountToSettle > 0.005) {
+                    settlements.push(`* *${debtors[i].name}* pays *${creditors[j].name}* *${amountToSettle.toFixed(2)} ${primaryCurrency}*`);
+                    debtors[i].amount -= amountToSettle;
+                    creditors[j].amount -= amountToSettle;
+                }
+                if (debtors[i].amount < 0.005) i++;
+                if (creditors[j].amount < 0.005) j++;
+            }
+
+            if (settlements.length === 0) {
                 message += `_🎉 All debts are settled!_\n`;
             } else {
                 message += `_Settlement Plan:_\n`;
@@ -1605,7 +1798,6 @@
             }
         });
 
-        // NEW: Clear calculator input functionality
         if (clearCalculatorBtn) {
             clearCalculatorBtn.addEventListener('click', () => {
                 if (calculatorInput) {
@@ -1617,59 +1809,82 @@
             });
         }
 
-        // Function to make an element horizontally draggable/scrollable
-        function makeDraggableScroll(element) {
+        // MODIFIED: Function to make an element horizontally draggable/scrollable with momentum
+        function makeDraggableScrollWithMomentum(element) {
             let isDown = false;
             let startX;
             let scrollLeft;
+            let velocity = 0;
+            let lastX = 0;
+            let lastTimestamp = 0;
+            let animationFrameId;
 
-            if (!element) return; // Guard clause
+            if (!element) return;
 
-            element.addEventListener('mousedown', (e) => {
+            const animateScroll = () => {
+                element.scrollLeft += velocity;
+                velocity *= 0.95; // Damping factor (adjust for desired friction)
+
+                if (Math.abs(velocity) > 0.5) { // Stop when velocity is very low
+                    animationFrameId = requestAnimationFrame(animateScroll);
+                } else {
+                    cancelAnimationFrame(animationFrameId);
+                }
+            };
+
+            const startDrag = (e) => {
                 isDown = true;
                 element.classList.add('active-dragging');
-                startX = e.pageX - element.offsetLeft;
+                startX = (e.touches ? e.touches[0].pageX : e.pageX) - element.offsetLeft;
                 scrollLeft = element.scrollLeft;
-            });
-            element.addEventListener('mouseleave', () => {
-                isDown = false;
-                element.classList.remove('active-dragging');
-            });
-            element.addEventListener('mouseup', () => {
-                isDown = false;
-                element.classList.remove('active-dragging');
-            });
-            element.addEventListener('mousemove', (e) => {
-                if (!isDown) return;
-                e.preventDefault(); // Prevent text selection and default scrolling
-                const x = e.pageX - element.offsetLeft;
-                const walk = (x - startX) * 1.5; // Adjust multiplier for desired scroll speed
-                element.scrollLeft = scrollLeft - walk;
-            });
+                lastX = startX;
+                lastTimestamp = Date.now();
+                cancelAnimationFrame(animationFrameId); // Stop any ongoing inertia scroll
+            };
 
-            // Touch events for mobile devices
-            element.addEventListener('touchstart', (e) => {
-                isDown = true;
-                element.classList.add('active-dragging');
-                startX = e.touches[0].pageX - element.offsetLeft;
-                scrollLeft = element.scrollLeft;
-            });
-            element.addEventListener('touchend', () => {
+            const endDrag = () => {
                 isDown = false;
                 element.classList.remove('active-dragging');
-            });
-            element.addEventListener('touchmove', (e) => {
+                if (Math.abs(velocity) > 5) { // Only start inertia if a meaningful swipe occurred
+                    animationFrameId = requestAnimationFrame(animateScroll);
+                } else {
+                    velocity = 0; // Reset velocity if not enough for inertia
+                }
+            };
+
+            const moveDrag = (e) => {
                 if (!isDown) return;
-                e.preventDefault(); // Prevent page scrolling
-                const x = e.touches[0].pageX - element.offsetLeft;
-                const walk = (x - startX) * 1.5; // Adjust multiplier for desired scroll speed
-                element.scrollLeft = scrollLeft - walk;
-            });
+                e.preventDefault();
+
+                const currentX = (e.touches ? e.touches[0].pageX : e.pageX) - element.offsetLeft;
+                const currentTime = Date.now();
+
+                const deltaX = currentX - lastX;
+                const deltaTime = currentTime - lastTimestamp;
+
+                if (deltaTime > 0) {
+                    velocity = deltaX / (deltaTime / 16); // px per ~16ms (simulating 60fps)
+                }
+
+                element.scrollLeft = scrollLeft - (currentX - startX);
+                
+                lastX = currentX;
+                lastTimestamp = currentTime;
+            };
+
+            element.addEventListener('mousedown', startDrag);
+            element.addEventListener('mouseleave', endDrag);
+            element.addEventListener('mouseup', endDrag);
+            element.addEventListener('mousemove', moveDrag);
+
+            element.addEventListener('touchstart', startDrag);
+            element.addEventListener('touchend', endDrag);
+            element.addEventListener('touchmove', moveDrag);
         }
 
-        // Initialize drag-to-scroll for the meal and currency button containers
-        makeDraggableScroll(mealButtonsContainer);
-        makeDraggableScroll(currencyButtonsContainer);
+        // Initialize drag-to-scroll with momentum for the meal and currency button containers
+        makeDraggableScrollWithMomentum(mealButtonsContainer);
+        makeDraggableScrollWithMomentum(currencyButtonsContainer);
 
 
         function clearForm() {
