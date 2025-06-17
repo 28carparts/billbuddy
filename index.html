@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Swiper.js for sliders -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -43,12 +45,23 @@
         }
         .custom-checkbox:focus { outline: none; box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.5); }
         
-        /* MODIFIED: Added placeholder for contenteditable div */
         [contenteditable][data-placeholder]:empty:before {
             content: attr(data-placeholder);
             color: #94a3b8; /* slate-400 */
             pointer-events: none;
             display: block; 
+        }
+
+        /* Swiper container styles */
+        .swiper-container {
+            width: 100%;
+            height: auto;
+            overflow: hidden;
+            padding: 4px 0;
+        }
+        .swiper-slide {
+            width: auto; /* Let the content define the width */
+            margin-right: 8px; /* Add some space between buttons */
         }
     </style>
 </head>
@@ -176,12 +189,17 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-slate-600 mb-1.5">Meal Type</label>
-                        <div class="flex flex-wrap gap-2">
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-meal="Breakfast"><span class="text-lg">🥞</span>Breakfast</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-meal="Lunch"><span class="text-lg">🥪</span>Lunch</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-meal="Tea"><span class="text-lg">🍵</span>Tea/Snacks</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-meal="Dinner"><span class="text-lg">🍝</span>Dinner</button>
-                            <button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-meal="Other"><span class="text-lg">🛍️</span>Other</button>
+                        <div class="swiper-container" id="meal-swiper">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Breakfast"><span class="text-lg">🥞</span>Breakfast</button></div>
+                                <div class="swiper-slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Lunch"><span class="text-lg">🥪</span>Lunch</button></div>
+                                <div class="swiper-slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Dinner"><span class="text-lg">🍝</span>Dinner</button></div>
+                                <div class="swiper-slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Taxi"><span class="text-lg">🚕</span>Taxi</button></div>
+                                <div class="swiper-slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Drink"><span class="text-lg">🍹</span>Drink</button></div>
+                                <div class="swiper-slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Tea"><span class="text-lg">🍵</span>Tea</button></div>
+                                <div class="swiper-slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Dessert"><span class="text-lg">🍰</span>Dessert</button></div>
+                                <div class="swiper-slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Other"><span class="text-lg">🛍️</span>Other</button></div>
+                            </div>
                         </div>
                         <input type="hidden" id="meal-type" name="meal-type">
                     </div>
@@ -193,14 +211,16 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-slate-600 mb-1.5">Currency</label>
-                        <div class="flex flex-wrap gap-2">
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="HKD"><span class="text-lg">🇭🇰</span>HKD</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="CNY"><span class="text-lg">🇨🇳</span>CNY</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="JPY"><span class="text-lg">🇯🇵</span>JPY</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="USD"><span class="text-lg">🇺🇸</span>USD</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="EUR"><span class="text-lg">🇪🇺</span>EUR</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="GBP"><span class="text-lg">🇬🇧</span>GBP</button>
-                            <button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center" data-currency="KRW"><span class="text-lg">🇰🇷</span>KRW</button>
+                        <div class="swiper-container" id="currency-swiper">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="HKD"><span class="text-lg">🇭🇰</span>HKD</button></div>
+                                <div class="swiper-slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="CNY"><span class="text-lg">🇨🇳</span>CNY</button></div>
+                                <div class="swiper-slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="JPY"><span class="text-lg">🇯🇵</span>JPY</button></div>
+                                <div class="swiper-slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="USD"><span class="text-lg">🇺🇸</span>USD</button></div>
+                                <div class="swiper-slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="EUR"><span class="text-lg">🇪🇺</span>EUR</button></div>
+                                <div class="swiper-slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="GBP"><span class="text-lg">🇬🇧</span>GBP</button></div>
+                                <div class="swiper-slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="KRW"><span class="text-lg">🇰🇷</span>KRW</button></div>
+                            </div>
                         </div>
                         <input type="hidden" id="currency" name="currency">
                     </div>
@@ -292,10 +312,14 @@
                                 <option value="">Select Receiver</option>
                             </select>
                         </div>
-                        <!-- MODIFIED: Added Calculator Input -->
                         <div>
                             <label for="calculator-input" class="block text-sm font-semibold text-slate-600 mb-1.5">Calculator (optional, press 'Enter' to solve)</label>
-                            <div id="calculator-input" contenteditable="true" data-placeholder="e.g., 8 + 28" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white"></div>
+                            <div class="relative">
+                                <div id="calculator-input" contenteditable="true" data-placeholder="e.g., 8 + 28" class="w-full p-2.5 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white"></div>
+                                <button id="clear-calculator-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Clear calculator input">
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <div>
@@ -408,6 +432,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
+    <!-- Swiper.js for sliders -->
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
 
     <script>
         // Your web app's Firebase configuration
@@ -439,7 +466,6 @@
             primaryCurrency: 'HKD'
         };
         let editingExpenseIndex = -1;
-        // MODIFIED: Added state for calculator
         let isCalculatorResultShown = false;
 
         // --- Exchange Rate State ---
@@ -480,8 +506,9 @@
         const loggedInEmailSpan = document.getElementById('logged-in-email');
         const logoutLink = document.getElementById('logout-link');
         const closeIconBtn = document.getElementById('close-modal-icon-btn');
-        const calculatorInput = document.getElementById('calculator-input'); // Calculator element
-        const adjustmentAmountInput = document.getElementById('adjustment-amount'); // Adjustment amount input
+        const calculatorInput = document.getElementById('calculator-input'); 
+        const adjustmentAmountInput = document.getElementById('adjustment-amount');
+        const clearCalculatorBtn = document.getElementById('clear-calculator-btn');
 
         // Universal Prompt/Confirmation Modal Elements
         const universalPromptModal = document.getElementById('universal-prompt-modal');
@@ -491,9 +518,25 @@
         const modalCancelBtn = document.getElementById('modal-cancel-btn');
         const modalConfirmBtn = document.getElementById('modal-confirm-btn');
         const modalClearInputBtn = document.getElementById('modal-clear-input-btn');
+        
+        // --- Initialize Swipers ---
+        function initSwipers() {
+            new Swiper('#meal-swiper', {
+                slidesPerView: 'auto',
+                freeMode: true,
+                mousewheel: true,
+            });
+            new Swiper('#currency-swiper', {
+                slidesPerView: 'auto',
+                freeMode: true,
+                mousewheel: true,
+            });
+        }
+        
+        // Call initSwipers when the page loads
+        window.onload = initSwipers;
 
         // --- Authentication Logic ---
-
         auth.onAuthStateChanged(async user => {
             if (user) {
                 authPage.classList.add('hidden');
@@ -571,7 +614,6 @@
         });
 
         // --- Trip Management ---
-        
         async function loadUserDashboard(userId) {
             const userTripsRef = database.ref(`users/${userId}/trips`);
             const snapshot = await userTripsRef.once('value');
@@ -887,7 +929,6 @@
         });
 
         // --- Database Logic ---
-
         function saveDataToFirebase() {
             if (!currentTripRef) {
                 showError("No active trip reference to save data.");
@@ -909,7 +950,6 @@
         }
 
         // --- Main App Logic ---
-
         function updateAllUI() {
             if (!currentTripId) return;
             
@@ -941,7 +981,7 @@
         }
 
         function getCurrencySymbol(currencyCode) {
-            const symbols = { 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'HKD': '$', 'CNY': '¥', 'KRW': '₩' }; /* Fixed KRW symbol */
+            const symbols = { 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'HKD': '$', 'CNY': '¥', 'KRW': '₩' };
             return symbols[currencyCode] || currencyCode;
         }
         
@@ -1218,8 +1258,8 @@
             showConfirmation('Are you sure you want to reset all expenses and adjustments for this trip? Buddies and trip name will not be changed.', async () => {
                 appData.expenses = [];
                 appData.adjustments = [];
-                appData.primaryCurrency = 'HKD'; // Explicitly reset primary currency to default
-                await fetchExchangeRates(); // Fetch new rates immediately for the updated primary currency
+                appData.primaryCurrency = 'HKD'; 
+                await fetchExchangeRates();
                 saveDataToFirebase();
                 showError('Trip data has been reset. 🚀', 3000, 'success');
                 showPage('page-buddies');
@@ -1631,7 +1671,6 @@
         }
 
         // --- Utility Functions ---
-
         let errorTimeout;
         function showError(message, duration = 4000, type = 'error') {
             if (!errorMsgElement) return;
@@ -1720,8 +1759,7 @@
                 };
             });
         }
-
-        // MODIFIED: Added Calculator Logic
+        
         function safeEvaluate(expression) {
             try {
                 if (!/^[0-9\s\.\+\-\*\/\(\)]+$/.test(expression)) {
@@ -1740,7 +1778,6 @@
         }
         
         calculatorInput.addEventListener('keydown', (event) => {
-            // MODIFIED: Changed event.key from '=' to 'Enter'
             if (event.key === 'Enter') { 
                 event.preventDefault();
                 const expression = calculatorInput.textContent.trim();
@@ -1754,7 +1791,6 @@
                     calculatorInput.innerHTML = `${expression} = <strong class="text-indigo-600 font-bold">${formattedResult}</strong>`;
                     isCalculatorResultShown = true;
                     
-                    // Move cursor to the end
                     const range = document.createRange();
                     const sel = window.getSelection();
                     range.selectNodeContents(calculatorInput);
@@ -1770,6 +1806,13 @@
                 adjustmentAmountInput.value = '';
                 isCalculatorResultShown = false;
             }
+        });
+
+        clearCalculatorBtn.addEventListener('click', () => {
+            calculatorInput.innerHTML = '';
+            adjustmentAmountInput.value = '';
+            isCalculatorResultShown = false;
+            calculatorInput.focus();
         });
 
 
