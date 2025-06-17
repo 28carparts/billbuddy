@@ -294,7 +294,7 @@
                         </div>
                         <!-- MODIFIED: Added Calculator Input -->
                         <div>
-                            <label for="calculator-input" class="block text-sm font-semibold text-slate-600 mb-1.5">Calculator (optional, press '=' to solve)</label>
+                            <label for="calculator-input" class="block text-sm font-semibold text-slate-600 mb-1.5">Calculator (optional, press 'Enter' to solve)</label>
                             <div id="calculator-input" contenteditable="true" data-placeholder="e.g., 8 + 28" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white"></div>
                         </div>
 
@@ -331,7 +331,7 @@
                 <button id="copy-whatsapp" class="w-full bg-green-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-green-600 active:bg-green-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
                     <span class="text-lg">📱</span>Copy Data to WhatsApp
                 </button>
-                <button id="reset" class="w-full bg-rose-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-rose-600 active:bg-rose-700 transform active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
+                <button id="reset" class="w-full bg-rose-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-rose-600 active:bg-rose-700 transform active:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
                     <span class="text-lg">♻️</span>Reset Trip Data
                 </button>
             </div>
@@ -1740,7 +1740,8 @@
         }
         
         calculatorInput.addEventListener('keydown', (event) => {
-            if (event.key === '=') {
+            // MODIFIED: Changed event.key from '=' to 'Enter'
+            if (event.key === 'Enter') { 
                 event.preventDefault();
                 const expression = calculatorInput.textContent.trim();
                 if (!expression) return;
