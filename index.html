@@ -95,6 +95,22 @@
         </div>
     </header>
 
+    <!-- Invitation Confirmation Page -->
+    <section id="page-invitation-confirm" class="hidden flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-md text-center bg-white rounded-xl shadow-xl p-8 space-y-6 transform transition-all duration-300 scale-95 opacity-0">
+            <h2 class="text-3xl font-bold text-slate-700">Welcome aboard! 🌟</h2>
+            <p class="text-slate-600 text-lg">Want to be part of <strong id="invitation-trip-name" class="text-sky-600">...</strong>? Confirm to join!</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                 <button id="confirm-join-btn" class="w-full sm:w-auto bg-emerald-500 text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-emerald-600 active:bg-emerald-700 transform hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <span class="text-lg">🧳</span> Yes, let's go!
+                </button>
+                <button id="cancel-join-btn" class="w-full sm:w-auto bg-slate-200 text-slate-700 font-medium py-3 px-6 rounded-lg hover:bg-slate-300 transition-all">
+                    Maybe later
+                </button>
+            </div>
+        </div>
+    </section>
+
     <!-- Auth Section -->
     <section id="page-auth" class="flex-grow flex items-center justify-center p-4">
         <div class="w-full max-w-md">
@@ -113,9 +129,12 @@
                     </div>
                     <button type="submit" class="w-full mt-6 bg-sky-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-sky-600 active:bg-sky-700 transform hover:scale-105 active:scale-95 transition-all">Login</button>
                 </form>
-                <p class="text-center text-sm text-slate-500">
-                    Don't have an account? <a href="#" id="show-register" class="font-semibold text-sky-600 hover:underline">Sign Up</a>
-                </p>
+                 <div class="text-center text-sm text-slate-500 flex justify-between items-center pt-2">
+                    <a href="#" id="forgot-password" class="font-semibold text-slate-500 hover:text-sky-600 hover:underline">Forgot Password?</a>
+                    <span>
+                        Don't have an account? <a href="#" id="show-register" class="font-semibold text-sky-600 hover:underline">Sign Up</a>
+                    </span>
+                </div>
             </div>
 
             <div id="register-container" class="bg-white rounded-xl shadow-xl p-6 sm:p-8 space-y-6 hidden">
@@ -152,6 +171,11 @@
             <button id="create-first-trip-btn" class="w-full bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-emerald-600 active:bg-emerald-700 transform hover:scale-105 active:scale-95 transition-all">
                 🚀 Create Your First Trip
             </button>
+            <!-- Logged in info for No Trips View -->
+            <div id="logged-in-info-no-trips" class="text-center text-sm text-slate-600 mt-4 py-2 border-t border-slate-200 pt-4 hidden">
+                Logged in as: <span id="logged-in-email-no-trips" class="font-semibold text-slate-800"></span> 
+                <a href="#" id="logout-link-no-trips" class="font-semibold text-sky-600 hover:underline ml-2">Logout</a>
+            </div>
         </div>
     </section>
 
@@ -495,6 +519,7 @@
         // --- DOM Elements ---
         const authPage = document.getElementById('page-auth');
         const noTripsPage = document.getElementById('page-no-trips');
+        const invitationConfirmPage = document.getElementById('page-invitation-confirm');
         const appContent = document.getElementById('app-content');
         const appNav = document.getElementById('app-nav');
         const tripSwitcherBtn = document.getElementById('trip-switcher-btn');
@@ -503,6 +528,7 @@
         const registerContainer = document.getElementById('register-container');
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
+        const forgotPasswordLink = document.getElementById('forgot-password');
         const mealButtons = document.querySelectorAll('.meal-btn');
         const currencyButtons = document.querySelectorAll('.currency-btn');
         const addExpenseBtn = document.getElementById('add-expense');
@@ -524,6 +550,9 @@
         const loggedInInfoDiv = document.getElementById('logged-in-info');
         const loggedInEmailSpan = document.getElementById('logged-in-email');
         const logoutLink = document.getElementById('logout-link');
+        const loggedInInfoNoTripsDiv = document.getElementById('logged-in-info-no-trips'); // Added for No Trips View
+        const loggedInEmailNoTripsSpan = document.getElementById('logged-in-email-no-trips'); // Added for No Trips View
+        const logoutLinkNoTrips = document.getElementById('logout-link-no-trips'); // Added for No Trips View
         const closeIconBtn = document.getElementById('close-modal-icon-btn');
         const calculatorInput = document.getElementById('calculator-input'); 
         const adjustmentAmountInput = document.getElementById('adjustment-amount');
@@ -558,23 +587,25 @@
 
         // --- Authentication Logic ---
         auth.onAuthStateChanged(async user => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedTripId = urlParams.get('shared');
+
             if (user) {
+                // User is logged in
                 authPage.classList.add('hidden');
                 loggedInEmailSpan.textContent = user.email; 
                 loggedInInfoDiv.classList.remove('hidden');
-                
-                const urlParams = new URLSearchParams(window.location.search);
-                const sharedTripId = urlParams.get('shared');
 
-                if (sharedTripId) {
-                    await joinTrip(sharedTripId, user.uid, user.email);
-                    // Clear the shared parameter from the URL after joining
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
+                loggedInEmailNoTripsSpan.textContent = user.email;
+                loggedInInfoNoTripsDiv.classList.remove('hidden');
                 
-                await loadUserDashboard(user.uid);
+                if (sharedTripId) {
+                    await handleInvitation(sharedTripId, user);
+                } else {
+                    await loadUserDashboard(user.uid);
+                }
             } else {
-                // If user logs out or is not authenticated, clear previous state
+                // User is not logged in
                 if (currentTripRef && dataUnsubscribe) {
                     currentTripRef.off('value', dataUnsubscribe); 
                 }
@@ -582,18 +613,89 @@
                 dataUnsubscribe = null;
                 currentTripId = null;
                 
-                authPage.classList.remove('hidden');
+                // Hide all main content and show auth page
                 appContent.classList.add('hidden');
                 appNav.classList.add('hidden');
                 noTripsPage.classList.add('hidden');
+                invitationConfirmPage.classList.add('hidden');
                 tripSwitcherBtn.classList.add('hidden');
                 loggedInInfoDiv.classList.add('hidden'); 
+                loggedInInfoNoTripsDiv.classList.add('hidden');
                 
-                // Reset appData to default state
+                authPage.classList.remove('hidden');
+
+                // If there's a shared link, the login form will just show. 
+                // After login, the logic will re-trigger to handle the invitation.
+                
                 appData = { owner: null, groupEventName: '', buddies: [], expenses: [], adjustments: [], primaryCurrency: 'HKD' };
                 clearAllUI();
             }
         });
+
+        async function handleInvitation(tripId, user) {
+            try {
+                const tripRef = database.ref(`trips/${tripId}`);
+                const tripSnapshot = await tripRef.once('value');
+                if (!tripSnapshot.exists()) {
+                    showError("This shared trip link is invalid or has been deleted.");
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    await loadUserDashboard(user.uid);
+                    return;
+                }
+                const tripData = tripSnapshot.val();
+
+                // Check if user is already a member
+                if (tripData.members && tripData.members[user.uid]) {
+                     showError("You're already a member of this trip!", 3000, 'success');
+                     window.history.replaceState({}, document.title, window.location.pathname);
+                     await loadTrip(tripId); // Directly load the trip
+                     return;
+                }
+
+                // Show confirmation page
+                showInvitationConfirmation(tripData.groupEventName || "this trip", async () => {
+                    // On Confirm
+                    await joinTrip(tripId, user.uid, user.email);
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    await loadTrip(tripId);
+                }, async () => {
+                    // On Cancel
+                    invitationConfirmPage.classList.add('hidden');
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    await loadUserDashboard(user.uid); // Load user's default dashboard
+                });
+
+            } catch (error) {
+                 showError(`Error handling invitation: ${error.message}`);
+                 window.history.replaceState({}, document.title, window.location.pathname);
+                 await loadUserDashboard(user.uid);
+            }
+        }
+        
+        function showInvitationConfirmation(tripName, onConfirm, onCancel) {
+            const tripNameEl = document.getElementById('invitation-trip-name');
+            const confirmBtn = document.getElementById('confirm-join-btn');
+            const cancelBtn = document.getElementById('cancel-join-btn');
+            const container = invitationConfirmPage.querySelector('div');
+
+            tripNameEl.textContent = `"${tripName}"`;
+
+            // Hide other pages
+            authPage.classList.add('hidden');
+            noTripsPage.classList.add('hidden');
+            appContent.classList.add('hidden');
+            appNav.classList.add('hidden');
+
+            // Show invitation page
+            invitationConfirmPage.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                 container.classList.remove('scale-95', 'opacity-0');
+            });
+
+            confirmBtn.onclick = onConfirm;
+            cancelBtn.onclick = onCancel;
+        }
+
         
         loginForm.addEventListener('submit', e => {
             e.preventDefault();
@@ -617,12 +719,41 @@
             auth.createUserWithEmailAndPassword(email, password)
                 .catch(error => showError(`Registration Failed: ${error.message}`));
         });
+
+        async function handlePasswordReset(e) {
+            e.preventDefault();
+            const email = await showPromptModal(
+                '🔑 Reset Password', 
+                'Please enter your email address. We will send you a link to reset your password.',
+                document.getElementById('login-email').value, // Pre-fill with login email if available
+                'your-email@example.com'
+            );
+
+            if (email) {
+                auth.sendPasswordResetEmail(email)
+                    .then(() => {
+                        showError('Password reset email sent! Please check your inbox.', 5000, 'success');
+                    })
+                    .catch(error => {
+                        showError(`Error: ${error.message}`);
+                    });
+            }
+        }
+
+        forgotPasswordLink.addEventListener('click', handlePasswordReset);
         
         logoutLink.addEventListener('click', (e) => {
             e.preventDefault();
             closeTripSwitcherModal();
             auth.signOut();
         });
+
+        // Event listener for logout link on No Trips View
+        logoutLinkNoTrips.addEventListener('click', (e) => {
+            e.preventDefault();
+            auth.signOut();
+        });
+
 
         document.getElementById('show-register').addEventListener('click', e => {
             e.preventDefault();
@@ -646,11 +777,9 @@
                 const lastTripId = localStorage.getItem('lastActiveTripId');
                 const tripToLoad = userTripIds[lastTripId] ? lastTripId : Object.keys(userTripIds)[0];
                 await loadTrip(tripToLoad);
-                appContent.classList.remove('hidden');
-                appNav.classList.remove('hidden');
-                noTripsPage.classList.add('hidden');
-                tripSwitcherBtn.classList.remove('hidden');
             } else {
+                // If there are no trips left for the user
+                currentTripId = null;
                 appContent.classList.add('hidden');
                 appNav.classList.add('hidden');
                 noTripsPage.classList.remove('hidden');
@@ -668,6 +797,15 @@
             currentTripRef = database.ref(`trips/${tripId}`);
             
             listenForDataChanges();
+            
+            // Show main app content, hide others
+            appContent.classList.remove('hidden');
+            appNav.classList.remove('hidden');
+            tripSwitcherBtn.classList.remove('hidden');
+            authPage.classList.add('hidden');
+            noTripsPage.classList.add('hidden');
+            invitationConfirmPage.classList.add('hidden');
+
             showPage('page-buddies'); // Default to buddies page on trip load
         }
         
@@ -676,7 +814,19 @@
             if (currentTripRef) {
                 dataUnsubscribe = currentTripRef.on('value', async (snapshot) => {
                     const data = snapshot.val();
-                    if (!data) return; // If no data, do nothing
+                    if (!data) { // Handle case where trip is deleted by another user
+                        console.log(`Trip ${currentTripId} was deleted.`);
+                        if (currentTripId === localStorage.getItem('lastActiveTripId')) {
+                           localStorage.removeItem('lastActiveTripId');
+                        }
+                        currentTripId = null; // Clear current trip ID
+                        // Detach the listener
+                        currentTripRef.off('value', dataUnsubscribe);
+                        // Reload the dashboard to find another trip or show the no-trips page
+                        await loadUserDashboard(auth.currentUser.uid);
+                        showError("The current trip has been deleted.", 3000, 'error');
+                        return;
+                    }
 
                     const oldCurrency = appData.primaryCurrency;
                     const newCurrency = data.primaryCurrency || 'HKD';
@@ -687,6 +837,7 @@
                     // Update appData with fetched data
                     appData = {
                        owner: data.owner || null,
+                       members: data.members || {},
                        groupEventName: data.groupEventName || '',
                        buddies: data.buddies || [],
                        expenses: data.expenses || [],
@@ -709,18 +860,12 @@
         // Handles joining a trip via a shared link
         async function joinTrip(tripId, userId, userEmail) {
             try {
-                const tripRef = database.ref(`trips/${tripId}`);
-                const tripSnapshot = await tripRef.once('value');
-                if (!tripSnapshot.exists()) {
-                    showError("This shared trip link is invalid or has been deleted.");
-                    return;
-                }
                 const memberData = { email: userEmail };
                 // Add user to the trip's members list
                 await database.ref(`trips/${tripId}/members`).update({ [userId]: memberData });
                 // Add trip to the user's list of trips
                 await database.ref(`users/${userId}/trips/${tripId}`).set(true);
-                showError("Successfully joined the trip!", 3000, 'success');
+                showError("Successfully joined the trip! 🎉", 3000, 'success');
             } catch (error) {
                 showError(`Error joining trip: ${error.message}`);
             }
@@ -758,13 +903,6 @@
                 
                 await loadTrip(newTripId); // Load the newly created trip
                 
-                appContent.classList.remove('hidden');
-                appNav.classList.remove('hidden');
-                noTripsPage.classList.add('hidden');
-                tripSwitcherBtn.classList.remove('hidden');
-
-                showError(`Trip '${tripName.trim()}' created successfully!`, 3000, 'success');
-
             } catch (error) {
                 showError(`Failed to create trip: ${error.message}`);
             }
@@ -805,6 +943,7 @@
             trips.forEach(trip => {
                 const isCurrentUserOwner = currentUser.uid === trip.owner;
                 const ownedByLabel = isCurrentUserOwner ? ' (Owned)' : '';
+                const memberIds = Object.keys(trip.members);
                 
                 const itemContainer = document.createElement('div');
                 itemContainer.className = 'trip-list-item-container bg-slate-50 rounded-lg';
@@ -838,27 +977,18 @@
                 const membersPanel = document.createElement('div');
                 membersPanel.className = 'members-panel hidden bg-slate-100/70 p-3 mx-0.5 mb-0.5 rounded-b-md text-xs text-slate-700 space-y-1';
                 
-                const memberEntries = Object.entries(trip.members);
-
-                if (memberEntries.length > 0) {
-                    memberEntries.forEach(([memberId, memberData]) => {
+                if (memberIds.length > 0) {
+                    memberIds.forEach((memberId) => {
+                        const memberData = trip.members[memberId];
                         const email = memberData.email;
                         if (!email) return;
 
                         const emailDiv = document.createElement('div');
                         emailDiv.className = 'flex justify-between items-center p-1';
-
-                        const isMemberOwner = memberId === trip.owner;
-                        let emailContent;
-                        if (isMemberOwner) {
-                            emailContent = `<strong class="truncate font-bold">${email} (Owner)</strong>`;
-                        } else {
-                            emailContent = `<span class="truncate">${email}</span>`;
-                        }
                         
                         let kickButton = '';
                         // Only show kick button if current user is owner and member is not the owner
-                        if (isCurrentUserOwner && !isMemberOwner) {
+                        if (isCurrentUserOwner && memberId !== trip.owner) {
                             kickButton = `<button class="kick-member-btn text-rose-500 hover:text-rose-700 transition-colors ml-2" 
                                             data-trip-id="${trip.id}" 
                                             data-member-id="${memberId}" 
@@ -868,11 +998,25 @@
                                     </button>`;
                         }
 
-                        emailDiv.innerHTML = `${emailContent}${kickButton}`;
+                        emailDiv.innerHTML = `<span class="truncate">${email}${memberId === trip.owner ? ' (Owner)' : ''}</span>${kickButton}`;
                         membersPanel.appendChild(emailDiv);
                     });
                 } else {
                     membersPanel.innerHTML = '<p class="text-slate-500 p-1">No members found.</p>';
+                }
+
+                // Add delete trip button for owner
+                if(isCurrentUserOwner) {
+                    const deleteDiv = document.createElement('div');
+                    deleteDiv.className = 'border-t border-slate-200 mt-2 pt-2 text-center';
+                    deleteDiv.innerHTML = `
+                        <a href="#" class="delete-trip-btn text-rose-600 hover:text-rose-800 hover:underline text-xs font-semibold"
+                           data-trip-id="${trip.id}"
+                           data-trip-name="${trip.name}"
+                           data-member-ids="${memberIds.join(',')}">
+                           Delete Trip
+                        </a>`;
+                    membersPanel.appendChild(deleteDiv);
                 }
                 
                 itemContainer.appendChild(item);
@@ -882,39 +1026,48 @@
             attachTripSwitcherListeners();
         }
 
-        // Attaches event listeners for trip switcher buttons (copy link, toggle members, kick member)
+        // Attaches event listeners for trip switcher buttons (copy link, toggle members, kick member, delete trip)
         function attachTripSwitcherListeners() {
             document.querySelectorAll('.copy-trip-link-btn').forEach(btn => {
                 btn.addEventListener('click', (event) => {
-                    event.stopPropagation(); // Prevent trip item click from firing
+                    event.stopPropagation();
                     const tripIdToCopy = event.currentTarget.dataset.tripId;
                     if (tripIdToCopy) {
                         const shareLink = `${window.location.origin}${window.location.pathname}?shared=${tripIdToCopy}`;
-                        copyToClipboard(shareLink, "Trip invitation link copied to clipboard! 🔗");
+                        copyToClipboard(shareLink, "Trip invitation link copied! 🔗");
                     }
                 });
             });
 
             document.querySelectorAll('.toggle-members-btn').forEach(btn => {
                 btn.addEventListener('click', (event) => {
-                    event.stopPropagation(); // Prevent trip item click from firing
+                    event.stopPropagation();
                     const itemContainer = btn.closest('.trip-list-item-container');
                     const panel = itemContainer.querySelector('.members-panel');
                     const icon = btn.querySelector('i');
                     if (panel && icon) {
                         panel.classList.toggle('hidden');
-                        icon.classList.toggle('rotate-180'); // Rotate chevron icon
+                        icon.classList.toggle('rotate-180');
                     }
                 });
             });
 
             document.querySelectorAll('.kick-member-btn').forEach(btn => {
                 btn.addEventListener('click', (event) => {
-                    event.stopPropagation(); // Prevent trip item click from firing
+                    event.stopPropagation();
                     const { tripId, memberId, memberEmail } = event.currentTarget.dataset;
                     showConfirmation(`Are you sure you want to remove ${memberEmail} from this trip?`, () => {
                         removeMemberFromTrip(tripId, memberId, memberEmail);
                     });
+                });
+            });
+
+            document.querySelectorAll('.delete-trip-btn').forEach(btn => {
+                btn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const { tripId, tripName, memberIds } = event.currentTarget.dataset;
+                    deleteTrip(tripId, tripName, memberIds.split(','));
                 });
             });
         }
@@ -933,6 +1086,36 @@
             }
         }
         
+        // Deletes a trip entirely
+        async function deleteTrip(tripId, tripName, memberIds) {
+            showConfirmation(`Are you sure you want to permanently delete '${tripName}'? This action will remove the trip for ALL members and cannot be undone.`, async () => {
+                try {
+                    const updates = {};
+                    updates[`/trips/${tripId}`] = null; // Mark trip for deletion
+                    memberIds.forEach(userId => {
+                        updates[`/users/${userId}/trips/${tripId}`] = null; // Mark user's reference for deletion
+                    });
+                    
+                    await database.ref().update(updates); // Perform atomic delete
+
+                    showError(`Trip '${tripName}' has been deleted.`, 3000, 'success');
+                    closeTripSwitcherModal();
+
+                    // If the deleted trip was the current one, reload the dashboard
+                    if (tripId === currentTripId) {
+                        localStorage.removeItem('lastActiveTripId');
+                        currentTripId = null;
+                        await loadUserDashboard(auth.currentUser.uid);
+                    } else {
+                         await updateAndPopulateTripSwitcher(); // Just refresh the list
+                    }
+                } catch (error) {
+                    showError(`Failed to delete trip: ${error.message}`);
+                    console.error("Error deleting trip:", error);
+                }
+            });
+        }
+
         // Opens the trip switcher modal
         function openTripSwitcherModal() {
             updateAndPopulateTripSwitcher();
@@ -974,7 +1157,7 @@
         // Saves the current appData to Firebase
         function saveDataToFirebase() {
             if (!currentTripRef) {
-                showError("No active trip reference to save data.");
+                // showError("No active trip reference to save data.");
                 return;
             }
             // Only update the mutable parts of appData
