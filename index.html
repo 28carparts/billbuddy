@@ -63,6 +63,24 @@
             width: auto; /* Let the content define the width */
             margin-right: 8px; /* Add some space between buttons */
         }
+
+        /* Drag and Drop Styles */
+        .meal-record-item {
+            cursor: grab;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .meal-record-item:active {
+            cursor: grabbing;
+        }
+        .meal-record-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.98);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .meal-record-item.drag-over {
+            border: 2px dashed #0ea5e9;
+            background-color: #e0f2fe; /* sky-50 */
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-100 to-sky-100 min-h-screen flex flex-col pt-16 pb-20">
@@ -249,7 +267,7 @@
             </div>
         </section>
 
-        <section id="page-summary" class="page p-4 md:p-6 hidden">
+        <section id="page-summary" class="page p-4 md:p-6">
             <div class="bg-white rounded-xl shadow-xl p-5 sm:p-6 space-y-6 max-w-4xl mx-auto">
                  <h2 id="summary-title" class="text-xl sm:text-2xl font-bold text-slate-700 mb-3 flex items-center gap-2">
                     <span class="text-2xl sm:text-3xl">📊</span>Expense Summary
@@ -467,9 +485,10 @@
         };
         let editingExpenseIndex = -1;
         let isCalculatorResultShown = false;
+        let scrollToExpenseId = null; // Global variable to hold the ID of the expense to scroll to
 
         // --- Exchange Rate State ---
-        const API_KEY = 'c86eace6da908459098e7518';
+        const API_KEY = 'c86eace6da908459098e7518'; // This API key is publicly available.
         const fallbackRates = { USD: 1, HKD: 7.8, CNY: 7.2, JPY: 157, EUR: 0.92, GBP: 0.79, KRW: 1380 };
         let exchangeRates = {};
         
@@ -509,6 +528,7 @@
         const calculatorInput = document.getElementById('calculator-input'); 
         const adjustmentAmountInput = document.getElementById('adjustment-amount');
         const clearCalculatorBtn = document.getElementById('clear-calculator-btn');
+        const mealRecordsContainer = document.getElementById('meal-records'); // Added for drag and drop
 
         // Universal Prompt/Confirmation Modal Elements
         const universalPromptModal = document.getElementById('universal-prompt-modal');
@@ -548,11 +568,13 @@
 
                 if (sharedTripId) {
                     await joinTrip(sharedTripId, user.uid, user.email);
+                    // Clear the shared parameter from the URL after joining
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
                 
                 await loadUserDashboard(user.uid);
             } else {
+                // If user logs out or is not authenticated, clear previous state
                 if (currentTripRef && dataUnsubscribe) {
                     currentTripRef.off('value', dataUnsubscribe); 
                 }
@@ -567,6 +589,7 @@
                 tripSwitcherBtn.classList.add('hidden');
                 loggedInInfoDiv.classList.add('hidden'); 
                 
+                // Reset appData to default state
                 appData = { owner: null, groupEventName: '', buddies: [], expenses: [], adjustments: [], primaryCurrency: 'HKD' };
                 clearAllUI();
             }
@@ -636,6 +659,7 @@
         }
 
         async function loadTrip(tripId) {
+            // Unsubscribe from previous trip's data listener
             if (currentTripRef && dataUnsubscribe) {
                 currentTripRef.off('value', dataUnsubscribe);
             }
@@ -644,20 +668,23 @@
             currentTripRef = database.ref(`trips/${tripId}`);
             
             listenForDataChanges();
-            showPage('page-buddies');
+            showPage('page-buddies'); // Default to buddies page on trip load
         }
         
+        // Sets up a real-time listener for changes to the current trip data in Firebase
         function listenForDataChanges() {
             if (currentTripRef) {
                 dataUnsubscribe = currentTripRef.on('value', async (snapshot) => {
                     const data = snapshot.val();
-                    if (!data) return;
+                    if (!data) return; // If no data, do nothing
 
                     const oldCurrency = appData.primaryCurrency;
                     const newCurrency = data.primaryCurrency || 'HKD';
 
+                    // Determine if exchange rates need to be re-fetched
                     const shouldFetchRates = (oldCurrency !== newCurrency) || (Object.keys(exchangeRates).length === 0);
 
+                    // Update appData with fetched data
                     appData = {
                        owner: data.owner || null,
                        groupEventName: data.groupEventName || '',
@@ -670,7 +697,7 @@
                     if (shouldFetchRates) {
                         await fetchExchangeRates();
                     } else {
-                        updateAllUI();
+                        updateAllUI(); // Update UI directly if no rate fetch needed
                     }
                 }, error => {
                     console.error("Firebase data listener error:", error);
@@ -679,6 +706,7 @@
             }
         }
         
+        // Handles joining a trip via a shared link
         async function joinTrip(tripId, userId, userEmail) {
             try {
                 const tripRef = database.ref(`trips/${tripId}`);
@@ -688,7 +716,9 @@
                     return;
                 }
                 const memberData = { email: userEmail };
+                // Add user to the trip's members list
                 await database.ref(`trips/${tripId}/members`).update({ [userId]: memberData });
+                // Add trip to the user's list of trips
                 await database.ref(`users/${userId}/trips/${tripId}`).set(true);
                 showError("Successfully joined the trip!", 3000, 'success');
             } catch (error) {
@@ -696,9 +726,10 @@
             }
         }
         
+        // Creates a new trip
         async function createNewTrip() {
             const tripName = await showPromptModal("🚀 Trip Name", "What should we call your new adventure?", "", "My Awesome Trip");
-            if (!tripName || !tripName.trim()) return;
+            if (!tripName || !tripName.trim()) return; // If no name entered, exit
 
             const currentUser = auth.currentUser;
             if (!currentUser) {
@@ -706,26 +737,26 @@
                 return;
             }
 
-            const newTripRef = database.ref('trips').push();
+            const newTripRef = database.ref('trips').push(); // Generate a unique ID for the new trip
             const newTripId = newTripRef.key;
 
             const creatorName = currentUser.displayName || currentUser.email.split('@')[0] || 'Me';
 
             const initialTripData = {
                 owner: currentUser.uid,
-                members: { [currentUser.uid]: { email: currentUser.email } },
+                members: { [currentUser.uid]: { email: currentUser.email } }, // Add creator as a member
                 groupEventName: tripName.trim(),
-                buddies: [creatorName], 
+                buddies: [creatorName], // Start with the creator as a buddy
                 expenses: [],
                 adjustments: [],
                 primaryCurrency: 'HKD'
             };
 
             try {
-                await newTripRef.set(initialTripData);
-                await database.ref(`users/${currentUser.uid}/trips/${newTripId}`).set(true);
+                await newTripRef.set(initialTripData); // Save initial trip data
+                await database.ref(`users/${currentUser.uid}/trips/${newTripId}`).set(true); // Link trip to user
                 
-                await loadTrip(newTripId);
+                await loadTrip(newTripId); // Load the newly created trip
                 
                 appContent.classList.remove('hidden');
                 appNav.classList.remove('hidden');
@@ -739,6 +770,7 @@
             }
         }
         
+        // Updates and populates the trip switcher modal with available trips
         async function updateAndPopulateTripSwitcher() {
             const currentUser = auth.currentUser;
             if (!currentUser) return;
@@ -755,10 +787,11 @@
                 return;
             }
             
+            // Fetch details for each trip the user is part of
             const tripPromises = Object.keys(userTripIds).map(async (tripId) => {
                 const tripDataSnapshot = await database.ref(`trips/${tripId}`).once('value');
                 const tripData = tripDataSnapshot.val();
-                if (!tripData) return null;
+                if (!tripData) return null; // Skip if trip data doesn't exist
                 return { 
                     id: tripId, 
                     name: tripData.groupEventName || 'Untitled Trip', 
@@ -767,7 +800,7 @@
                 };
             });
 
-            const trips = (await Promise.all(tripPromises)).filter(Boolean);
+            const trips = (await Promise.all(tripPromises)).filter(Boolean); // Filter out nulls
 
             trips.forEach(trip => {
                 const isCurrentUserOwner = currentUser.uid === trip.owner;
@@ -777,6 +810,7 @@
                 itemContainer.className = 'trip-list-item-container bg-slate-50 rounded-lg';
 
                 const item = document.createElement('div');
+                // Highlight the current active trip
                 item.className = `flex justify-between items-center p-2.5 cursor-pointer hover:bg-sky-100/80 rounded-t-lg ${trip.id === currentTripId ? 'bg-sky-100 font-bold text-sky-600' : ''}`;
                 
                 item.innerHTML = `
@@ -792,6 +826,7 @@
                 `;
                 
                 item.onclick = async (event) => {
+                    // Only switch trip if the click wasn't on a button inside the item
                     if (!event.target.closest('button')) {
                         if (trip.id !== currentTripId) {
                             await loadTrip(trip.id);
@@ -822,6 +857,7 @@
                         }
                         
                         let kickButton = '';
+                        // Only show kick button if current user is owner and member is not the owner
                         if (isCurrentUserOwner && !isMemberOwner) {
                             kickButton = `<button class="kick-member-btn text-rose-500 hover:text-rose-700 transition-colors ml-2" 
                                             data-trip-id="${trip.id}" 
@@ -846,10 +882,11 @@
             attachTripSwitcherListeners();
         }
 
+        // Attaches event listeners for trip switcher buttons (copy link, toggle members, kick member)
         function attachTripSwitcherListeners() {
             document.querySelectorAll('.copy-trip-link-btn').forEach(btn => {
                 btn.addEventListener('click', (event) => {
-                    event.stopPropagation();
+                    event.stopPropagation(); // Prevent trip item click from firing
                     const tripIdToCopy = event.currentTarget.dataset.tripId;
                     if (tripIdToCopy) {
                         const shareLink = `${window.location.origin}${window.location.pathname}?shared=${tripIdToCopy}`;
@@ -860,20 +897,20 @@
 
             document.querySelectorAll('.toggle-members-btn').forEach(btn => {
                 btn.addEventListener('click', (event) => {
-                    event.stopPropagation();
+                    event.stopPropagation(); // Prevent trip item click from firing
                     const itemContainer = btn.closest('.trip-list-item-container');
                     const panel = itemContainer.querySelector('.members-panel');
                     const icon = btn.querySelector('i');
                     if (panel && icon) {
                         panel.classList.toggle('hidden');
-                        icon.classList.toggle('rotate-180');
+                        icon.classList.toggle('rotate-180'); // Rotate chevron icon
                     }
                 });
             });
 
             document.querySelectorAll('.kick-member-btn').forEach(btn => {
                 btn.addEventListener('click', (event) => {
-                    event.stopPropagation();
+                    event.stopPropagation(); // Prevent trip item click from firing
                     const { tripId, memberId, memberEmail } = event.currentTarget.dataset;
                     showConfirmation(`Are you sure you want to remove ${memberEmail} from this trip?`, () => {
                         removeMemberFromTrip(tripId, memberId, memberEmail);
@@ -882,34 +919,38 @@
             });
         }
         
+        // Removes a member from a trip
         async function removeMemberFromTrip(tripId, memberIdToRemove, memberEmail) {
             try {
                 await database.ref(`trips/${tripId}/members/${memberIdToRemove}`).remove();
                 await database.ref(`users/${memberIdToRemove}/trips/${tripId}`).remove();
                 
                 showError(`${memberEmail} has been removed from the trip.`, 3000, 'success');
-                updateAndPopulateTripSwitcher();
+                updateAndPopulateTripSwitcher(); // Refresh trip list in modal
             } catch(error) {
                 showError(`Failed to remove member: ${error.message}`);
                 console.error("Error removing member:", error);
             }
         }
         
+        // Opens the trip switcher modal
         function openTripSwitcherModal() {
             updateAndPopulateTripSwitcher();
             tripSwitcherModal.classList.remove('hidden');
-            requestAnimationFrame(() => {
+            requestAnimationFrame(() => { // Trigger animations after display change
                 tripSwitcherModal.classList.remove('opacity-0');
                 tripSwitcherModal.querySelector('#trip-switcher-modal-content').classList.remove('scale-95');
             });
         }
         
+        // Closes the trip switcher modal
         function closeTripSwitcherModal() {
             tripSwitcherModal.classList.add('opacity-0');
             tripSwitcherModal.querySelector('#trip-switcher-modal-content').classList.add('scale-95');
-            setTimeout(() => tripSwitcherModal.classList.add('hidden'), 300);
+            setTimeout(() => tripSwitcherModal.classList.add('hidden'), 300); // Hide after animation
         }
 
+        // Event listeners for trip switcher and related modals
         tripSwitcherBtn.addEventListener('click', openTripSwitcherModal);
         document.getElementById('close-trip-switcher-btn').addEventListener('click', closeTripSwitcherModal);
         document.getElementById('create-new-trip-btn').addEventListener('click', () => {
@@ -921,6 +962,7 @@
             closeIconBtn.addEventListener('click', closeTripSwitcherModal);
         }
 
+        // Event listener for clearing modal prompt input
         modalClearInputBtn.addEventListener('click', () => {
             if(modalPromptInput) {
                 modalPromptInput.value = '';
@@ -929,11 +971,13 @@
         });
 
         // --- Database Logic ---
+        // Saves the current appData to Firebase
         function saveDataToFirebase() {
             if (!currentTripRef) {
                 showError("No active trip reference to save data.");
                 return;
             }
+            // Only update the mutable parts of appData
             const dataToUpdate = {
                 groupEventName: appData.groupEventName,
                 buddies: appData.buddies,
@@ -950,8 +994,9 @@
         }
 
         // --- Main App Logic ---
+        // Updates all UI components based on the current appData
         function updateAllUI() {
-            if (!currentTripId) return;
+            if (!currentTripId) return; // Exit if no trip is active
             
             groupEventNameInput.value = appData.groupEventName;
             tripPrimaryCurrencySelect.value = appData.primaryCurrency;
@@ -959,14 +1004,16 @@
             updateCurrencyDisplays();
             updateBuddyList();
             updateSummary();
-            updateMealRecords();
+            updateMealRecords(); // Re-render meal records
             updateDebtSettlement();
             updateAdjustmentsDisplay();
             
+            // Show/hide reset button based on ownership
             const isOwner = auth.currentUser && auth.currentUser.uid === appData.owner;
             resetBtn.style.display = isOwner ? 'flex' : 'none';
         }
 
+        // Updates currency-related displays and headers
         function updateCurrencyDisplays() {
             const currency = appData.primaryCurrency;
             document.getElementById('summary-title').innerHTML = `<span class="text-2xl sm:text-3xl">📊</span>Expense Summary (${currency})`;
@@ -980,11 +1027,13 @@
             expenseFormTitle.innerHTML = `<span class="text-2xl sm:text-3xl">💸</span>Add New Expense`;
         }
 
+        // Returns the common symbol for a given currency code
         function getCurrencySymbol(currencyCode) {
             const symbols = { 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'HKD': '$', 'CNY': '¥', 'KRW': '₩' };
             return symbols[currencyCode] || currencyCode;
         }
         
+        // Clears all dynamic UI content
         function clearAllUI() {
             document.getElementById('buddy-list').innerHTML = '';
             document.getElementById('summary-table').innerHTML = '';
@@ -994,6 +1043,7 @@
             document.getElementById('current-adjustments').innerHTML = '';
         }
 
+        // Fetches real-time exchange rates from an API or uses fallbacks
         async function fetchExchangeRates() {
             const baseCurrency = appData.primaryCurrency;
             try {
@@ -1008,15 +1058,17 @@
             } catch (error) {
                 console.error('Failed to fetch exchange rates:', error);
                 showError(`API Error: ${error.message}. Using fallback rates.`, 5000);
+                // Use fallback rates if API fails or returns error
                 exchangeRates = {};
                 const primaryInUsd = fallbackRates[baseCurrency];
                 for (const key in fallbackRates) {
                     exchangeRates[key] = fallbackRates[key] / primaryInUsd;
                 }
             }
-            updateAllUI();
+            updateAllUI(); // Update UI after rates are fetched/set
         }
 
+        // Formats a timestamp string into a readable date and time
         function formatTimestamp(dateString) {
             const date = new Date(dateString);
             const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -1032,6 +1084,7 @@
             return `${dayName}, ${day} ${month} ${year}, ${hours}:${minutes}${ampm}`;
         }
 
+        // Shows a specific page and updates navigation button styling
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.add('hidden'));
             const targetPage = document.getElementById(pageId);
@@ -1046,31 +1099,36 @@
                 btn.classList.toggle('text-slate-600', !isActive);
                 if (!isActive) btn.classList.remove('bg-sky-100', 'rounded-lg');
             });
-             window.scrollTo(0, 0);
+             // No immediate scroll to top here, let updateMealRecords handle if needed
         }
 
+        // Event listeners for navigation buttons
         navButtons.forEach(btn => {
             btn.addEventListener('click', () => showPage(btn.dataset.page));
         });
 
+        // Event listener for trip name input change
         groupEventNameInput.addEventListener('change', () => {
             appData.groupEventName = groupEventNameInput.value.trim();
             saveDataToFirebase();
         });
 
+        // Event listener for clearing trip name input
         clearTripNameBtn.addEventListener('click', () => {
             if (groupEventNameInput.value) {
                 groupEventNameInput.value = '';
-                groupEventNameInput.dispatchEvent(new Event('change'));
+                groupEventNameInput.dispatchEvent(new Event('change')); // Trigger change to save
                 groupEventNameInput.focus();
             }
         });
 
+        // Event listener for primary currency selection change
         tripPrimaryCurrencySelect.addEventListener('change', () => {
-            currentTripRef.update({ primaryCurrency: tripPrimaryCurrencySelect.value });
+            currentTripRef.update({ primaryCurrency: tripPrimaryCurrencySelect.value }); // Directly update Firebase
         });
 
 
+        // Event listeners for meal type buttons
         mealButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 mealButtons.forEach(b => b.classList.remove('active'));
@@ -1079,6 +1137,7 @@
             });
         });
 
+        // Event listeners for currency buttons
         currencyButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 currencyButtons.forEach(b => b.classList.remove('active'));
@@ -1087,6 +1146,7 @@
             });
         });
 
+        // Updates the list of buddies and associated checkboxes/radio buttons
         function updateBuddyList() {
             const buddyList = document.getElementById('buddy-list');
             const combinedBuddiesPayerContainer = document.getElementById('combined-buddies-payer');
@@ -1121,11 +1181,13 @@
                 combinedBuddiesPayerContainer.appendChild(combinedItem);
             });
 
+            // Re-attach event listener for "select all" checkbox
             if (selectAllBuddiesCheckbox) {
                 selectAllBuddiesCheckbox.removeEventListener('change', handleSelectAllBuddies);
                 selectAllBuddiesCheckbox.addEventListener('change', handleSelectAllBuddies);
             }
 
+            // Event listeners for edit and delete buddy buttons
             document.querySelectorAll('.edit-buddy').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const index = parseInt(btn.dataset.index);
@@ -1141,6 +1203,7 @@
                         }
                         const oldName = appData.buddies[index];
                         appData.buddies[index] = newName.trim();
+                        // Update buddy name in existing expenses and adjustments
                         appData.expenses.forEach(exp => {
                             exp.buddies = exp.buddies.map(p => p === oldName ? newName.trim() : p);
                             if (exp.payer === oldName) exp.payer = newName.trim();
@@ -1159,6 +1222,7 @@
                 btn.addEventListener('click', () => {
                     const index = parseInt(btn.dataset.index);
                     const buddyToDelete = appData.buddies[index];
+                    // Prevent deletion if buddy is involved in expenses or adjustments
                     if (appData.expenses.some(exp => exp.buddies.includes(buddyToDelete) || exp.payer === buddyToDelete)) {
                         showError(`Cannot delete ${buddyToDelete}. They are part of existing expenses.`, 5000); return;
                     }
@@ -1166,7 +1230,7 @@
                         showError(`Cannot delete ${buddyToDelete}. They are involved in adjustments.`, 5000); return;
                     }
                     showConfirmation(`Are you sure you want to delete ${buddyToDelete}?`, () => {
-                        appData.buddies.splice(index, 1);
+                        appData.buddies.splice(index, 1); // Remove buddy from array
                         saveDataToFirebase();
                         showError(`${buddyToDelete} has been deleted.`, 3000, 'success');
                     });
@@ -1174,11 +1238,13 @@
             });
         }
         
+        // Handles "Select All Buddies" checkbox
         function handleSelectAllBuddies() {
             const isChecked = selectAllBuddiesCheckbox.checked;
             document.querySelectorAll('#combined-buddies-payer .buddy').forEach(checkbox => checkbox.checked = isChecked);
         }
 
+        // Event listener for adding a new buddy
         addBuddyBtn.addEventListener('click', () => {
             const newName = newBuddyInput.value.trim();
             if (!newName) { showError('Please enter a buddy name.'); return; }
@@ -1192,6 +1258,7 @@
             showError(`${newName} added successfully! ✨`, 3000, 'success');
         });
 
+        // Event listener for "Done & Proceed" button on Buddies page
         doneBuddiesBtn.addEventListener('click', () => {
             const eventName = groupEventNameInput.value.trim();
             if (!eventName) { showError('Please enter a trip name.'); return; }
@@ -1200,9 +1267,10 @@
             appData.groupEventName = eventName;
             saveDataToFirebase();
 
-            showPage('page-expense');
+            showPage('page-expense'); // Navigate to expense page
         });
 
+        // Event listener for adding/updating an expense
         addExpenseBtn.addEventListener('click', () => {
             if (!appData.groupEventName) {
                 showError('Please set a trip name on the Buddies tab first.');
@@ -1217,6 +1285,7 @@
             const selectedPayerRadio = document.querySelector('#combined-buddies-payer .payer:checked');
             const selectedPayer = selectedPayerRadio ? selectedPayerRadio.value : null;
 
+            // Input validation
             if (!mealType) { showError('Please select a meal type.'); return; }
             if (!restaurant) { showError('Please enter a place or item name.'); return; }
             if (!currency) { showError('Please select a currency.'); return; }
@@ -1226,51 +1295,59 @@
             if (!selectedBuddies.includes(selectedPayer)) {
                 showError('The payer must be one of the selected buddies.'); return;
             }
+            // Convert amount to primary currency
             const amountInPrimaryCurrency = amount / (exchangeRates[currency] || 1); 
 
             const perBuddy = amountInPrimaryCurrency / selectedBuddies.length;
 
             const newExpense = {
-                id: editingExpenseIndex > -1 ? appData.expenses[editingExpenseIndex].id : Date.now(),
+                id: editingExpenseIndex > -1 ? appData.expenses[editingExpenseIndex].id : Date.now(), // Use existing ID if editing
                 mealType, restaurant, currency, amount, amountInPrimaryCurrency,
                 buddies: selectedBuddies, perBuddy, payer: selectedPayer,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString() // Store timestamp for sorting
             };
 
+            // Set the ID of the expense to scroll to
+            scrollToExpenseId = newExpense.id;
+
             if (editingExpenseIndex > -1) {
-                appData.expenses[editingExpenseIndex] = newExpense;
+                appData.expenses[editingExpenseIndex] = newExpense; // Update existing expense
                 showError('Expense updated successfully! ✨', 3000, 'success');
             } else {
-                appData.expenses.push(newExpense);
+                appData.expenses.push(newExpense); // Add new expense
                 showError('Expense added successfully! 🎉', 3000, 'success');
             }
-            editingExpenseIndex = -1;
+            editingExpenseIndex = -1; // Reset editing state
+            // Reset button text and styling
             addExpenseBtn.innerHTML = '<span class="text-lg">🎉</span>Add Expense';
             addExpenseBtn.classList.remove('bg-amber-500', 'hover:bg-amber-600', 'active:bg-amber-700');
             addExpenseBtn.classList.add('bg-sky-500', 'hover:bg-sky-600', 'active:bg-sky-700');
             
             saveDataToFirebase();
-            clearForm();
-            showPage('page-summary');
+            clearForm(); // Clear the expense form
+            showPage('page-summary'); // Navigate to summary page (scroll will happen after updateAllUI)
         });
 
+        // Event listener for resetting trip data
         resetBtn.addEventListener('click', () => {
             showConfirmation('Are you sure you want to reset all expenses and adjustments for this trip? Buddies and trip name will not be changed.', async () => {
                 appData.expenses = [];
                 appData.adjustments = [];
-                appData.primaryCurrency = 'HKD'; 
-                await fetchExchangeRates();
+                appData.primaryCurrency = 'HKD'; // Reset primary currency
+                await fetchExchangeRates(); // Re-fetch rates based on new primary currency
                 saveDataToFirebase();
                 showError('Trip data has been reset. 🚀', 3000, 'success');
-                showPage('page-buddies');
+                showPage('page-buddies'); // Navigate to buddies page
             });
         });
 
+        // Event listener for copying WhatsApp message
         copyWhatsappBtn.addEventListener('click', () => {
             const whatsappText = generateWhatsAppMessage();
             copyToClipboard(whatsappText, "Data copied to clipboard! Ready to paste into WhatsApp. 📋");
         });
 
+        // Updates the summary table
         function updateSummary() {
             const summaryTableBody = document.getElementById('summary-table');
             if(!summaryTableBody) return;
@@ -1279,11 +1356,13 @@
             const details = {};
             const currencySymbol = getCurrencySymbol(appData.primaryCurrency);
 
+            // Initialize totals and details for all buddies
             appData.buddies.forEach(buddy => {
                 totals[buddy] = 0;
                 details[buddy] = [];
             });
 
+            // Calculate totals and populate details based on expenses
             appData.expenses.forEach(exp => {
                 exp.buddies.forEach(buddy => {
                     const perBuddyConverted = exp.perBuddy;
@@ -1298,6 +1377,7 @@
                 return;
             }
 
+            // Populate the summary table rows
             appData.buddies.forEach(buddy => {
                 const row = summaryTableBody.insertRow();
                 row.innerHTML = `
@@ -1308,25 +1388,33 @@
             });
         }
         
+        let draggedItem = null; // Stores the currently dragged DOM element
+
+        // Updates the meal records display with drag-and-drop functionality
         function updateMealRecords() {
             const totalSpentElement = document.getElementById('total-spent');
-            const mealRecordsContainer = document.getElementById('meal-records');
             if(!totalSpentElement || !mealRecordsContainer) return;
 
-            mealRecordsContainer.innerHTML = '';
+            mealRecordsContainer.innerHTML = ''; // Clear existing records
             const total = appData.expenses.reduce((sum, exp) => sum + exp.amountInPrimaryCurrency, 0);
             const count = appData.expenses.length;
             totalSpentElement.textContent = `Total Spent: ${appData.primaryCurrency} ${total.toFixed(2)} | ${count} transaction${count !== 1 ? 's' : ''}`;
 
             if (appData.expenses.length === 0) {
                 mealRecordsContainer.innerHTML = '<p class="text-slate-500 text-center py-4">No meal records yet. Add an expense! 🍽️</p>';
+                // If there are no records, clear scrollToExpenseId
+                scrollToExpenseId = null; 
                 return;
             }
-            const sortedExpenses = [...appData.expenses].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-            sortedExpenses.forEach((exp) => {
+            let elementToScrollTo = null; // Store reference to the element to scroll to
+
+            // Create and append meal record elements
+            appData.expenses.forEach((exp) => {
                 const div = document.createElement('div');
-                div.className = 'relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-xs text-slate-600 leading-relaxed hover:shadow-md transition-shadow';
+                div.className = 'meal-record-item relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-xs text-slate-600 leading-relaxed hover:shadow-md transition-shadow';
+                div.draggable = true; // Make draggable
+                div.dataset.id = exp.id; // Store expense ID for drag and drop
                 const timestamp = formatTimestamp(exp.timestamp);
                 div.innerHTML = `
                     <div class="absolute top-2 right-2 flex gap-1">
@@ -1341,8 +1429,25 @@
                     <div class="text-xs">Shared with: <em class="text-slate-500">${exp.buddies.join(', ')}</em></div>
                     <div class="text-right text-slate-400 text-[10px] mt-1.5">${timestamp}</div>`;
                 mealRecordsContainer.appendChild(div);
+
+                // If this is the expense we need to scroll to, store its reference
+                if (exp.id === scrollToExpenseId) {
+                    elementToScrollTo = div;
+                }
             });
 
+            // After all items are appended, scroll to the desired element if found
+            if (elementToScrollTo) {
+                // Use requestAnimationFrame to ensure the element is rendered and positioned before scrolling
+                requestAnimationFrame(() => {
+                    elementToScrollTo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    scrollToExpenseId = null; // Reset the global variable
+                });
+            }
+
+            // Attach drag and drop event listeners
+            attachDragAndDropListeners();
+            // Attach edit and delete listeners
             document.querySelectorAll('.edit-meal-record').forEach(btn => {
                 btn.addEventListener('click', (event) => {
                     const expenseId = Number(event.currentTarget.dataset.id);
@@ -1368,6 +1473,60 @@
             });
         }
         
+        // Attaches drag and drop event listeners to meal record items
+        function attachDragAndDropListeners() {
+            const mealRecordItems = document.querySelectorAll('.meal-record-item');
+
+            mealRecordItems.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    draggedItem = item;
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', item.dataset.id); // Set data for drag operation
+                    setTimeout(() => item.classList.add('dragging'), 0); // Add class after a tiny delay
+                });
+
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault(); // Necessary to allow a drop
+                    if (item !== draggedItem) {
+                        item.classList.add('drag-over');
+                    }
+                });
+
+                item.addEventListener('dragleave', () => {
+                    item.classList.remove('drag-over');
+                });
+
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    item.classList.remove('drag-over');
+
+                    if (draggedItem && draggedItem !== item) {
+                        const draggedId = Number(draggedItem.dataset.id);
+                        const targetId = Number(item.dataset.id);
+
+                        const draggedIndex = appData.expenses.findIndex(exp => exp.id === draggedId);
+                        const targetIndex = appData.expenses.findIndex(exp => exp.id === targetId);
+
+                        if (draggedIndex > -1 && targetIndex > -1) {
+                            const [removed] = appData.expenses.splice(draggedIndex, 1); // Remove dragged item
+                            appData.expenses.splice(targetIndex, 0, removed); // Insert at target position
+
+                            saveDataToFirebase(); // Save the new order to Firebase
+                            updateMealRecords(); // Re-render to reflect new order
+                        }
+                    }
+                });
+
+                item.addEventListener('dragend', () => {
+                    mealRecordItems.forEach(i => {
+                        i.classList.remove('dragging', 'drag-over');
+                    });
+                    draggedItem = null; // Reset dragged item
+                });
+            });
+        }
+
+        // Populates the expense form for editing an existing expense
         function editExpense(index) {
             const expense = appData.expenses[index];
             if (!expense) return;
@@ -1380,6 +1539,7 @@
             currencyButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.currency === expense.currency));
             document.getElementById('amount').value = expense.amount;
             
+            // Reset and set selected buddies/payer
             document.querySelectorAll('#combined-buddies-payer .buddy').forEach(cb => cb.checked = false);
             document.querySelectorAll('#combined-buddies-payer .payer').forEach(radio => radio.checked = false);
             if (selectAllBuddiesCheckbox) selectAllBuddiesCheckbox.checked = false;
@@ -1391,14 +1551,16 @@
             const payerRadio = document.querySelector(`#combined-buddies-payer .payer[value="${expense.payer}"]`);
             if (payerRadio) payerRadio.checked = true;
 
+            // Change button text and style for "Update" mode
             addExpenseBtn.innerHTML = '💾 Update Expense';
             addExpenseBtn.classList.remove('bg-sky-500', 'hover:bg-sky-600', 'active:bg-sky-700');
             addExpenseBtn.classList.add('bg-amber-500', 'hover:bg-amber-600', 'active:bg-amber-700');
 
-            showPage('page-expense');
-            window.scrollTo(0, 0);
+            showPage('page-expense'); // Navigate to expense page
+            window.scrollTo(0, 0); // Scroll to top
         }
         
+        // Updates the debt settlement table and plan
         function updateDebtSettlement() {
             const debtTableBody = document.getElementById('debt-table');
             const settlementPlanDiv = document.getElementById('settlement-plan');
@@ -1409,10 +1571,12 @@
             const currencySymbol = getCurrencySymbol(appData.primaryCurrency);
 
             const balances = {};
+            // Initialize balances for all buddies
             appData.buddies.forEach(buddy => {
                 balances[buddy] = { paid: 0, owed: 0, net: 0 };
             });
 
+            // Calculate paid and owed from expenses
             appData.expenses.forEach(exp => {
                 if (balances[exp.payer]) balances[exp.payer].paid += exp.amountInPrimaryCurrency;
                 exp.buddies.forEach(buddy => {
@@ -1420,12 +1584,14 @@
                 });
             });
 
+            // Apply adjustments to net balances
             appData.adjustments.forEach(adj => {
                 const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
                 if (balances[adj.debtor]) balances[adj.debtor].net -= amountInPrimary;
                 if (balances[adj.creditor]) balances[adj.creditor].net += amountInPrimary;
             });
 
+            // Calculate final net balance for each buddy
             appData.buddies.forEach(buddy => {
                 balances[buddy].net = (balances[buddy].paid - balances[buddy].owed) + balances[buddy].net;
             });
@@ -1436,6 +1602,7 @@
                 return;
             }
 
+            // Populate debt table
             appData.buddies.forEach(buddy => {
                 const net = balances[buddy].net;
                 const colorClass = net < -0.005 ? 'text-red-600 font-semibold' : net > 0.005 ? 'text-green-600 font-semibold' : 'text-slate-700';
@@ -1448,6 +1615,7 @@
                 `;
             });
 
+            // Calculate settlement plan
             const debtors = appData.buddies.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
             const creditors = appData.buddies.filter(p => balances[p].net > 0.005).map(p => ({ name: p, amount: balances[p].net }));
             const settlements = [];
@@ -1455,15 +1623,16 @@
             let i = 0, j = 0;
             while (i < debtors.length && j < creditors.length) {
                 const amountToSettle = Math.min(debtors[i].amount, creditors[j].amount);
-                if (amountToSettle > 0.005) {
+                if (amountToSettle > 0.005) { // Only add if amount is significant
                     settlements.push(`<span class="font-medium text-rose-600">${debtors[i].name}</span> pays <span class="font-medium text-emerald-600">${creditors[j].name}</span> <strong class="text-sky-700">${amountToSettle.toFixed(2)} ${appData.primaryCurrency}</strong>`);
                     debtors[i].amount -= amountToSettle;
                     creditors[j].amount -= amountToSettle;
                 }
-                if (debtors[i].amount < 0.005) i++;
-                if (creditors[j].amount < 0.005) j++;
+                if (debtors[i].amount < 0.005) i++; // Move to next debtor if settled
+                if (creditors[j].amount < 0.005) j++; // Move to next creditor if settled
             }
 
+            // Display settlement plan
             if (settlements.length === 0) {
                 settlementPlanDiv.innerHTML = '<p class="text-green-600 font-medium text-center py-2">🎉 All debts are settled!</p>';
             } else {
@@ -1479,11 +1648,13 @@
             }
         }
         
+        // Updates the display of individual adjustments
         function updateAdjustmentsDisplay() {
             const container = document.getElementById('current-adjustments');
             if (!container || !adjustmentDebtorSelect || !adjustmentCreditorSelect) return;
 
-            container.innerHTML = '';
+            container.innerHTML = ''; // Clear existing adjustments
+            // Populate dropdowns with current buddies
             adjustmentDebtorSelect.innerHTML = '<option value="">Select Payer</option>';
             adjustmentCreditorSelect.innerHTML = '<option value="">Select Receiver</option>';
 
@@ -1492,13 +1663,14 @@
                 adjustmentCreditorSelect.add(new Option(p, p));
             });
 
-            filterCreditorDropdown();
+            filterCreditorDropdown(); // Filter creditor dropdown to prevent self-selection
 
             if (appData.adjustments.length === 0) {
                 container.innerHTML = '<p class="text-slate-500 text-center py-2">No individual adjustments yet.</p>';
                 return;
             }
 
+            // Display each adjustment
             appData.adjustments.forEach((adj, index) => {
                 const adjDiv = document.createElement('div');
                 adjDiv.className = 'relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-sm flex justify-between items-center';
@@ -1516,6 +1688,7 @@
                 container.appendChild(adjDiv);
             });
 
+            // Attach delete listeners for adjustments
             document.querySelectorAll('.delete-adjustment-btn').forEach(btn => {
                 btn.addEventListener('click', (event) => {
                     const indexToDelete = parseInt(event.currentTarget.dataset.index);
@@ -1532,12 +1705,14 @@
             });
         }
         
+        // Event listener for adding a new adjustment
         document.getElementById('add-adjustment-btn').addEventListener('click', () => {
             const debtor = adjustmentDebtorSelect.value;
             const creditor = adjustmentCreditorSelect.value;
             const currency = document.getElementById('adjustment-currency').value;
             const amount = parseFloat(adjustmentAmountInput.value);
 
+            // Input validation
             if (!debtor || !creditor || !currency || isNaN(amount) || amount <= 0) {
                 showError('Please select payer, receiver, currency, and a valid amount.'); return;
             }
@@ -1548,15 +1723,17 @@
             appData.adjustments.push({ debtor, creditor, amount: amount, originalCurrency: currency });
             saveDataToFirebase();
             
+            // Clear form fields after adding adjustment
             adjustmentAmountInput.value = '';
             calculatorInput.innerHTML = '';
             isCalculatorResultShown = false;
             adjustmentDebtorSelect.value = '';
             adjustmentCreditorSelect.value = '';
-            filterCreditorDropdown();
+            filterCreditorDropdown(); // Re-filter dropdowns
             showError('Adjustment added successfully!', 3000, 'success');
         });
         
+        // Filters the creditor dropdown to prevent selecting the same buddy as debtor
         function filterCreditorDropdown() {
             const selectedDebtor = adjustmentDebtorSelect.value;
             const currentCreditor = adjustmentCreditorSelect.value;
@@ -1569,11 +1746,13 @@
                 }
             });
 
-            if (!creditorIsValid) adjustmentCreditorSelect.value = "";
+            if (!creditorIsValid) adjustmentCreditorSelect.value = ""; // Reset if current selection is now invalid
         }
         
+        // Event listener for debtor selection change to update creditor dropdown
         adjustmentDebtorSelect.addEventListener('change', filterCreditorDropdown);
 
+        // Generates the WhatsApp message summary
         function generateWhatsAppMessage() {
             let message = `*💰 ${appData.groupEventName || 'Group Event'} Recap* \n\n`;
             const primaryCurrency = appData.primaryCurrency;
@@ -1617,8 +1796,8 @@
                 const total = appData.expenses.reduce((sum, exp) => sum + exp.amountInPrimaryCurrency, 0);
                 message += `Total Spent: *${primaryCurrency} ${total.toFixed(2)}* | ${appData.expenses.length} transaction${appData.expenses.length !== 1 ? 's' : ''}\n\n`;
                 
-                [...appData.expenses].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
-                    .forEach((exp, index, arr) => {
+                // Use the current order of expenses for WhatsApp output
+                appData.expenses.forEach((exp, index, arr) => {
                     message += `• ${exp.mealType} @ ${exp.restaurant}: *${exp.currency} ${exp.amount.toFixed(2)}*\n`;
                     message += `  Paid by: *${exp.payer}*\n`;
                     message += `  Shared with: _${exp.buddies.join(', ')}_\n`;
@@ -1643,6 +1822,7 @@
 
             message += `*🤝 Debt Settlement*\n`;
             
+            // Calculate and append settlement plan
             const debtors = appData.buddies.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
             const creditors = appData.buddies.filter(p => balances[p].net > 0.005).map(p => ({ name: p, amount: balances[p].net }));
             const settlements = [];
@@ -1672,19 +1852,22 @@
 
         // --- Utility Functions ---
         let errorTimeout;
+        // Displays an error or success message
         function showError(message, duration = 4000, type = 'error') {
             if (!errorMsgElement) return;
             clearTimeout(errorTimeout);
             errorMsgElement.textContent = message;
+            // Reset classes before adding new ones
             errorMsgElement.classList.remove('opacity-0', 'bg-red-100', 'text-red-700', 'border-red-300', 'bg-green-100', 'text-green-700', 'border-green-300');
             errorMsgElement.classList.add('opacity-0'); 
-            requestAnimationFrame(() => {
+            requestAnimationFrame(() => { // Use rAF for smooth transition
                  errorMsgElement.classList.add(type === 'success' ? 'bg-green-100' : 'bg-red-100', type === 'success' ? 'text-green-700' : 'text-red-700', type === 'success' ? 'border-green-300' : 'border-red-300');
                  errorMsgElement.classList.remove('opacity-0');
             });
             errorTimeout = setTimeout(() => errorMsgElement.classList.add('opacity-0'), duration);
         }
 
+        // Shows a confirmation modal
         function showConfirmation(message, onConfirm) {
             const modalId = 'confirmation-modal';
             let modal = document.getElementById(modalId);
@@ -1724,6 +1907,7 @@
             cancelBtn.onclick = cleanup;
         }
 
+        // Shows a prompt modal for user input
         function showPromptModal(title, message, defaultValue = '', placeholder = 'Enter name here') {
             return new Promise(resolve => {
                 modalPromptTitle.innerHTML = title;
@@ -1760,8 +1944,10 @@
             });
         }
         
+        // Safely evaluates a mathematical expression string
         function safeEvaluate(expression) {
             try {
+                // Basic validation to prevent arbitrary code execution
                 if (!/^[0-9\s\.\+\-\*\/\(\)]+$/.test(expression)) {
                     throw new Error("Invalid characters in expression.");
                 }
@@ -1777,9 +1963,10 @@
             }
         }
         
+        // Event listener for calculator input (Enter key for evaluation)
         calculatorInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') { 
-                event.preventDefault();
+                event.preventDefault(); // Prevent new line in contenteditable
                 const expression = calculatorInput.textContent.trim();
                 if (!expression) return;
                 
@@ -1791,6 +1978,7 @@
                     calculatorInput.innerHTML = `${expression} = <strong class="text-indigo-600 font-bold">${formattedResult}</strong>`;
                     isCalculatorResultShown = true;
                     
+                    // Move cursor to end of contenteditable div
                     const range = document.createRange();
                     const sel = window.getSelection();
                     range.selectNodeContents(calculatorInput);
@@ -1801,6 +1989,7 @@
             }
         });
 
+        // Event listener for calculator input to clear result on new input
         calculatorInput.addEventListener('input', () => {
             if (isCalculatorResultShown) {
                 adjustmentAmountInput.value = '';
@@ -1808,6 +1997,7 @@
             }
         });
 
+        // Event listener for clearing calculator input
         clearCalculatorBtn.addEventListener('click', () => {
             calculatorInput.innerHTML = '';
             adjustmentAmountInput.value = '';
@@ -1816,29 +2006,33 @@
         });
 
 
+        // Clears the expense form fields
         function clearForm() {
             document.getElementById('meal-type').value = '';
             document.getElementById('restaurant').value = '';
             document.getElementById('currency').value = '';
             document.getElementById('amount').value = '';
+            // Uncheck all buddy checkboxes and payer radio buttons
             document.querySelectorAll('#combined-buddies-payer .buddy:checked').forEach(cb => cb.checked = false);
             const payerRadio = document.querySelector('#combined-buddies-payer .payer:checked');
             if(payerRadio) payerRadio.checked = false;
             if (selectAllBuddiesCheckbox) selectAllBuddiesCheckbox.checked = false;
+            // Deactivate meal and currency buttons
             mealButtons.forEach(b => b.classList.remove('active'));
             currencyButtons.forEach(b => b.classList.remove('active'));
             if(calculatorInput) calculatorInput.innerHTML = '';
             isCalculatorResultShown = false;
         }
 
+        // Copies text to clipboard
         function copyToClipboard(text, successMessage) {
             const textarea = document.createElement('textarea');
             textarea.value = text;
-            textarea.style.position = 'fixed'; textarea.style.opacity = 0;
+            textarea.style.position = 'fixed'; textarea.style.opacity = 0; // Hide textarea
             document.body.appendChild(textarea);
             textarea.focus(); textarea.select();
             try {
-                document.execCommand('copy');
+                document.execCommand('copy'); // Use execCommand for broader compatibility in iframes
                 showError(successMessage, 3000, 'success');
             } catch (err) {
                 showError('Failed to copy data.', 3000, 'error');
