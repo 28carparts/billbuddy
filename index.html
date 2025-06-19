@@ -129,7 +129,7 @@
                     </div>
                     <button type="submit" class="w-full mt-6 bg-sky-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-sky-600 active:bg-sky-700 transform hover:scale-105 active:scale-95 transition-all">Login</button>
                 </form>
-                <div class="text-center text-sm text-slate-500 space-y-2">
+                 <div class="text-center text-sm text-slate-500 space-y-2 pt-2">
                     <p>
                         Don't have an account? <a href="#" id="show-register" class="font-semibold text-sky-600 hover:underline">Sign Up</a>
                     </p>
@@ -816,27 +816,37 @@
             if (currentTripRef) {
                 dataUnsubscribe = currentTripRef.on('value', async (snapshot) => {
                     const data = snapshot.val();
-                    if (!data) { // Handle case where trip is deleted by another user
+                    const currentUser = auth.currentUser;
+
+                    // Case 1: Trip was deleted entirely
+                    if (!data) {
                         console.log(`Trip ${currentTripId} was deleted.`);
                         if (currentTripId === localStorage.getItem('lastActiveTripId')) {
                            localStorage.removeItem('lastActiveTripId');
                         }
-                        currentTripId = null; // Clear current trip ID
-                        // Detach the listener
                         currentTripRef.off('value', dataUnsubscribe);
-                        // Reload the dashboard to find another trip or show the no-trips page
-                        await loadUserDashboard(auth.currentUser.uid);
+                        await loadUserDashboard(currentUser.uid);
                         showError("The current trip has been deleted.", 3000, 'error');
                         return;
                     }
 
+                    // Case 2: Current user was removed from the trip
+                    if (currentUser && data.members && !data.members[currentUser.uid]) {
+                        console.log(`User ${currentUser.uid} was removed from trip ${currentTripId}.`);
+                        if (currentTripId === localStorage.getItem('lastActiveTripId')) {
+                           localStorage.removeItem('lastActiveTripId');
+                        }
+                        currentTripRef.off('value', dataUnsubscribe);
+                        await loadUserDashboard(currentUser.uid);
+                        showError("You have been removed from the trip.", 4000, 'error');
+                        return; 
+                    }
+
+                    // Proceed with normal data update
                     const oldCurrency = appData.primaryCurrency;
                     const newCurrency = data.primaryCurrency || 'HKD';
-
-                    // Determine if exchange rates need to be re-fetched
                     const shouldFetchRates = (oldCurrency !== newCurrency) || (Object.keys(exchangeRates).length === 0);
 
-                    // Update appData with fetched data
                     appData = {
                        owner: data.owner || null,
                        members: data.members || {},
@@ -850,7 +860,7 @@
                     if (shouldFetchRates) {
                         await fetchExchangeRates();
                     } else {
-                        updateAllUI(); // Update UI directly if no rate fetch needed
+                        updateAllUI();
                     }
                 }, error => {
                     console.error("Firebase data listener error:", error);
@@ -1077,8 +1087,12 @@
         // Removes a member from a trip
         async function removeMemberFromTrip(tripId, memberIdToRemove, memberEmail) {
             try {
-                await database.ref(`trips/${tripId}/members/${memberIdToRemove}`).remove();
-                await database.ref(`users/${memberIdToRemove}/trips/${tripId}`).remove();
+                // Using a multi-path update for atomic operation
+                const updates = {};
+                updates[`/trips/${tripId}/members/${memberIdToRemove}`] = null;
+                updates[`/users/${memberIdToRemove}/trips/${tripId}`] = null;
+
+                await database.ref().update(updates);
                 
                 showError(`${memberEmail} has been removed from the trip.`, 3000, 'success');
                 updateAndPopulateTripSwitcher(); // Refresh trip list in modal
