@@ -29,7 +29,6 @@ let appData = {
 let editingExpenseIndex = -1;
 let isCalculatorResultShown = false;
 let scrollToExpenseId = null; // Global variable to hold the ID of the expense to scroll to
-let mealSwiper, currencySwiper; // Swiper instances
 
 // --- Exchange Rate State ---
 const API_KEY = 'c86eace6da908459098e7518'; // This API key is publicly available.
@@ -91,21 +90,20 @@ const modalClearInputBtn = document.getElementById('modal-clear-input-btn');
 
 // --- Initialize Swipers ---
 function initSwipers() {
-    mealSwiper = new Swiper('#meal-swiper', {
+    new Swiper('#meal-swiper', {
         slidesPerView: 'auto',
         freeMode: true,
         mousewheel: true,
     });
-    currencySwiper = new Swiper('#currency-swiper', {
+    new Swiper('#currency-swiper', {
         slidesPerView: 'auto',
         freeMode: true,
         mousewheel: true,
     });
 }
 
-// Initialize Swipers when the script loads.
-// The 'defer' attribute in the HTML ensures the DOM is ready.
-initSwipers();
+// Call initSwipers when the page loads
+window.onload = initSwipers;
 
 // --- Authentication Logic ---
 auth.onAuthStateChanged(async user => {
@@ -829,18 +827,6 @@ function showPage(pageId) {
         btn.classList.toggle('text-slate-600', !isActive);
         if (!isActive) btn.classList.remove('bg-sky-100', 'rounded-lg');
     });
-
-    // --- FIX FOR SWIPER ---
-    // If we're showing the expense page, update the swipers
-    // so they can recalculate their dimensions now that they are visible.
-    if (pageId === 'page-expense') {
-        if (mealSwiper) {
-            mealSwiper.update();
-        }
-        if (currencySwiper) {
-            currencySwiper.update();
-        }
-    }
      // No immediate scroll to top here, let updateMealRecords handle if needed
 }
 
