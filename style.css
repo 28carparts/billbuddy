@@ -38,32 +38,23 @@ body {
     display: block; 
 }
 
-/* Slick Carousel Custom Styles */
-.slick-carousel {
-    width: 100%;
-    height: auto;
+/* Embla Carousel Custom Styles */
+.embla {
+    overflow: hidden;
     padding: 4px 0;
 }
-.slick-slide {
-    margin: 0 4px; /* Adjust spacing between slides */
-    display: inline-block; /* Important for variable width */
-    height: auto;
-    vertical-align: middle;
-}
-.slick-track {
-    display: flex !important; /* Overriding slick's block display */
-    align-items: center;
-}
-.slick-list {
-    overflow: hidden;
-}
-/* Make the buttons inside the slides take up the slide's width */
-.slick-slide > div {
+.embla__container {
     display: flex;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -khtml-user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
-.slick-slide .choice-btn {
-    width: 100%;
-    margin: 0 auto;
+.embla__slide {
+    position: relative;
+    flex: 0 0 auto; /* Let content define width */
+    padding-left: 8px; /* Spacing between slides */
+    min-width: 0;
 }
 
 
