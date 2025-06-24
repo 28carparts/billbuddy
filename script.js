@@ -88,22 +88,45 @@ const modalCancelBtn = document.getElementById('modal-cancel-btn');
 const modalConfirmBtn = document.getElementById('modal-confirm-btn');
 const modalClearInputBtn = document.getElementById('modal-clear-input-btn');
 
-// --- Initialize Swipers ---
-function initSwipers() {
-    new Swiper('#meal-swiper', {
-        slidesPerView: 'auto',
-        freeMode: true,
-        mousewheel: true,
-    });
-    new Swiper('#currency-swiper', {
-        slidesPerView: 'auto',
-        freeMode: true,
-        mousewheel: true,
-    });
+// --- Initialize Slick Carousels ---
+function initSlickCarousels() {
+    // Check if slick is available
+    if (typeof $.fn.slick !== 'function') {
+        console.error('Slick Carousel is not loaded.');
+        return;
+    }
+
+    const slickOptions = {
+        dots: false,
+        infinite: false,
+        speed: 300,
+        slidesToShow: 1, // This will be ignored because of variableWidth
+        variableWidth: true,
+        swipeToSlide: true,
+        arrows: false, // Hide default arrows, as we just want to swipe
+    };
+
+    // Initialize or re-initialize carousels
+    const mealCarousel = $('#meal-carousel');
+    const currencyCarousel = $('#currency-carousel');
+    
+    if (mealCarousel.hasClass('slick-initialized')) {
+        mealCarousel.slick('unslick');
+    }
+    mealCarousel.slick(slickOptions);
+    
+    if (currencyCarousel.hasClass('slick-initialized')) {
+        currencyCarousel.slick('unslick');
+    }
+    currencyCarousel.slick(slickOptions);
 }
 
-// Call initSwipers when the page loads
-window.onload = initSwipers;
+
+// Call initSlickCarousels when the page loads
+window.onload = function() {
+    initSlickCarousels();
+};
+
 
 // --- Authentication Logic ---
 auth.onAuthStateChanged(async user => {
@@ -827,6 +850,11 @@ function showPage(pageId) {
         btn.classList.toggle('text-slate-600', !isActive);
         if (!isActive) btn.classList.remove('bg-sky-100', 'rounded-lg');
     });
+
+    // Re-initialize Slick Carousel if the expense page is shown
+    if (pageId === 'page-expense') {
+        initSlickCarousels();
+    }
      // No immediate scroll to top here, let updateMealRecords handle if needed
 }
 
