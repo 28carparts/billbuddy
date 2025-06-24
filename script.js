@@ -30,6 +30,9 @@ let editingExpenseIndex = -1;
 let isCalculatorResultShown = false;
 let scrollToExpenseId = null; // Global variable to hold the ID of the expense to scroll to
 
+// --- Carousel State ---
+let emblaInstances = [];
+
 // --- Exchange Rate State ---
 const API_KEY = 'c86eace6da908459098e7518'; // This API key is publicly available.
 const fallbackRates = { USD: 1, HKD: 7.8, CNY: 7.2, JPY: 157, EUR: 0.92, GBP: 0.79, KRW: 1380 };
@@ -88,43 +91,35 @@ const modalCancelBtn = document.getElementById('modal-cancel-btn');
 const modalConfirmBtn = document.getElementById('modal-confirm-btn');
 const modalClearInputBtn = document.getElementById('modal-clear-input-btn');
 
-// --- Initialize Slick Carousels ---
-function initSlickCarousels() {
-    // Check if slick is available
-    if (typeof $.fn.slick !== 'function') {
-        console.error('Slick Carousel is not loaded.');
-        return;
-    }
+// --- Initialize Embla Carousels ---
+function initEmblaCarousels() {
+    // Destroy any existing instances
+    emblaInstances.forEach(embla => embla.destroy());
+    emblaInstances = [];
 
-    const slickOptions = {
-        dots: false,
-        infinite: false,
-        speed: 300,
-        slidesToShow: 1, // This will be ignored because of variableWidth
-        variableWidth: true,
-        swipeToSlide: true,
-        arrows: false, // Hide default arrows, as we just want to swipe
+    const emblaOptions = { 
+        align: 'start', 
+        containScroll: 'trimSnaps',
+        dragFree: true // As requested
     };
 
-    // Initialize or re-initialize carousels
-    const mealCarousel = $('#meal-carousel');
-    const currencyCarousel = $('#currency-carousel');
-    
-    if (mealCarousel.hasClass('slick-initialized')) {
-        mealCarousel.slick('unslick');
+    const mealCarouselNode = document.getElementById('meal-carousel');
+    const currencyCarouselNode = document.getElementById('currency-carousel');
+
+    if (mealCarouselNode) {
+        const emblaApi = EmblaCarousel(mealCarouselNode, emblaOptions);
+        emblaInstances.push(emblaApi);
     }
-    mealCarousel.slick(slickOptions);
-    
-    if (currencyCarousel.hasClass('slick-initialized')) {
-        currencyCarousel.slick('unslick');
+    if (currencyCarouselNode) {
+        const emblaApi = EmblaCarousel(currencyCarouselNode, emblaOptions);
+        emblaInstances.push(emblaApi);
     }
-    currencyCarousel.slick(slickOptions);
 }
 
 
-// Call initSlickCarousels when the page loads
+// Call initEmblaCarousels when the page loads
 window.onload = function() {
-    initSlickCarousels();
+    initEmblaCarousels();
 };
 
 
@@ -851,9 +846,9 @@ function showPage(pageId) {
         if (!isActive) btn.classList.remove('bg-sky-100', 'rounded-lg');
     });
 
-    // Re-initialize Slick Carousel if the expense page is shown
+    // Re-initialize Embla Carousel if the expense page is shown
     if (pageId === 'page-expense') {
-        initSlickCarousels();
+        initEmblaCarousels();
     }
      // No immediate scroll to top here, let updateMealRecords handle if needed
 }
