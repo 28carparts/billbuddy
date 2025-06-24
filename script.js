@@ -850,7 +850,12 @@ function showPage(pageId) {
     if (pageId === 'page-expense') {
         initEmblaCarousels();
     }
-     // No immediate scroll to top here, let updateMealRecords handle if needed
+    
+    // Scroll to top of app-content when navigating to Buddies, Expense, or Debt pages
+    // The Summary page handles its own scrolling (e.g., to a new expense)
+    if (pageId === 'page-buddies' || pageId === 'page-expense' || pageId === 'page-debt') {
+        appContent.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 }
 
 // Event listeners for navigation buttons
