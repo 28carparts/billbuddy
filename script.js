@@ -1653,7 +1653,7 @@ function generateWhatsAppMessage() {
         
         appData.expenses.forEach((item, index, arr) => {
             if (item.type === 'divider') {
-                message += `\n*--- ${item.label} ---*\n\n`;
+                message += `\n*--- ${item.label} ---*\n`;
             } else { // It's an expense
                 const exp = item;
                 message += `• ${exp.mealType} @ ${exp.restaurant}: *${exp.currency} ${exp.amount.toFixed(2)}*\n`;
