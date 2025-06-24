@@ -38,17 +38,34 @@ body {
     display: block; 
 }
 
-/* Swiper container styles */
-.swiper-container {
+/* Slick Carousel Custom Styles */
+.slick-carousel {
     width: 100%;
     height: auto;
-    overflow: hidden;
     padding: 4px 0;
 }
-.swiper-slide {
-    width: auto; /* Let the content define the width */
-    margin-right: 8px; /* Add some space between buttons */
+.slick-slide {
+    margin: 0 4px; /* Adjust spacing between slides */
+    display: inline-block; /* Important for variable width */
+    height: auto;
+    vertical-align: middle;
 }
+.slick-track {
+    display: flex !important; /* Overriding slick's block display */
+    align-items: center;
+}
+.slick-list {
+    overflow: hidden;
+}
+/* Make the buttons inside the slides take up the slide's width */
+.slick-slide > div {
+    display: flex;
+}
+.slick-slide .choice-btn {
+    width: 100%;
+    margin: 0 auto;
+}
+
 
 /* Drag and Drop Styles for all record items */
 .record-list-item {
