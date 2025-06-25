@@ -1175,6 +1175,7 @@ function updateSummary() {
     const currencySymbol = getCurrencySymbol(appData.primaryCurrency);
     const lastDividerForBuddy = {};
 
+    // Helper function for consistent currency formatting
     const formatCurrency = (amount) => amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     // Initialize totals and details for all buddies
@@ -1913,8 +1914,11 @@ calculatorInput.addEventListener('keydown', (event) => {
         const result = safeEvaluate(expression);
         
         if (result !== null) {
-            const formattedResult = Number(result.toFixed(2));
-            adjustmentAmountInput.value = formattedResult;
+            // Format the result to always have two decimal places for the input field
+            const formattedResultForInput = result.toFixed(2); 
+            adjustmentAmountInput.value = formattedResultForInput;
+            
+            // Format the result for the calculator display with commas and two decimal places
             calculatorInput.innerHTML = `${expression} = <strong class="text-indigo-600 font-bold">${result.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>`;
             isCalculatorResultShown = true;
             
