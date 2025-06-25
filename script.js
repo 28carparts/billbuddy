@@ -35,7 +35,26 @@ let emblaInstances = [];
 
 // --- Exchange Rate State ---
 const API_KEY = 'c86eace6da908459098e7518'; // This API key is publicly available.
-const fallbackRates = { USD: 1, HKD: 7.8, CNY: 7.2, JPY: 157, EUR: 0.92, GBP: 0.79, KRW: 1380 };
+const fallbackRates = { 
+    HKD: 7.8, // Hong Kong Dollar
+    CNY: 7.2, // Chinese Yuan
+    GBP: 0.79, // British Pound
+    JPY: 157, // Japanese Yen
+    THB: 36.5, // Thai Baht (Approx)
+    TWD: 32.5, // New Taiwan Dollar (Approx)
+    KRW: 1380, // South Korean Won
+    SGD: 1.35, // Singapore Dollar (Approx)
+    USD: 1, // United States Dollar (Base)
+    EUR: 0.92, // Euro
+    AUD: 1.5, // Australian Dollar (Approx)
+    CAD: 1.35, // Canadian Dollar (Approx)
+    NZD: 1.6, // New Zealand Dollar (Approx)
+    CHF: 0.9, // Swiss Franc (Approx)
+    MYR: 4.7, // Malaysian Ringgit (Approx)
+    VND: 25400, // Vietnamese Dong (Approx)
+    PHP: 58.5, // Philippine Peso (Approx)
+    IDR: 16300 // Indonesian Rupiah (Approx)
+};
 let exchangeRates = {};
 
 // --- DOM Elements ---
@@ -775,7 +794,26 @@ function updateCurrencyDisplays() {
 
 // Returns the common symbol for a given currency code
 function getCurrencySymbol(currencyCode) {
-    const symbols = { 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥', 'HKD': '$', 'CNY': '¥', 'KRW': '₩' };
+    const symbols = { 
+        'HKD': '$',
+        'CNY': '¥',
+        'GBP': '£',
+        'JPY': '¥',
+        'THB': '฿',
+        'TWD': 'NT$',
+        'KRW': '₩',
+        'SGD': '$',
+        'USD': '$',
+        'EUR': '€',
+        'AUD': '$',
+        'CAD': '$',
+        'NZD': '$',
+        'CHF': 'Fr',
+        'MYR': 'RM',
+        'VND': '₫',
+        'PHP': '₱',
+        'IDR': 'Rp'
+    };
     return symbols[currencyCode] || currencyCode;
 }
 
@@ -1137,6 +1175,7 @@ function updateSummary() {
     const currencySymbol = getCurrencySymbol(appData.primaryCurrency);
     const lastDividerForBuddy = {};
 
+    const formatCurrency = (amount) => amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     // Initialize totals and details for all buddies
     appData.buddies.forEach(buddy => {
@@ -1167,7 +1206,7 @@ function updateSummary() {
                 lastDividerForBuddy[buddy] = currentDividerLabel;
             }
             
-            details[buddy].push(`<div class="text-xs"><span class="font-medium">${exp.mealType}</span> at ${exp.restaurant}: ${currencySymbol}${perBuddyConverted.toFixed(2)}</div>`);
+            details[buddy].push(`<div class="text-xs"><span class="font-medium">${exp.mealType}</span> at ${exp.restaurant}: ${currencySymbol}${formatCurrency(perBuddyConverted)}</div>`);
         });
     });
 
@@ -1182,7 +1221,7 @@ function updateSummary() {
         const row = summaryTableBody.insertRow();
         row.innerHTML = `
             <td class="py-3 px-2 md:px-4 text-slate-700 font-medium whitespace-normal">${buddy}</td>
-            <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${currencySymbol}${totals[buddy].toFixed(2)}</td>
+            <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${currencySymbol}${formatCurrency(totals[buddy])}</td>
             <td class="py-3 px-2 md:px-4 text-slate-700 space-y-1 whitespace-normal">${details[buddy].join('') || '<span class="text-slate-400">No expenses</span>'}</td>
         `;
     });
@@ -1234,7 +1273,8 @@ function updateMealRecords() {
     const expenseItems = appData.expenses.filter(item => item.type === 'expense');
     const total = expenseItems.reduce((sum, exp) => sum + exp.amountInPrimaryCurrency, 0);
     const count = expenseItems.length;
-    totalSpentElement.textContent = `Total Spent: ${appData.primaryCurrency} ${total.toFixed(2)} | ${count} transaction${count !== 1 ? 's' : ''}`;
+    const formatCurrency = (amount) => amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    totalSpentElement.textContent = `Total Spent: ${appData.primaryCurrency} ${formatCurrency(total)} | ${count} transaction${count !== 1 ? 's' : ''}`;
 
     if (appData.expenses.length === 0) {
         mealRecordsContainer.innerHTML = '<p class="text-slate-500 text-center py-4">No meal records yet. Add an expense! 🍽️</p>';
@@ -1270,7 +1310,7 @@ function updateMealRecords() {
                 </div>
                 <div class="flex justify-between items-start mb-1 pr-14">
                     <span class="font-semibold text-slate-800 text-sm">${exp.mealType} @ ${exp.restaurant}</span>
-                    <span class="text-sky-600 font-bold text-sm">${exp.currency} ${exp.amount.toFixed(2)}</span>
+                    <span class="text-sky-600 font-bold text-sm">${exp.currency} ${formatCurrency(exp.amount)}</span>
                 </div>
                 <div class="text-xs">Paid by: <strong class="text-slate-700">${exp.payer}</strong></div>
                 <div class="text-xs">Shared with: <em class="text-slate-500">${exp.buddies.join(', ')}</em></div>
@@ -1450,6 +1490,7 @@ function updateDebtSettlement() {
     debtTableBody.innerHTML = '';
     settlementPlanDiv.innerHTML = '';
     const currencySymbol = getCurrencySymbol(appData.primaryCurrency);
+    const formatCurrency = (amount) => amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     const balances = {};
     // Initialize balances for all buddies
@@ -1491,9 +1532,9 @@ function updateDebtSettlement() {
         const row = debtTableBody.insertRow();
         row.innerHTML = `
             <td class="py-3 px-2 md:px-4 text-slate-700 font-medium whitespace-normal">${buddy}</td>
-            <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${currencySymbol}${balances[buddy].paid.toFixed(2)}</td>
-            <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${currencySymbol}${balances[buddy].owed.toFixed(2)}</td>
-            <td class="py-3 px-2 md:px-4 whitespace-nowrap ${colorClass}">${currencySymbol}${net.toFixed(2)}</td>
+            <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${currencySymbol}${formatCurrency(balances[buddy].paid)}</td>
+            <td class="py-3 px-2 md:px-4 text-slate-700 whitespace-nowrap">${currencySymbol}${formatCurrency(balances[buddy].owed)}</td>
+            <td class="py-3 px-2 md:px-4 whitespace-nowrap ${colorClass}">${currencySymbol}${formatCurrency(net)}</td>
         `;
     });
 
@@ -1506,7 +1547,7 @@ function updateDebtSettlement() {
     while (i < debtors.length && j < creditors.length) {
         const amountToSettle = Math.min(debtors[i].amount, creditors[j].amount);
         if (amountToSettle > 0.005) { // Only add if amount is significant
-            settlements.push(`<span class="font-medium text-rose-600">${debtors[i].name}</span> pays <span class="font-medium text-emerald-600">${creditors[j].name}</span> <strong class="text-sky-700">${amountToSettle.toFixed(2)} ${appData.primaryCurrency}</strong>`);
+            settlements.push(`<span class="font-medium text-rose-600">${debtors[i].name}</span> pays <span class="font-medium text-emerald-600">${creditors[j].name}</span> <strong class="text-sky-700">${formatCurrency(amountToSettle)} ${appData.primaryCurrency}</strong>`);
             debtors[i].amount -= amountToSettle;
             creditors[j].amount -= amountToSettle;
         }
@@ -1551,6 +1592,7 @@ function updateAdjustmentsDisplay() {
         container.innerHTML = '<p class="text-slate-500 text-center py-2">No individual adjustments yet.</p>';
         return;
     }
+    const formatCurrency = (amount) => amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     // Display each adjustment
     appData.adjustments.forEach((adj, index) => {
@@ -1558,8 +1600,8 @@ function updateAdjustmentsDisplay() {
         adjDiv.className = 'relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-sm flex justify-between items-center';
         const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
         
-        const displayAmount = `<strong class="text-sky-700">${adj.originalCurrency} ${adj.amount.toFixed(2)}</strong> 
-                             <span class="text-slate-500 text-xs">(~${amountInPrimary.toFixed(2)} ${appData.primaryCurrency})</span>`;
+        const displayAmount = `<strong class="text-sky-700">${adj.originalCurrency} ${formatCurrency(adj.amount)}</strong> 
+                             <span class="text-slate-500 text-xs">(~${formatCurrency(amountInPrimary)} ${appData.primaryCurrency})</span>`;
 
         adjDiv.innerHTML = `
             <span class="flex-grow flex flex-wrap items-center gap-x-2">
@@ -1639,6 +1681,7 @@ function generateWhatsAppMessage() {
     let message = `*💰 ${appData.groupEventName || 'Group Event'} Recap* \n\n`;
     const primaryCurrency = appData.primaryCurrency;
     const expenseItems = appData.expenses.filter(item => item.type === 'expense');
+    const formatCurrency = (amount) => amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     const balances = {};
     appData.buddies.forEach(buddy => {
@@ -1664,9 +1707,9 @@ function generateWhatsAppMessage() {
         appData.buddies.forEach(buddy => {
             const netBalance = balances[buddy].net;
             if (netBalance < -0.005) {
-                message += `• *${buddy}* pays ${primaryCurrency} ${(-netBalance).toFixed(2)}\n`;
+                message += `• *${buddy}* pays ${primaryCurrency} ${formatCurrency(-netBalance)}\n`;
             } else if (netBalance > 0.005) {
-                message += `• *${buddy}* receives ${primaryCurrency} ${netBalance.toFixed(2)}\n`;
+                message += `• *${buddy}* receives ${primaryCurrency} ${formatCurrency(netBalance)}\n`;
             }
         });
     } else {
@@ -1677,14 +1720,14 @@ function generateWhatsAppMessage() {
     message += `*🧾 Meal Records*\n`;
     if (appData.expenses.length > 0) {
         const total = expenseItems.reduce((sum, exp) => sum + exp.amountInPrimaryCurrency, 0);
-        message += `Total Spent: *${primaryCurrency} ${total.toFixed(2)}* | ${expenseItems.length} transaction${expenseItems.length !== 1 ? 's' : ''}\n\n`;
+        message += `Total Spent: *${primaryCurrency} ${formatCurrency(total)}* | ${expenseItems.length} transaction${expenseItems.length !== 1 ? 's' : ''}\n\n`;
         
         appData.expenses.forEach((item, index, arr) => {
             if (item.type === 'divider') {
                 message += `\n*--- ${item.label} ---*\n`;
             } else { // It's an expense
                 const exp = item;
-                message += `• ${exp.mealType} @ ${exp.restaurant}: *${exp.currency} ${exp.amount.toFixed(2)}*\n`;
+                message += `• ${exp.mealType} @ ${exp.restaurant}: *${exp.currency} ${formatCurrency(exp.amount)}*\n`;
                 message += `  Paid by: *${exp.payer}*\n`;
                 message += `  Shared with: _${exp.buddies.join(', ')}_\n`;
                  // Check if the next item is also an expense to add a separator
@@ -1703,7 +1746,7 @@ function generateWhatsAppMessage() {
         message += `*💱 Individual Adjustments:*\n`;
         appData.adjustments.forEach(adj => {
              const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
-            const adjAmountStr = `*${adj.originalCurrency} ${adj.amount.toFixed(2)}* (~${amountInPrimary.toFixed(2)} ${primaryCurrency})`;
+            const adjAmountStr = `*${adj.originalCurrency} ${formatCurrency(adj.amount)}* (~${formatCurrency(amountInPrimary)} ${primaryCurrency})`;
             message += `• *${adj.debtor}* pays *${adj.creditor}* ${adjAmountStr}\n`;
         });
         message += `\n`;
@@ -1720,7 +1763,7 @@ function generateWhatsAppMessage() {
     while (i < debtors.length && j < creditors.length) {
         const amountToSettle = Math.min(debtors[i].amount, creditors[j].amount);
         if (amountToSettle > 0.005) {
-            settlements.push(`* *${debtors[i].name}* pays *${creditors[j].name}* *${amountToSettle.toFixed(2)} ${primaryCurrency}*`);
+            settlements.push(`* *${debtors[i].name}* pays *${creditors[j].name}* *${formatCurrency(amountToSettle)} ${primaryCurrency}*`);
             debtors[i].amount -= amountToSettle;
             creditors[j].amount -= amountToSettle;
         }
@@ -1872,7 +1915,7 @@ calculatorInput.addEventListener('keydown', (event) => {
         if (result !== null) {
             const formattedResult = Number(result.toFixed(2));
             adjustmentAmountInput.value = formattedResult;
-            calculatorInput.innerHTML = `${expression} = <strong class="text-indigo-600 font-bold">${formattedResult}</strong>`;
+            calculatorInput.innerHTML = `${expression} = <strong class="text-indigo-600 font-bold">${result.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>`;
             isCalculatorResultShown = true;
             
             // Move cursor to end of contenteditable div
