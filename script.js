@@ -1,3 +1,24 @@
+// Firebase Imports - Use the latest modular syntax
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword, 
+    sendPasswordResetEmail, 
+    signOut 
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { 
+    getDatabase, 
+    ref, 
+    onValue, 
+    set, 
+    update, 
+    get, 
+    push, 
+    remove 
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyC_fcgI07cxvP26LVW8W3ZqrWwTa3fmvLw",
@@ -9,12 +30,13 @@ const firebaseConfig = {
   appId: "1:380690422701:web:17da1bb5f55f12f3625f24"
 };
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const database = firebase.database();
-let currentTripRef;
-let dataUnsubscribe;
+// Initialize Firebase App
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app); // Get Auth service instance
+const database = getDatabase(app); // Get Realtime Database service instance
+
+let currentTripRef; // Will hold a Firebase Realtime Database Ref object
+let dataUnsubscribe; // Will hold the unsubscribe function for the onValue listener
 
 // --- App State ---
 let currentTripId = null;
@@ -35,7 +57,7 @@ let emblaInstances = [];
 
 // --- Exchange Rate State ---
 const API_KEY = 'c86eace6da908459098e7518'; // This API key is publicly available.
-const fallbackRates = { 
+const fallbackRates = {
     HKD: 7.8, // Hong Kong Dollar
     CNY: 7.2, // Chinese Yuan
     GBP: 0.79, // British Pound
@@ -95,7 +117,7 @@ const loggedInInfoNoTripsDiv = document.getElementById('logged-in-info-no-trips'
 const loggedInEmailNoTripsSpan = document.getElementById('logged-in-email-no-trips'); // Added for No Trips View
 const logoutLinkNoTrips = document.getElementById('logout-link-no-trips'); // Added for No Trips View
 const closeIconBtn = document.getElementById('close-modal-icon-btn');
-const calculatorInput = document.getElementById('calculator-input'); 
+const calculatorInput = document.getElementById('calculator-input');
 const adjustmentAmountInput = document.getElementById('adjustment-amount');
 const clearCalculatorBtn = document.getElementById('clear-calculator-btn');
 const mealRecordsContainer = document.getElementById('meal-records');
@@ -116,8 +138,8 @@ function initEmblaCarousels() {
     emblaInstances.forEach(embla => embla.destroy());
     emblaInstances = [];
 
-    const emblaOptions = { 
-        align: 'start', 
+    const emblaOptions = {
+        align: 'start',
         containScroll: 'trimSnaps',
         dragFree: true // As requested
     };
@@ -143,19 +165,20 @@ window.onload = function() {
 
 
 // --- Authentication Logic ---
-auth.onAuthStateChanged(async user => {
+// onAuthStateChanged now takes the auth instance as its first argument
+onAuthStateChanged(auth, async user => {
     const urlParams = new URLSearchParams(window.location.search);
     const sharedTripId = urlParams.get('shared');
 
     if (user) {
         // User is logged in
         authPage.classList.add('hidden');
-        loggedInEmailSpan.textContent = user.email; 
+        loggedInEmailSpan.textContent = user.email;
         loggedInInfoDiv.classList.remove('hidden');
 
         loggedInEmailNoTripsSpan.textContent = user.email;
         loggedInInfoNoTripsDiv.classList.remove('hidden');
-        
+
         if (sharedTripId) {
             await handleInvitation(sharedTripId, user);
         } else {
@@ -164,35 +187,36 @@ auth.onAuthStateChanged(async user => {
     } else {
         // User is not logged in
         if (currentTripRef && dataUnsubscribe) {
-            currentTripRef.off('value', dataUnsubscribe); 
+            dataUnsubscribe(); // Call the unsubscribe function to detach listener
         }
         currentTripRef = null;
         dataUnsubscribe = null;
         currentTripId = null;
-        
+
         // Hide all main content and show auth page
         appContent.classList.add('hidden');
         appNav.classList.add('hidden');
         noTripsPage.classList.add('hidden');
         invitationConfirmPage.classList.add('hidden');
         tripSwitcherBtn.classList.add('hidden');
-        loggedInInfoDiv.classList.add('hidden'); 
+        loggedInInfoDiv.classList.add('hidden');
         loggedInInfoNoTripsDiv.classList.add('hidden');
-        
+
         authPage.classList.remove('hidden');
 
-        // If there's a shared link, the login form will just show. 
+        // If there's a shared link, the login form will just show.
         // After login, the logic will re-trigger to handle the invitation.
-        
+
         appData = { owner: null, groupEventName: '', buddies: [], expenses: [], adjustments: [], primaryCurrency: 'HKD' };
         clearAllUI();
     }
 });
 
+
 async function handleInvitation(tripId, user) {
     try {
-        const tripRef = database.ref(`trips/${tripId}`);
-        const tripSnapshot = await tripRef.once('value');
+        const tripRef = ref(database, `trips/${tripId}`); // Modular ref
+        const tripSnapshot = await get(tripRef); // Modular get for once('value')
         if (!tripSnapshot.exists()) {
             showError("This shared trip link is invalid or has been deleted.");
             window.history.replaceState({}, document.title, window.location.pathname);
@@ -258,7 +282,8 @@ loginForm.addEventListener('submit', e => {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
-    auth.signInWithEmailAndPassword(email, password)
+    // signInWithEmailAndPassword now takes the auth instance as its first argument
+    signInWithEmailAndPassword(auth, email, password)
         .catch(error => showError(`Login Failed: ${error.message}`));
 });
 
@@ -272,22 +297,23 @@ registerForm.addEventListener('submit', e => {
         showError("Passwords do not match.");
         return;
     }
-
-    auth.createUserWithEmailAndPassword(email, password)
+    // createUserWithEmailAndPassword now takes the auth instance as its first argument
+    createUserWithEmailAndPassword(auth, email, password)
         .catch(error => showError(`Registration Failed: ${error.message}`));
 });
 
 async function handlePasswordReset(e) {
     e.preventDefault();
     const email = await showPromptModal(
-        '🔑 Reset Password', 
+        '🔑 Reset Password',
         'Please enter your email address. We will send you a link to reset your password.',
         document.getElementById('login-email').value, // Pre-fill with login email if available
         'your-email@example.com'
     );
 
     if (email) {
-        auth.sendPasswordResetEmail(email)
+        // sendPasswordResetEmail now takes the auth instance as its first argument
+        sendPasswordResetEmail(auth, email)
             .then(() => {
                 showError('Password reset email sent! Please check your inbox.', 5000, 'success');
             })
@@ -302,13 +328,13 @@ forgotPasswordLink.addEventListener('click', handlePasswordReset);
 logoutLink.addEventListener('click', (e) => {
     e.preventDefault();
     closeTripSwitcherModal();
-    auth.signOut();
+    signOut(auth); // Modular signOut
 });
 
 // Event listener for logout link on No Trips View
 logoutLinkNoTrips.addEventListener('click', (e) => {
     e.preventDefault();
-    auth.signOut();
+    signOut(auth); // Modular signOut
 });
 
 
@@ -326,8 +352,8 @@ document.getElementById('show-login').addEventListener('click', e => {
 
 // --- Trip Management ---
 async function loadUserDashboard(userId) {
-    const userTripsRef = database.ref(`users/${userId}/trips`);
-    const snapshot = await userTripsRef.once('value');
+    const userTripsRef = ref(database, `users/${userId}/trips`); // Modular ref
+    const snapshot = await get(userTripsRef); // Modular get for once('value')
     const userTripIds = snapshot.val();
 
     if (userTripIds) {
@@ -347,14 +373,14 @@ async function loadUserDashboard(userId) {
 async function loadTrip(tripId) {
     // Unsubscribe from previous trip's data listener
     if (currentTripRef && dataUnsubscribe) {
-        currentTripRef.off('value', dataUnsubscribe);
+        dataUnsubscribe(); // Call the unsubscribe function
     }
     currentTripId = tripId;
     localStorage.setItem('lastActiveTripId', tripId);
-    currentTripRef = database.ref(`trips/${tripId}`);
-    
+    currentTripRef = ref(database, `trips/${tripId}`); // Modular ref
+
     listenForDataChanges();
-    
+
     // Show main app content, hide others
     appContent.classList.remove('hidden');
     appNav.classList.remove('hidden');
@@ -369,7 +395,8 @@ async function loadTrip(tripId) {
 // Sets up a real-time listener for changes to the current trip data in Firebase
 function listenForDataChanges() {
     if (currentTripRef) {
-        dataUnsubscribe = currentTripRef.on('value', async (snapshot) => {
+        // onValue returns the unsubscribe function
+        dataUnsubscribe = onValue(currentTripRef, async (snapshot) => { // Modular onValue
             const data = snapshot.val();
             const currentUser = auth.currentUser;
 
@@ -379,7 +406,7 @@ function listenForDataChanges() {
                 if (currentTripId === localStorage.getItem('lastActiveTripId')) {
                    localStorage.removeItem('lastActiveTripId');
                 }
-                currentTripRef.off('value', dataUnsubscribe);
+                dataUnsubscribe(); // Unsubscribe using the stored function
                 await loadUserDashboard(currentUser.uid);
                 showError("The current trip has been deleted.", 3000, 'error');
                 return;
@@ -391,10 +418,10 @@ function listenForDataChanges() {
                 if (currentTripId === localStorage.getItem('lastActiveTripId')) {
                    localStorage.removeItem('lastActiveTripId');
                 }
-                currentTripRef.off('value', dataUnsubscribe);
+                dataUnsubscribe(); // Unsubscribe using the stored function
                 await loadUserDashboard(currentUser.uid);
                 showError("You have been removed from the trip.", 4000, 'error');
-                return; 
+                return;
             }
 
             // Proceed with normal data update
@@ -422,7 +449,7 @@ function listenForDataChanges() {
                adjustments: data.adjustments || [],
                primaryCurrency: newCurrency
             };
-            
+
             if (shouldFetchRates) {
                 await fetchExchangeRates();
             } else {
@@ -440,9 +467,11 @@ async function joinTrip(tripId, userId, userEmail) {
     try {
         const memberData = { email: userEmail };
         // Add user to the trip's members list
-        await database.ref(`trips/${tripId}/members`).update({ [userId]: memberData });
+        // Modular update
+        await update(ref(database, `trips/${tripId}/members`), { [userId]: memberData });
         // Add trip to the user's list of trips
-        await database.ref(`users/${userId}/trips/${tripId}`).set(true);
+        // Modular set
+        await set(ref(database, `users/${userId}/trips/${tripId}`), true);
         showError("Successfully joined the trip! 🎉", 3000, 'success');
     } catch (error) {
         showError(`Error joining trip: ${error.message}`);
@@ -460,7 +489,8 @@ async function createNewTrip() {
         return;
     }
 
-    const newTripRef = database.ref('trips').push(); // Generate a unique ID for the new trip
+    // Modular push for unique ID
+    const newTripRef = push(ref(database, 'trips'));
     const newTripId = newTripRef.key;
 
     const creatorName = currentUser.displayName || currentUser.email.split('@')[0] || 'Me';
@@ -476,11 +506,13 @@ async function createNewTrip() {
     };
 
     try {
-        await newTripRef.set(initialTripData); // Save initial trip data
-        await database.ref(`users/${currentUser.uid}/trips/${newTripId}`).set(true); // Link trip to user
-        
+        // Modular set to save data
+        await set(newTripRef, initialTripData);
+        // Modular set to link trip to user
+        await set(ref(database, `users/${currentUser.uid}/trips/${newTripId}`), true);
+
         await loadTrip(newTripId); // Load the newly created trip
-        
+
     } catch (error) {
         showError(`Failed to create trip: ${error.message}`);
     }
@@ -491,10 +523,10 @@ async function updateAndPopulateTripSwitcher() {
     const currentUser = auth.currentUser;
     if (!currentUser) return;
 
-    const userTripsRef = database.ref(`users/${currentUser.uid}/trips`);
-    const snapshot = await userTripsRef.once('value');
+    const userTripsRef = ref(database, `users/${currentUser.uid}/trips`); // Modular ref
+    const snapshot = await get(userTripsRef); // Modular get
     const userTripIds = snapshot.val();
-    
+
     const menu = document.getElementById('trip-list-menu');
     menu.innerHTML = '';
 
@@ -502,15 +534,15 @@ async function updateAndPopulateTripSwitcher() {
         menu.innerHTML = '<p class="text-center text-sm text-slate-500 py-2">No trips found.</p>';
         return;
     }
-    
+
     // Fetch details for each trip the user is part of
     const tripPromises = Object.keys(userTripIds).map(async (tripId) => {
-        const tripDataSnapshot = await database.ref(`trips/${tripId}`).once('value');
+        const tripDataSnapshot = await get(ref(database, `trips/${tripId}`)); // Modular get
         const tripData = tripDataSnapshot.val();
         if (!tripData) return null; // Skip if trip data doesn't exist
-        return { 
-            id: tripId, 
-            name: tripData.groupEventName || 'Untitled Trip', 
+        return {
+            id: tripId,
+            name: tripData.groupEventName || 'Untitled Trip',
             owner: tripData.owner,
             members: tripData.members || {}
         };
@@ -522,14 +554,14 @@ async function updateAndPopulateTripSwitcher() {
         const isCurrentUserOwner = currentUser.uid === trip.owner;
         const ownedByLabel = isCurrentUserOwner ? ' (Owned)' : '';
         const memberIds = Object.keys(trip.members);
-        
+
         const itemContainer = document.createElement('div');
         itemContainer.className = 'trip-list-item-container bg-slate-50 rounded-lg';
 
         const item = document.createElement('div');
         // Highlight the current active trip
         item.className = `flex justify-between items-center p-2.5 cursor-pointer hover:bg-sky-100/80 rounded-t-lg ${trip.id === currentTripId ? 'bg-sky-100 font-bold text-sky-600' : ''}`;
-        
+
         item.innerHTML = `
             <span class="truncate pr-2">${trip.name}${ownedByLabel}</span>
             <div class="flex items-center gap-3 shrink-0">
@@ -541,7 +573,7 @@ async function updateAndPopulateTripSwitcher() {
                 </button>
             </div>
         `;
-        
+
         item.onclick = async (event) => {
             // Only switch trip if the click wasn't on a button inside the item
             if (!event.target.closest('button')) {
@@ -554,7 +586,7 @@ async function updateAndPopulateTripSwitcher() {
 
         const membersPanel = document.createElement('div');
         membersPanel.className = 'members-panel hidden bg-slate-100/70 p-3 mx-0.5 mb-0.5 rounded-b-md text-xs text-slate-700 space-y-1';
-        
+
         if (memberIds.length > 0) {
             memberIds.forEach((memberId) => {
                 const memberData = trip.members[memberId];
@@ -563,13 +595,13 @@ async function updateAndPopulateTripSwitcher() {
 
                 const emailDiv = document.createElement('div');
                 emailDiv.className = 'flex justify-between items-center p-1';
-                
+
                 let kickButton = '';
                 // Only show kick button if current user is owner and member is not the owner
                 if (isCurrentUserOwner && memberId !== trip.owner) {
-                    kickButton = `<button class="kick-member-btn text-rose-500 hover:text-rose-700 transition-colors ml-2" 
-                                    data-trip-id="${trip.id}" 
-                                    data-member-id="${memberId}" 
+                    kickButton = `<button class="kick-member-btn text-rose-500 hover:text-rose-700 transition-colors ml-2"
+                                    data-trip-id="${trip.id}"
+                                    data-member-id="${memberId}"
                                     data-member-email="${email}"
                                     aria-label="Remove ${email}">
                                 <i class="fas fa-user-slash text-sm"></i>
@@ -596,7 +628,7 @@ async function updateAndPopulateTripSwitcher() {
                 </a>`;
             membersPanel.appendChild(deleteDiv);
         }
-        
+
         itemContainer.appendChild(item);
         itemContainer.appendChild(membersPanel);
         menu.appendChild(itemContainer);
@@ -658,8 +690,9 @@ async function removeMemberFromTrip(tripId, memberIdToRemove, memberEmail) {
         updates[`/trips/${tripId}/members/${memberIdToRemove}`] = null;
         updates[`/users/${memberIdToRemove}/trips/${tripId}`] = null;
 
-        await database.ref().update(updates);
-        
+        // Modular update on the root reference
+        await update(ref(database, '/'), updates);
+
         showError(`${memberEmail} has been removed from the trip.`, 3000, 'success');
         updateAndPopulateTripSwitcher(); // Refresh trip list in modal
     } catch(error) {
@@ -677,8 +710,9 @@ async function deleteTrip(tripId, tripName, memberIds) {
             memberIds.forEach(userId => {
                 updates[`/users/${userId}/trips/${tripId}`] = null; // Mark user's reference for deletion
             });
-            
-            database.ref().update(updates).then(async () => {
+
+            // Modular update on the root reference
+            update(ref(database, '/'), updates).then(async () => {
                 showError(`Trip '${tripName}' has been deleted.`, 3000, 'success');
                 closeTripSwitcherModal();
 
@@ -723,7 +757,7 @@ document.getElementById('create-new-trip-btn').addEventListener('click', () => {
     createNewTrip();
 });
 document.getElementById('create-first-trip-btn').addEventListener('click', createNewTrip);
-if (closeIconBtn) { 
+if (closeIconBtn) {
     closeIconBtn.addEventListener('click', closeTripSwitcherModal);
 }
 
@@ -750,8 +784,9 @@ function saveDataToFirebase() {
         adjustments: appData.adjustments,
         primaryCurrency: appData.primaryCurrency
     };
-    
-    currentTripRef.update(dataToUpdate)
+
+    // Modular update
+    update(currentTripRef, dataToUpdate)
        .catch(err => {
            console.error("Firebase update error:", err);
            showError(`Failed to save data: ${err.message}`);
@@ -762,7 +797,7 @@ function saveDataToFirebase() {
 // Updates all UI components based on the current appData
 function updateAllUI() {
     if (!currentTripId) return; // Exit if no trip is active
-    
+
     groupEventNameInput.value = appData.groupEventName;
     tripPrimaryCurrencySelect.value = appData.primaryCurrency;
     currentTripNameEl.textContent = appData.groupEventName || 'Untitled Trip';
@@ -772,7 +807,7 @@ function updateAllUI() {
     updateMealRecords(); // Re-render meal records
     updateDebtSettlement();
     updateAdjustmentsDisplay();
-    
+
     // Show/hide reset button based on ownership
     const isOwner = auth.currentUser && auth.currentUser.uid === appData.owner;
     resetBtn.style.display = isOwner ? 'flex' : 'none';
@@ -783,7 +818,7 @@ function updateCurrencyDisplays() {
     const currency = appData.primaryCurrency;
     document.getElementById('summary-title').innerHTML = `<span class="text-2xl sm:text-3xl">📊</span>Expense Summary (${currency})`;
     document.getElementById('debt-title').innerHTML = `<span class="text-2xl sm:text-3xl">🤝</span>Debt Settlement (${currency})`;
-    
+
     document.getElementById('summary-total-owed-header').textContent = 'Total Owed';
     document.getElementById('debt-paid-header').textContent = 'Paid';
     document.getElementById('debt-owed-header').textContent = 'Owed';
@@ -794,7 +829,7 @@ function updateCurrencyDisplays() {
 
 // Returns the common symbol for a given currency code
 function getCurrencySymbol(currencyCode) {
-    const symbols = { 
+    const symbols = {
         'HKD': '$',
         'CNY': '¥',
         'GBP': '£',
@@ -888,7 +923,7 @@ function showPage(pageId) {
     if (pageId === 'page-expense') {
         initEmblaCarousels();
     }
-    
+
     // Scroll to top of app-content when navigating to Buddies, Expense, or Debt pages
     // The Summary page handles its own scrolling (e.g., to a new expense)
     if (pageId === 'page-buddies' || pageId === 'page-expense' || pageId === 'page-debt') {
@@ -926,13 +961,14 @@ tripPrimaryCurrencySelect.addEventListener('change', () => {
 
     // Immediately revert the dropdown visually to the old currency
     tripPrimaryCurrencySelect.value = oldCurrency;
-    
+
     const message = `All shared expenses will be settled in ${newCurrency}.`;
     showConfirmation(
-        message, 
+        message,
         () => { // onConfirm callback
             // Update the primary currency in Firebase. The listener will do the rest.
-            currentTripRef.update({ primaryCurrency: newCurrency });
+            // Modular update
+            update(currentTripRef, { primaryCurrency: newCurrency });
             showError(`Primary currency updated to ${newCurrency}.`, 3000, 'success');
         },
         { // Options for the modal
@@ -1069,7 +1105,7 @@ addBuddyBtn.addEventListener('click', () => {
     if (!newName) { showError('Please enter a buddy name.'); return; }
     if (appData.buddies.includes(newName)) { showError('Buddy already exists.'); return; }
     if (newName.length > 50) { showError('Buddy name must be 50 characters or less.'); return; }
-    
+
     appData.buddies.push(newName);
     saveDataToFirebase();
 
@@ -1082,7 +1118,7 @@ doneBuddiesBtn.addEventListener('click', () => {
     const eventName = groupEventNameInput.value.trim();
     if (!eventName) { showError('Please enter a trip name.'); return; }
     if (appData.buddies.length === 0) { showError('Please add at least one buddy.'); return; }
-    
+
     appData.groupEventName = eventName;
     saveDataToFirebase();
 
@@ -1115,7 +1151,7 @@ addExpenseBtn.addEventListener('click', () => {
         showError('The payer must be one of the selected buddies.'); return;
     }
     // Convert amount to primary currency
-    const amountInPrimaryCurrency = amount / (exchangeRates[currency] || 1); 
+    const amountInPrimaryCurrency = amount / (exchangeRates[currency] || 1);
 
     const perBuddy = amountInPrimaryCurrency / selectedBuddies.length;
 
@@ -1142,7 +1178,7 @@ addExpenseBtn.addEventListener('click', () => {
     addExpenseBtn.innerHTML = '<span class="text-lg">🎉</span>Add Expense';
     addExpenseBtn.classList.remove('bg-amber-500', 'hover:bg-amber-600', 'active:bg-amber-700');
     addExpenseBtn.classList.add('bg-sky-500', 'hover:bg-sky-600', 'active:bg-sky-700');
-    
+
     saveDataToFirebase();
     clearForm(); // Clear the expense form
     showPage('page-summary'); // Navigate to summary page (scroll will happen after updateAllUI)
@@ -1192,7 +1228,7 @@ function updateSummary() {
             currentDividerLabel = item.label;
             return; // Continue to the next item
         }
-        
+
         // It's an expense item
         const exp = item;
         exp.buddies.forEach(buddy => {
@@ -1206,7 +1242,7 @@ function updateSummary() {
                 details[buddy].push(`<div class="text-xs font-bold text-sky-700 ${borderClass}">${currentDividerLabel}</div>`);
                 lastDividerForBuddy[buddy] = currentDividerLabel;
             }
-            
+
             details[buddy].push(`<div class="text-xs"><span class="font-medium">${exp.mealType}</span> at ${exp.restaurant}: ${currencySymbol}${formatCurrency(perBuddyConverted)}</div>`);
         });
     });
@@ -1245,7 +1281,7 @@ function renumberDayDividers() {
 addDayDividerBtn.addEventListener('click', () => {
     const dayDividersCount = appData.expenses.filter(item => item.type === 'divider').length;
     const newLabel = `Day ${dayDividersCount + 1}`;
-    
+
     const newDivider = {
         type: 'divider',
         id: Date.now(),
@@ -1259,7 +1295,7 @@ addDayDividerBtn.addEventListener('click', () => {
         // Add "Day 2", "Day 3", etc., to the bottom
         appData.expenses.push(newDivider);
     }
-    
+
     saveDataToFirebase();
     showError(`Added ${newLabel}`, 2000, 'success');
 });
@@ -1279,7 +1315,7 @@ function updateMealRecords() {
 
     if (appData.expenses.length === 0) {
         mealRecordsContainer.innerHTML = '<p class="text-slate-500 text-center py-4">No meal records yet. Add an expense! 🍽️</p>';
-        scrollToExpenseId = null; 
+        scrollToExpenseId = null;
         return;
     }
 
@@ -1317,7 +1353,7 @@ function updateMealRecords() {
                 <div class="text-xs">Shared with: <em class="text-slate-500">${exp.buddies.join(', ')}</em></div>
                 <div class="text-right text-slate-400 text-[10px] mt-1.5">${timestamp}</div>`;
         }
-        
+
         if (div) {
              mealRecordsContainer.appendChild(div);
              if (item.id === scrollToExpenseId) {
@@ -1346,7 +1382,7 @@ function attachDragAndDropListeners() {
         item.addEventListener('dragstart', (e) => {
             draggedItem = item;
             e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', item.dataset.id); 
+            e.dataTransfer.setData('text/plain', item.dataset.id);
             setTimeout(() => item.classList.add('dragging'), 0);
         });
 
@@ -1371,14 +1407,14 @@ function attachDragAndDropListeners() {
 
                 const draggedIndex = appData.expenses.findIndex(exp => exp.id === draggedId);
                 let targetIndex = appData.expenses.findIndex(exp => exp.id === targetId);
-                
+
                 if (draggedIndex > -1 && targetIndex > -1) {
                     const [removed] = appData.expenses.splice(draggedIndex, 1);
                     // Adjust target index if the removed item was before it in the array
                     if (draggedIndex < targetIndex) {
-                        targetIndex--; 
+                        targetIndex--;
                     }
-                    
+
                     // Check the position relative to the target element's midpoint
                     const rect = item.getBoundingClientRect();
                     const isAfter = e.clientY > rect.top + rect.height / 2;
@@ -1387,7 +1423,7 @@ function attachDragAndDropListeners() {
                     } else {
                         appData.expenses.splice(targetIndex, 0, removed);
                     }
-                    
+
                     renumberDayDividers();
                     saveDataToFirebase();
                 }
@@ -1418,7 +1454,7 @@ function attachRecordActionListeners() {
         btn.addEventListener('click', (event) => {
             const expenseId = Number(event.currentTarget.dataset.id);
             const expenseToDelete = appData.expenses.find(item => item.id === expenseId);
-            
+
             if (expenseToDelete && expenseToDelete.type === 'expense') {
                 const confirmationMessage = `Are you sure you want to delete the '${expenseToDelete.mealType} @ ${expenseToDelete.restaurant}' expense?`;
                 showConfirmation(confirmationMessage, () => {
@@ -1434,7 +1470,7 @@ function attachRecordActionListeners() {
          btn.addEventListener('click', (event) => {
             const dividerId = Number(event.currentTarget.dataset.id);
             const dividerToDelete = appData.expenses.find(item => item.id === dividerId);
-            
+
             if (dividerToDelete) {
                 const confirmationMessage = `Are you sure you want to delete the '${dividerToDelete.label}' divider?`;
                 showConfirmation(confirmationMessage, () => {
@@ -1460,7 +1496,7 @@ function editExpense(index) {
     document.getElementById('currency').value = expense.currency;
     currencyButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.currency === expense.currency));
     document.getElementById('amount').value = expense.amount;
-    
+
     // Reset and set selected buddies/payer
     document.querySelectorAll('#combined-buddies-payer .buddy').forEach(cb => cb.checked = false);
     document.querySelectorAll('#combined-buddies-payer .payer').forEach(radio => radio.checked = false);
@@ -1600,8 +1636,8 @@ function updateAdjustmentsDisplay() {
         const adjDiv = document.createElement('div');
         adjDiv.className = 'relative bg-white p-3.5 rounded-lg shadow-sm border border-slate-200 text-sm flex justify-between items-center';
         const amountInPrimary = adj.amount / (exchangeRates[adj.originalCurrency] || 1);
-        
-        const displayAmount = `<strong class="text-sky-700">${adj.originalCurrency} ${formatCurrency(adj.amount)}</strong> 
+
+        const displayAmount = `<strong class="text-sky-700">${adj.originalCurrency} ${formatCurrency(adj.amount)}</strong>
                              <span class="text-slate-500 text-xs">(~${formatCurrency(amountInPrimary)} ${appData.primaryCurrency})</span>`;
 
         adjDiv.innerHTML = `
@@ -1644,10 +1680,10 @@ document.getElementById('add-adjustment-btn').addEventListener('click', () => {
     if (debtor === creditor) {
         showError('Payer and Receiver cannot be the same buddy.'); return;
     }
-    
+
     appData.adjustments.push({ debtor, creditor, amount: amount, originalCurrency: currency });
     saveDataToFirebase();
-    
+
     // Clear form fields after adding adjustment
     adjustmentAmountInput.value = '';
     calculatorInput.innerHTML = '';
@@ -1722,7 +1758,7 @@ function generateWhatsAppMessage() {
     if (appData.expenses.length > 0) {
         const total = expenseItems.reduce((sum, exp) => sum + exp.amountInPrimaryCurrency, 0);
         message += `Total Spent: *${primaryCurrency} ${formatCurrency(total)}* | ${expenseItems.length} transaction${expenseItems.length !== 1 ? 's' : ''}\n\n`;
-        
+
         appData.expenses.forEach((item, index, arr) => {
             if (item.type === 'divider') {
                 message += `\n*--- ${item.label} ---*\n`;
@@ -1754,7 +1790,7 @@ function generateWhatsAppMessage() {
     }
 
     message += `*🤝 Debt Settlement*\n`;
-    
+
     // Calculate and append settlement plan
     const debtors = appData.buddies.filter(p => balances[p].net < -0.005).map(p => ({ name: p, amount: -balances[p].net }));
     const creditors = appData.buddies.filter(p => balances[p].net > 0.005).map(p => ({ name: p, amount: balances[p].net }));
@@ -1778,7 +1814,7 @@ function generateWhatsAppMessage() {
         message += `_Settlement Plan:_\n`;
         message += settlements.join('\n') + '\n';
     }
-    
+
     message += `\n🐾 _Generated by Bill Buddy_ 🐾`;
     return message;
 }
@@ -1792,7 +1828,7 @@ function showError(message, duration = 4000, type = 'error') {
     errorMsgElement.textContent = message;
     // Reset classes before adding new ones
     errorMsgElement.classList.remove('opacity-0', 'bg-red-100', 'text-red-700', 'border-red-300', 'bg-green-100', 'text-green-700', 'border-green-300');
-    errorMsgElement.classList.add('opacity-0'); 
+    errorMsgElement.classList.add('opacity-0');
     requestAnimationFrame(() => { // Use rAF for smooth transition
          errorMsgElement.classList.add(type === 'success' ? 'bg-green-100' : 'bg-red-100', type === 'success' ? 'text-green-700' : 'text-red-700', type === 'success' ? 'border-green-300' : 'border-red-300');
          errorMsgElement.classList.remove('opacity-0');
@@ -1812,7 +1848,7 @@ function showConfirmation(message, onConfirm, options = {}) {
     const modalId = 'confirmation-modal';
     let modal = document.getElementById(modalId);
     if (modal) modal.remove(); // Remove existing modal to ensure clean state
-    
+
     modal = document.createElement('div');
     modal.id = modalId;
     modal.className = 'fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[200] p-4 transition-opacity duration-300 opacity-0';
@@ -1829,19 +1865,19 @@ function showConfirmation(message, onConfirm, options = {}) {
 
     document.getElementById('confirmation-title').textContent = title;
     document.getElementById('confirmation-message').textContent = message;
-    
+
     requestAnimationFrame(() => {
         modal.classList.remove('opacity-0');
         modal.querySelector('div').classList.remove('scale-95');
     });
-    
+
     const confirmBtn = document.getElementById('confirm-btn');
     const cancelBtn = document.getElementById('cancel-btn');
-    const cleanup = () => { 
+    const cleanup = () => {
         modal.classList.add('opacity-0');
         modal.querySelector('div').classList.add('scale-95');
         setTimeout(() => {
-            if (modal) modal.remove(); 
+            if (modal) modal.remove();
         }, 300);
      };
     confirmBtn.onclick = () => { onConfirm(); cleanup(); };
@@ -1906,22 +1942,22 @@ function safeEvaluate(expression) {
 
 // Event listener for calculator input (Enter key for evaluation)
 calculatorInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') { 
+    if (event.key === 'Enter') {
         event.preventDefault(); // Prevent new line in contenteditable
         const expression = calculatorInput.textContent.trim();
         if (!expression) return;
-        
+
         const result = safeEvaluate(expression);
-        
+
         if (result !== null) {
             // Format the result to always have two decimal places for the input field
-            const formattedResultForInput = result.toFixed(2); 
+            const formattedResultForInput = result.toFixed(2);
             adjustmentAmountInput.value = formattedResultForInput;
-            
+
             // Format the result for the calculator display with commas and two decimal places
             calculatorInput.innerHTML = `${expression} = <strong class="text-indigo-600 font-bold">${result.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>`;
             isCalculatorResultShown = true;
-            
+
             // Move cursor to end of contenteditable div
             const range = document.createRange();
             const sel = window.getSelection();
