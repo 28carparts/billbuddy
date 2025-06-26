@@ -4,7 +4,7 @@ const firebaseConfig = {
   authDomain: "perrybillbuddy.firebaseapp.com",
   databaseURL: "https://perrybillbuddy-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "perrybillbuddy",
-  storageBucket: "perrybillbuddy.appspot.com",
+  storageBucket: "perrybillbuddy.firebasestorage.app",
   messagingSenderId: "380690422701",
   appId: "1:380690422701:web:17da1bb5f55f12f3625f24"
 };
