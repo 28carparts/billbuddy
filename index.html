@@ -106,7 +106,7 @@
             </button>
             <!-- Logged in info for No Trips View -->
             <div id="logged-in-info-no-trips" class="text-center text-sm text-slate-600 mt-4 py-2 border-t border-slate-200 pt-4 hidden">
-                Logged in as: <span id="logged-in-email-no-trips" class="font-semibold text-slate-800"></span> 
+                Logged in as: <span id="logged-in-email-no-trips" class="font-semibold text-slate-800"></span>
                 <a href="#" id="logout-link-no-trips" class="font-semibold text-sky-600 hover:underline ml-2">Logout</a>
             </div>
         </div>
@@ -383,7 +383,7 @@
     <div id="error-container" class="fixed top-40 left-1/2 -translate-x-1/2 transform z-[201] w-[90%] md:w-auto max-w-[90%] pointer-events-none">
          <p id="error" class="bg-red-100 text-red-700 border border-red-300 p-3 rounded-lg text-sm shadow-lg opacity-0 transition-opacity duration-300"></p>
     </div>
-    
+
     <!-- Trip Switcher Modal -->
     <div id="trip-switcher-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[200] p-4 transition-opacity duration-300 opacity-0">
         <div id="trip-switcher-modal-content" class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full space-y-4 transform scale-95 transition-all duration-300">
@@ -401,7 +401,7 @@
                 Cancel
             </button>
             <div id="logged-in-info" class="text-center text-sm text-slate-600 mt-4 py-2 border-t border-slate-200 pt-4 hidden">
-                Logged in as: <span id="logged-in-email" class="font-semibold text-slate-800"></span> 
+                Logged in as: <span id="logged-in-email" class="font-semibold text-slate-800"></span>
                 <a href="#" id="logout-link" class="font-semibold text-sky-600 hover:underline ml-2">Logout</a>
             </div>
         </div>
@@ -444,13 +444,8 @@
             <span class="text-xs mt-1">Debt</span>
         </button>
     </nav>
-    
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-    
-    <!-- Link to external JavaScript file -->
-    <script src="script.js" defer></script>
+
+    <!-- Link to external JavaScript file, now as a module -->
+    <script type="module" src="script.js" defer></script>
 </body>
 </html>
