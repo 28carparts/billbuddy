@@ -1754,7 +1754,7 @@ function generateWhatsAppMessage() {
     }
     message += `\n`;
 
-    message += `*🧾 Meal Records*\n`;
+    message += `*🧾 Expense Records*\n`;
     if (appData.expenses.length > 0) {
         const total = expenseItems.reduce((sum, exp) => sum + exp.amountInPrimaryCurrency, 0);
         message += `Total Spent: *${primaryCurrency} ${formatCurrency(total)}* | ${expenseItems.length} transaction${expenseItems.length !== 1 ? 's' : ''}\n\n`;
