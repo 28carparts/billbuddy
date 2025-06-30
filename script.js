@@ -566,10 +566,10 @@ async function updateAndPopulateTripSwitcher() {
             <span class="truncate pr-2">${trip.name}${ownedByLabel}</span>
             <div class="flex items-center gap-3 shrink-0">
                 <button class="copy-trip-link-btn text-slate-500 hover:text-sky-500 transition-colors" data-trip-id="${trip.id}" aria-label="Copy link for ${trip.name}">
-                    <i class="fas fa-clipboard text-base"></i>
+                    <i class="fa-regular fa-copy text-base"></i>
                 </button>
                 <button class="toggle-members-btn text-slate-500 hover:text-sky-500 transition-colors" aria-label="Show members for ${trip.name}">
-                    <i class="fas fa-chevron-down text-xs transition-transform duration-200"></i>
+                    <i class="fa-regular fa-circle-arrow-down text-xs transition-transform duration-200"></i>
                 </button>
             </div>
         `;
