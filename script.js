@@ -569,7 +569,7 @@ async function updateAndPopulateTripSwitcher() {
                     <i class="fa-regular fa-copy text-base"></i>
                 </button>
                 <button class="toggle-members-btn text-slate-500 hover:text-sky-500 transition-colors" aria-label="Show members for ${trip.name}">
-                    <i class="fa-regular fa-circle-arrow-down text-xs transition-transform duration-200"></i>
+                    <i class="fa-solid fa-circle-arrow-down text-xs transition-transform duration-200"></i>
                 </button>
             </div>
         `;
