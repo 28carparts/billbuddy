@@ -173,8 +173,11 @@ onAuthStateChanged(auth, async user => {
 
     if (user) {
         // User is logged in
-        authPage.classList.add('hidden');
-        authLoadingIndicator.classList.add('hidden'); // Hide loading indicator
+        // Show loading indicator immediately when a user is detected as logged in,
+        // before any trip loading logic begins.
+        authLoadingIndicator.classList.remove('hidden'); // Show loading indicator
+        authPage.classList.add('hidden'); // Hide auth page immediately
+
         loggedInEmailSpan.textContent = user.email;
         loggedInInfoDiv.classList.remove('hidden');
 
@@ -186,6 +189,9 @@ onAuthStateChanged(auth, async user => {
         } else {
             await loadUserDashboard(user.uid);
         }
+        // Hide loading indicator AFTER the dashboard or trip has loaded
+        authLoadingIndicator.classList.add('hidden');
+
     } else {
         // User is not logged in
         if (currentTripRef && dataUnsubscribe) {
@@ -205,7 +211,7 @@ onAuthStateChanged(auth, async user => {
         loggedInInfoNoTripsDiv.classList.add('hidden');
 
         authPage.classList.remove('hidden');
-        authLoadingIndicator.classList.add('hidden'); // Ensure loading indicator is hidden on initial load
+        authLoadingIndicator.classList.add('hidden'); // Ensure loading indicator is hidden on initial load when not logged in
 
         // If there's a shared link, the login form will just show.
         // After login, the logic will re-trigger to handle the invitation.
@@ -659,7 +665,7 @@ function attachTripSwitcherListeners() {
             const tripName = event.currentTarget.dataset.tripName;
             if (tripIdToCopy) {
                 const shareLink = `${window.location.origin}${window.location.pathname}?shared=${tripIdToCopy}`;
-                const message = `Click to join *${tripName}* now! 🗺️😊\n ${shareLink}`;
+                const message = `Click to join ${tripName} now! 🗺️😊 ${shareLink}`;
                 copyToClipboard(message, "Trip invitation link copied! 🔗");
             }
         });
@@ -672,7 +678,7 @@ function attachTripSwitcherListeners() {
             const tripName = event.currentTarget.dataset.tripName;
             if (tripIdToShare) {
                 const shareLink = `${window.location.origin}${window.location.pathname}?shared=${tripIdToShare}`;
-                const message = encodeURIComponent(`Click to join *${tripName}* now! 🗺️😊\n ${shareLink}`);
+                const message = encodeURIComponent(`Click to join ${tripName} now! 🗺️😊 ${shareLink}`);
                 window.open(`https://wa.me/?text=${message}`, '_blank');
             }
         });
