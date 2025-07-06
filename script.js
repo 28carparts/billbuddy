@@ -659,7 +659,7 @@ function attachTripSwitcherListeners() {
             const tripName = event.currentTarget.dataset.tripName;
             if (tripIdToCopy) {
                 const shareLink = `${window.location.origin}${window.location.pathname}?shared=${tripIdToCopy}`;
-                const message = `Click to join ${tripName} now! 🗺️😊 ${shareLink}`;
+                const message = `Click to join *${tripName}* now! 🗺️😊\n ${shareLink}`;
                 copyToClipboard(message, "Trip invitation link copied! 🔗");
             }
         });
@@ -672,7 +672,7 @@ function attachTripSwitcherListeners() {
             const tripName = event.currentTarget.dataset.tripName;
             if (tripIdToShare) {
                 const shareLink = `${window.location.origin}${window.location.pathname}?shared=${tripIdToShare}`;
-                const message = encodeURIComponent(`Click to join ${tripName} now! 🗺️😊 ${shareLink}`);
+                const message = encodeURIComponent(`Click to join *${tripName}* now! 🗺️😊\n ${shareLink}`);
                 window.open(`https://wa.me/?text=${message}`, '_blank');
             }
         });
