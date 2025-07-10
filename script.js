@@ -2011,8 +2011,8 @@ function safeEvaluate(expression) {
 // Event listener for calculator input (Enter key for evaluation)
 calculatorInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
-        event.preventDefault(); // Keep this to prevent any default form submission behavior
-        const expression = calculatorInput.value.trim(); // Changed from .textContent
+        event.preventDefault(); // Prevent new line in contenteditable
+        const expression = calculatorInput.textContent.trim();
         if (!expression) return;
 
         const result = safeEvaluate(expression);
@@ -2022,8 +2022,8 @@ calculatorInput.addEventListener('keydown', (event) => {
             const formattedResultForInput = result.toFixed(2);
             adjustmentAmountInput.value = formattedResultForInput;
 
-            // Update the input's value to show the result.
-            calculatorInput.value = result.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); // Changed from .innerHTML
+            // Format the result for the calculator display with commas and two decimal places
+            calculatorInput.innerHTML = `${expression} = <strong class="text-indigo-600 font-bold">${result.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>`;
             isCalculatorResultShown = true;
 
             // Move cursor to end of contenteditable div
@@ -2047,7 +2047,7 @@ calculatorInput.addEventListener('input', () => {
 
 // Event listener for clearing calculator input
 clearCalculatorBtn.addEventListener('click', () => {
-    calculatorInput.value = ''; // Changed from .innerHTML
+    calculatorInput.innerHTML = '';
     adjustmentAmountInput.value = '';
     isCalculatorResultShown = false;
     calculatorInput.focus();
