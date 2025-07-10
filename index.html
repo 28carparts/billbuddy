@@ -321,7 +321,7 @@
                         <div>
                             <label for="calculator-input" class="block text-sm font-semibold text-slate-600 mb-1.5">Calculator (optional, press 'Enter' to solve)</label>
                             <div class="relative">
-                                <input type="text" inputmode="tel" id="calculator-input" placeholder="e.g., 8 + 28" class="w-full p-2.5 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white" />
+                                <div id="calculator-input" contenteditable="true" data-placeholder="e.g., 8 + 28" class="w-full p-2.5 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white"></div>
                                 <button id="clear-calculator-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Clear calculator input">
                                     <i class="fas fa-times-circle"></i>
                                 </button>
