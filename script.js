@@ -1215,9 +1215,10 @@ addExpenseBtn.addEventListener('click', () => {
     if (isNaN(amount) || amount <= 0) { showError('Please enter a valid amount.'); return; }
     if (selectedBuddies.length === 0) { showError('Please select at least one buddy.'); return; }
     if (!selectedPayer) { showError('Please select who paid.'); return; }
-    if (!selectedBuddies.includes(selectedPayer)) {
-        showError('The payer must be one of the selected buddies.'); return;
-    }
+    
+    // REMOVED: The check that required the payer to be in the selected buddies list has been removed.
+    // This now allows for scenarios where someone pays on behalf of a group without participating.
+
     // Convert amount to primary currency
     const amountInPrimaryCurrency = amount / (exchangeRates[currency] || 1);
 
