@@ -1283,6 +1283,32 @@ function updateSummary() {
     // Helper function for consistent currency formatting
     const formatCurrency = (amount) => amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+    // --- Step 1: Pre-calculate daily subtotals for each buddy ---
+    const buddyDailySubtotals = {};
+    appData.buddies.forEach(buddy => {
+        buddyDailySubtotals[buddy] = {};
+    });
+
+    let currentDayLabelForSubtotal = null;
+    appData.expenses.forEach(item => {
+        if (item.type === 'divider') {
+            currentDayLabelForSubtotal = item.label;
+            // Initialize subtotal for all buddies for this day
+            appData.buddies.forEach(buddy => {
+                if (!buddyDailySubtotals[buddy][currentDayLabelForSubtotal]) {
+                    buddyDailySubtotals[buddy][currentDayLabelForSubtotal] = 0;
+                }
+            });
+        } else if (item.type === 'expense' && currentDayLabelForSubtotal) {
+            item.buddies.forEach(buddy => {
+                // Ensure buddy exists in the subtotals object
+                if (buddyDailySubtotals[buddy]) { 
+                    buddyDailySubtotals[buddy][currentDayLabelForSubtotal] += item.perBuddy;
+                }
+            });
+        }
+    });
+
     // Initialize totals and details for all buddies
     appData.buddies.forEach(buddy => {
         totals[buddy] = 0;
@@ -1290,7 +1316,7 @@ function updateSummary() {
         lastDividerForBuddy[buddy] = null;
     });
 
-    // Calculate totals and populate details based on expenses
+    // --- Step 2: Calculate totals and populate details, including subtotals ---
     let currentDividerLabel = null;
     appData.expenses.forEach(item => {
         if (item.type === 'divider') {
@@ -1306,9 +1332,14 @@ function updateSummary() {
 
             // Add the divider to the details view if it's the first time we've seen it for this buddy
             if (currentDividerLabel && lastDividerForBuddy[buddy] !== currentDividerLabel) {
-                // Logic to remove top border for Day 1 divider
-                const borderClass = (currentDividerLabel === 'Day 1') ? '' : 'pt-2 border-t border-slate-200 mt-2';
-                details[buddy].push(`<div class="text-xs font-bold text-sky-700 ${borderClass}">${currentDividerLabel}</div>`);
+                // Get the pre-calculated subtotal for this buddy and day
+                const subtotal = buddyDailySubtotals[buddy]?.[currentDividerLabel] || 0;
+                const subtotalText = subtotal > 0 ? ` <span class="font-normal text-slate-500">- Subtotal ${currencySymbol}${formatCurrency(subtotal)}</span>` : '';
+                
+                // Add a border-top unless it's the very first item for this buddy.
+                const borderClass = (details[buddy].length === 0) ? '' : 'pt-2 border-t border-slate-200 mt-2';
+
+                details[buddy].push(`<div class="text-xs font-bold text-sky-700 ${borderClass}">${currentDividerLabel}${subtotalText}</div>`);
                 lastDividerForBuddy[buddy] = currentDividerLabel;
             }
 
@@ -1331,6 +1362,23 @@ function updateSummary() {
             <td class="py-3 px-2 md:px-4 text-slate-700 space-y-1 whitespace-normal">${details[buddy].join('') || '<span class="text-slate-400">No expenses</span>'}</td>
         `;
     });
+}
+
+// Calculates the subtotal for each day defined by a divider
+function calculateDailySubtotals() {
+    const subtotals = {};
+    let currentDayLabel = null;
+
+    appData.expenses.forEach(item => {
+        if (item.type === 'divider') {
+            currentDayLabel = item.label;
+            subtotals[currentDayLabel] = 0; // Initialize subtotal for this day
+        } else if (item.type === 'expense' && currentDayLabel) {
+            // If it's an expense and we're "in" a day, add to its total
+            subtotals[currentDayLabel] += item.amountInPrimaryCurrency;
+        }
+    });
+    return subtotals;
 }
 
 let draggedItem = null; // Stores the currently dragged DOM element
@@ -1369,7 +1417,6 @@ addDayDividerBtn.addEventListener('click', () => {
     showError(`Added ${newLabel}`, 2000, 'success');
 });
 
-
 // Updates the meal records display with drag-and-drop functionality
 function updateMealRecords() {
     const totalSpentElement = document.getElementById('total-spent');
@@ -1390,6 +1437,10 @@ function updateMealRecords() {
 
     let elementToScrollTo = null; // Store reference to the element to scroll to
 
+    // Calculate daily subtotals before rendering
+    const dailySubtotals = calculateDailySubtotals();
+    const currencySymbol = getCurrencySymbol(appData.primaryCurrency);
+
     // Create and append meal record and divider elements
     appData.expenses.forEach((item) => {
         let div;
@@ -1398,8 +1449,13 @@ function updateMealRecords() {
             div.className = 'day-divider-item record-list-item';
             div.draggable = true;
             div.dataset.id = item.id;
+            
+            // Include subtotal in the divider's label
+            const subtotal = dailySubtotals[item.label] || 0;
+            const subtotalText = subtotal > 0 ? ` - Subtotal ${currencySymbol}${formatCurrency(subtotal)}` : '';
+
             div.innerHTML = `
-                <span class="divider-label">${item.label}</span>
+                <span class="divider-label">${item.label}${subtotalText}</span>
                 <button class="delete-divider absolute top-2 right-2 bg-rose-100 text-rose-600 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold hover:bg-rose-200" data-id="${item.id}" aria-label="Delete divider">✖</button>
             `;
         } else if (item.type === 'expense') {
@@ -1825,12 +1881,30 @@ function generateWhatsAppMessage() {
 
     message += `*🧾 Expense Records*\n`;
     if (appData.expenses.length > 0) {
+        // --- START OF MODIFICATION ---
+        // Calculate daily subtotals for the message
+        const dailySubtotals = {};
+        let currentDayLabelForSubtotal = null;
+        appData.expenses.forEach(item => {
+            if (item.type === 'divider') {
+                currentDayLabelForSubtotal = item.label;
+                dailySubtotals[currentDayLabelForSubtotal] = 0; // Initialize
+            } else if (item.type === 'expense' && currentDayLabelForSubtotal) {
+                dailySubtotals[currentDayLabelForSubtotal] += item.amountInPrimaryCurrency;
+            }
+        });
+        // --- END OF MODIFICATION ---
+
         const total = expenseItems.reduce((sum, exp) => sum + exp.amountInPrimaryCurrency, 0);
         message += `Total Spent: *${primaryCurrency} ${formatCurrency(total)}* | ${expenseItems.length} transaction${expenseItems.length !== 1 ? 's' : ''}\n\n`;
 
         appData.expenses.forEach((item, index, arr) => {
             if (item.type === 'divider') {
-                message += `\n*--- ${item.label} ---*\n`;
+                // --- START OF MODIFICATION ---
+                const subtotal = dailySubtotals[item.label] || 0;
+                const subtotalText = subtotal > 0 ? ` - Subtotal: ${primaryCurrency} ${formatCurrency(subtotal)}` : '';
+                message += `\n*--- ${item.label}${subtotalText} ---*\n`;
+                // --- END OF MODIFICATION ---
             } else { // It's an expense
                 const exp = item;
                 message += `• ${exp.mealType} @ ${exp.restaurant}: *${exp.currency} ${formatCurrency(exp.amount)}*\n`;
