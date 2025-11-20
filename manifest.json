@@ -1,5 +1,5 @@
 {
-  "name": "BillBuddy Name",
+  "name": "BillBuddy",
   "short_name": "BillBuddy",
   "icons": [
     {
@@ -16,4 +16,5 @@
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
   "display": "standalone"
+
 }
