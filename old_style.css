@@ -1,0 +1,157 @@
+body {
+    font-family: 'Inter', sans-serif;
+    scroll-behavior: smooth;
+}
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Active choice buttons */
+.choice-btn.active {
+    background-color: #0ea5e9 !important; /* sky-500 */
+    color: white !important;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+/* Custom checkbox */
+.custom-checkbox {
+    appearance: none; -webkit-appearance: none;
+    height: 1.25rem; width: 1.25rem;
+    border: 1px solid #94a3b8;
+    border-radius: 0.25rem;
+    display: inline-block; position: relative; cursor: pointer;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+.custom-checkbox:checked { background-color: #0ea5e9; border-color: #0ea5e9; }
+.custom-checkbox:checked::after {
+    content: '✔'; font-size: 0.8rem; color: white;
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+}
+.custom-checkbox:focus { outline: none; box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.5); }
+
+[contenteditable][data-placeholder]:empty:before {
+    content: attr(data-placeholder);
+    color: #94a3b8; /* slate-400 */
+    pointer-events: none;
+    display: block; 
+}
+
+/* Embla Carousel Custom Styles */
+.embla {
+    overflow: hidden;
+    padding: 4px 0;
+}
+.embla__container {
+    display: flex;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -khtml-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.embla__slide {
+    position: relative;
+    flex: 0 0 auto; /* Let content define width */
+    padding-left: 8px; /* Spacing between slides */
+    min-width: 0;
+}
+
+
+/* Drag and Drop Styles for all record items */
+.record-list-item {
+    cursor: grab;
+    transition: transform 0.3s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.record-list-item:active {
+    cursor: grabbing;
+}
+.record-list-item.dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+.record-list-item.drag-over {
+    border: 2px dashed #0ea5e9 !important;
+    background-color: #e0f2fe; /* sky-50 */
+}
+
+/* Day Divider Styles */
+.day-divider-item {
+    padding: 8px;
+    text-align: center;
+    background-color: #f0f9ff; /* sky-50 */
+    border-top: 2px solid #7dd3fc; /* sky-300 */
+    border-bottom: 2px solid #7dd3fc; /* sky-300 */
+    margin-bottom: 0.75rem; /* 12px */
+    border-radius: 8px;
+    position: relative;
+}
+.day-divider-item .divider-label {
+    font-weight: 600;
+    color: #0c4a6e; /* sky-900 */
+}
+
+/* Meal Record Item style (restored from before swipe) */
+.meal-record-item {
+    position: relative;
+    background-color: white;
+    padding: 0.875rem; /* 14px */
+    border-radius: 0.5rem; /* 8px */
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    border: 1px solid #e2e8f0; /* slate-200 */
+    font-size: 0.75rem; /* 12px */
+    color: #475569; /* slate-600 */
+    line-height: 1.6;
+    transition: box-shadow 0.2s ease-in-out;
+}
+.meal-record-item:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Loading Spinner Styles - Refreshed */
+#loading-overlay {
+    /* Existing styles: fixed inset-0 bg-gray-900 bg-opacity-75 flex flex-col items-center justify-center z-[202] transition-opacity duration-300 opacity-0 hidden */
+    background: linear-gradient(135deg, #67e8f9, #0ea5e9, #6366f1); /* Vibrant gradient background */
+}
+
+#loading-overlay > div { /* Target the inner container with message and spinner */
+    background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent white background */
+    border-radius: 1.5rem; /* More rounded corners */
+    padding: 2.5rem; /* Increased padding */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 0 0 10px rgba(255, 255, 255, 0.1); /* Enhanced shadow with a subtle glow */
+    transform: scale(1); /* Ensure no initial scaling issues */
+    transition: transform 0.3s ease-out; /* Smooth transition for potential scaling on show/hide */
+}
+
+#loading-overlay.opacity-0 > div {
+    transform: scale(0.95); /* Scale down slightly when hidden */
+}
+
+.loader {
+    border: 4px solid rgba(255, 255, 255, 0.3); /* Lighter, more subtle border for the spinner track */
+    border-top-color: #ffffff; /* White color for the spinning part */
+    border-radius: 50%;
+    height: 3rem; /* Slightly larger spinner */
+    width: 3rem; /* Slightly larger spinner */
+    -webkit-animation: spinner 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite; /* More energetic animation */
+    animation: spinner 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite; /* More energetic animation */
+    margin-bottom: 1.5rem; /* Increased space below spinner */
+}
+
+@-webkit-keyframes spinner {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#loading-text {
+    color: #334155; /* slate-700, good contrast */
+    font-size: 1.125rem; /* Larger font size */
+    font-weight: 600; /* Semi-bold */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Subtle text shadow */
+}
