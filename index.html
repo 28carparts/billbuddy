@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Buddy</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="shortcut icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Embla Carousel -->
+    <script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js"></script>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient-to-br from-slate-100 to-sky-100 min-h-screen flex flex-col pt-16 pb-20">
+
+    <header class="text-center py-3 px-4 bg-gradient-to-r from-sky-500 to-indigo-600 shadow-lg fixed top-0 left-0 right-0 z-40 h-16 flex items-center justify-between">
+        <!-- Title Section -->
+        <div class="flex items-center gap-2">
+            <h1 class="text-xl md:text-2xl font-bold text-white drop-shadow-sm ml-4 shrink-0">💰 Bill Buddy</h1>
+        </div>
+
+        <!-- Trip Switcher Button (Moved outside the div above) -->
+        <!-- Note: The initial content here is a placeholder. script.js will completely replace it. -->
+        <button id="trip-switcher-btn" class="hidden ml-auto bg-white/20 text-white font-medium py-1.5 px-3 rounded-lg hover:bg-white/30 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 shrink-0 max-w-[220px] md:max-w-md">
+            <span id="current-trip-name" class="truncate text-sm"></span>
+            <span class="text-xs">▼</span>
+        </button>
+    </header>
+
+    <!-- Invitation Confirmation Page -->
+    <section id="page-invitation-confirm" class="hidden flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-md text-center bg-white rounded-xl shadow-xl p-8 space-y-6 transform transition-all duration-300 scale-95 opacity-0">
+            <h2 class="text-3xl font-bold text-slate-700">Welcome aboard! 🌟</h2>
+            <p class="text-slate-600 text-lg">Want to be part of <strong id="invitation-trip-name" class="text-sky-600">...</strong>? Confirm to join!</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                 <button id="confirm-join-btn" class="w-full sm:w-auto bg-emerald-500 text-white font-semibold py-3 px-8 rounded-lg shadow-md hover:bg-emerald-600 active:bg-emerald-700 transform hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <span class="text-lg">🧳</span> Yes, let's go!
+                </button>
+                <button id="cancel-join-btn" class="w-full sm:w-auto bg-slate-200 text-slate-700 font-medium py-3 px-6 rounded-lg hover:bg-slate-300 transition-all">
+                    Maybe later
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Auth Section -->
+    <section id="page-auth" class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
+            <div id="login-container" class="bg-white rounded-xl shadow-xl p-6 sm:p-8 space-y-6">
+                <h2 class="text-2xl font-bold text-center text-slate-700">Welcome Back!</h2>
+                <form id="login-form">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="login-email" class="block text-sm font-semibold text-slate-600 mb-1.5">Email</label>
+                            <input type="email" id="login-email" autocomplete="username" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" required>
+                        </div>
+                        <div>
+                            <label for="login-password" class="block text-sm font-semibold text-slate-600 mb-1.5">Password</label>
+                            <input type="password" id="login-password" autocomplete="current-password" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full mt-6 bg-sky-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-sky-600 active:bg-sky-700 transform hover:scale-105 active:scale-95 transition-all">Login</button>
+                </form>
+                 <div class="text-center text-sm text-slate-500 space-y-2 pt-2">
+                    <p>
+                        Don't have an account? <a href="#" id="show-register" class="font-semibold text-sky-600 hover:underline">Sign Up</a>
+                    </p>
+                    <p>
+                        <a href="#" id="forgot-password" class="font-semibold text-slate-500 hover:text-sky-600 hover:underline">Forgot Password?</a>
+                    </p>
+                </div>
+            </div>
+
+            <div id="register-container" class="bg-white rounded-xl shadow-xl p-6 sm:p-8 space-y-6 hidden">
+                <h2 class="2xl font-bold text-center text-slate-700">Create Account</h2>
+                <form id="register-form">
+                     <div class="space-y-4">
+                        <div>
+                            <label for="register-email" class="block text-sm font-semibold text-slate-600 mb-1.5">Email</label>
+                            <input type="email" id="register-email" autocomplete="username" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" required>
+                        </div>
+                        <div>
+                            <label for="register-password" class="block text-sm font-semibold text-slate-600 mb-1.5">Password</label>
+                            <input type="password" id="register-password" autocomplete="new-password" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" required>
+                        </div>
+                         <div>
+                            <label for="register-password-confirm" class="block text-sm font-semibold text-slate-600 mb-1.5">Confirm Password</label>
+                            <input type="password" id="register-password-confirm" autocomplete="new-password" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full mt-6 bg-emerald-500 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-emerald-600 active:bg-emerald-700 transform hover:scale-105 active:scale-95 transition-all">Register</button>
+                </form>
+                <p class="text-center text-sm text-slate-500">
+                    Already have an account? <a href="#" id="show-login" class="font-semibold text-sky-600 hover:underline">Log In</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- No Trips View -->
+    <section id="page-no-trips" class="hidden flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-md text-center bg-white rounded-xl shadow-xl p-8 space-y-6">
+            <h2 class="text-2xl font-bold text-slate-700">Welcome!</h2>
+            <p class="text-slate-600">You're not part of any trips yet. Create a new one to get started!</p>
+            <button id="create-first-trip-btn" class="w-full bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-emerald-600 active:bg-emerald-700 transform hover:scale-105 active:scale-95 transition-all">
+                🚀 Create Your First Trip
+            </button>
+            <!-- Logged in info for No Trips View -->
+            <div id="logged-in-info-no-trips" class="text-center text-sm text-slate-600 mt-4 py-2 border-t border-slate-200 pt-4 hidden">
+                Logged in as: <span id="logged-in-email-no-trips" class="font-semibold text-slate-800"></span>
+                <a href="#" id="logout-link-no-trips" class="font-semibold text-sky-600 hover:underline ml-2">Logout</a>
+            </div>
+        </div>
+    </section>
+
+    <main id="app-content" class="flex-grow overflow-y-auto w-full hidden">
+        <section id="page-buddies" class="page p-4 md:p-6">
+            <div class="bg-white rounded-xl shadow-xl p-5 sm:p-6 space-y-6 max-w-2xl mx-auto">
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-700 flex items-center gap-2">
+                    <span class="text-2xl sm:text-3xl">👥</span>Manage Buddies
+                </h2>
+                <div class="space-y-4">
+                    <div class="flex flex-row flex-nowrap gap-3 items-end">
+                        <div class="flex-grow">
+                            <label for="group-event-name" class="block text-sm font-semibold text-slate-600 mb-1.5">Trip Name</label>
+                            <div class="relative">
+                                <input type="text" id="group-event-name" class="w-full h-11 p-2.5 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., Weekend Getaway 🎉" required>
+                                <button id="clear-trip-name-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Clear trip name">
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="w-[105px] shrink-0"> <!-- Narrow fixed width -->
+                            <label for="trip-primary-currency" class="block text-sm font-semibold text-slate-600 mb-1.5">Currency</label>
+                             <select id="trip-primary-currency" class="w-full h-11 pl-2 pr-1 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white text-sm font-medium">
+                                <option value="CUSTOM" class="font-bold text-sky-600 bg-sky-50">⚙️ Rate</option>
+                                <option value="HKD">🇭🇰 HKD</option>
+                                <option value="CNY">🇨🇳 CNY</option>
+                                <option value="GBP">🇬🇧 GBP</option>
+                                <option value="JPY">🇯🇵 JPY</option>
+                                <option value="THB">🇹🇭 THB</option>
+                                <option value="TWD">🇹🇼 TWD</option>
+                                <option value="KRW">🇰🇷 KRW</option>
+                                <option value="SGD">🇸🇬 SGD</option>
+                                <option value="USD">🇺🇸 USD</option>
+                                <option value="EUR">🇪🇺 EUR</option>
+                                <option value="AUD">🇦🇺 AUD</option>
+                                <option value="CAD">🇨🇦 CAD</option>
+                                <option value="NZD">🇳🇿 NZD</option>
+                                <option value="CHF">🇨🇭 CHF</option>
+                                <option value="MYR">🇲🇾 MYR</option>
+                                <option value="VND">🇻🇳 VND</option>
+                                <option value="PHP">🇵🇭 PHP</option>
+                                <option value="IDR">🇮🇩 IDR</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="buddy-list" class="flex flex-col gap-3"></div>
+                    <div class="flex gap-3 items-center">
+                        <input type="text" id="new-buddy" class="flex-grow p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="Enter buddy name">
+                        <button id="add-buddy" class="bg-sky-500 text-white font-medium py-2.5 px-4 rounded-lg shadow hover:bg-sky-600 active:bg-sky-700 transform active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-1.5 shrink-0">
+                            <span class="text-lg">✨</span>Add
+                        </button>
+                    </div>
+                    <button id="done-buddies" class="w-full bg-emerald-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-emerald-600 active:bg-emerald-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2">
+                        <span class="text-lg">✅</span>Done & Proceed
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-expense" class="page p-4 md:p-6 hidden">
+            <div class="bg-white rounded-xl shadow-xl p-5 sm:p-6 space-y-6 max-w-2xl mx-auto">
+                <h2 id="expense-form-title" class="text-xl sm:text-2xl font-bold text-slate-700 flex items-center gap-2">
+                        <span class="text-2xl sm:text-3xl">💸</span>Add New Expense
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <!-- FIXED: Changed <label> to <div> -->
+                        <div class="block text-sm font-semibold text-slate-600 mb-1.5">Category</div>
+                        <div class="embla" id="meal-carousel">
+                            <div class="embla__container">
+                                <div class="embla__slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Breakfast"><span class="text-lg">🥞</span>Breakfast</button></div>
+                                <div class="embla__slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Lunch"><span class="text-lg">🍝</span>Lunch</button></div>
+                                <div class="embla__slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Dinner"><span class="text-lg">🍛</span>Dinner</button></div>
+                                <div class="embla__slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Taxi"><span class="text-lg">🚕</span>Taxi</button></div>
+                                <div class="embla__slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Drink"><span class="text-lg">🍹</span>Drink</button></div>
+                                <div class="embla__slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Tea"><span class="text-lg">🥪</span>Tea</button></div>
+                                <div class="embla__slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Dessert"><span class="text-lg">🍰</span>Dessert</button></div>
+                                <div class="embla__slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Ticket"><span class="text-lg">🎫</span>Ticket</button></div>
+                                <div class="embla__slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Hotel"><span class="text-lg">🏨</span>Hotel</button></div>
+                                <div class="embla__slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Plane"><span class="text-lg">✈️</span>Plane</button></div>
+                                <div class="embla__slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Train"><span class="text-lg">🚅</span>Train</button></div>
+                                <div class="embla__slide"><button type="button" class="meal-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-meal="Other"><span class="text-lg">🛍️</span>Other</button></div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="meal-type" name="meal-type">
+                    </div>
+
+                    <div>
+                        <label for="restaurant" class="block text-sm font-semibold text-slate-600 mb-1.5">Place / Item Name</label>
+                        <input type="text" id="restaurant" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., Cafe Delight or Movie Tickets" required>
+                    </div>
+
+                    <div>
+                        <!-- FIXED: Changed <label> to <div> -->
+                        <div class="block text-sm font-semibold text-slate-600 mb-1.5">Currency</div>
+                            <div class="embla" id="currency-carousel">
+                            <div class="embla__container">
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="HKD"><span class="text-lg">🇭🇰</span>HKD</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="CNY"><span class="text-lg">🇨🇳</span>CNY</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="GBP"><span class="text-lg">🇬🇧</span>GBP</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="JPY"><span class="text-lg">🇯🇵</span>JPY</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="THB"><span class="text-lg">🇹🇭</span>THB</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="TWD"><span class="text-lg">🇹🇼</span>TWD</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="KRW"><span class="text-lg">🇰🇷</span>KRW</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="SGD"><span class="text-lg">🇸🇬</span>SGD</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="USD"><span class="text-lg">🇺🇸</span>USD</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="EUR"><span class="text-lg">🇪🇺</span>EUR</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="AUD"><span class="text-lg">🇦🇺</span>AUD</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="CAD"><span class="text-lg">🇨🇦</span>CAD</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="NZD"><span class="text-lg">🇳🇿</span>NZD</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="CHF"><span class="text-lg">🇨🇭</span>CHF</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="MYR"><span class="text-lg">🇲🇾</span>MYR</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="VND"><span class="text-lg">🇻🇳</span>VND</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="PHP"><span class="text-lg">🇵🇭</span>PHP</button></div>
+                                <div class="embla__slide"><button type="button" class="currency-btn choice-btn bg-slate-100 text-slate-700 px-3 py-2 rounded-lg hover:bg-sky-100 transition-all duration-150 ease-in-out text-sm font-medium flex items-center gap-1.5 justify-center w-full" data-currency="IDR"><span class="text-lg">🇮🇩</span>IDR</button></div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="currency" name="currency">
+                    </div>
+
+                    <div>
+                        <label for="amount" class="block text-sm font-semibold text-slate-600 mb-1.5">Total Amount</label>
+                        <input type="number" inputmode="decimal" id="amount" class="w-full p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="Enter amount" min="0" step="0.01" required>
+                    </div>
+
+                    <div>
+                        <!-- FIXED: Changed <label> to <div> -->
+                        <div class="block text-sm font-semibold text-slate-600 mb-1.5">Which buddies participated and who paid?</div>
+                        <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-md mb-2">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" class="custom-checkbox" id="select-all-buddies">
+                                <span class="text-sm text-slate-700 font-semibold">All</span>
+                            </label>
+                        </div>
+                        <div id="combined-buddies-payer" class="space-y-2">
+                        </div>
+                    </div>
+
+                    <button id="add-expense" class="w-full bg-sky-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-sky-600 active:bg-sky-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2">
+                        <span class="text-lg">🎉</span>Add Expense
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-summary" class="page p-4 md:p-6">
+            <div class="bg-white rounded-xl shadow-xl p-5 sm:p-6 space-y-6 max-w-4xl mx-auto">
+                 <h2 id="summary-title" class="text-xl sm:text-2xl font-bold text-slate-700 mb-3 flex items-center gap-2">
+                    <span class="text-2xl sm:text-3xl">📊</span>Expense Summary
+                </h2>
+                <div class="overflow-x-auto rounded-lg shadow-sm border border-slate-200">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <!-- Added 'w-full': Forces this column to take all available space -->
+                                <th class="w-full py-3 px-2 md:px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider text-left">Buddy</th>
+                                
+                                <!-- Added 'w-auto whitespace-nowrap': Keeps this column as small as possible without breaking text -->
+                                <th id="summary-total-owed-header" class="w-auto whitespace-nowrap py-3 px-2 md:px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider text-right">Total Owed</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summary-table" class="divide-y divide-slate-200"></tbody>
+                    </table>
+                </div>
+
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-700 mt-6 mb-3 flex items-center gap-2">
+                    <span class="text-2xl sm:text-3xl">🧾</span>Expense Records
+                </h2>
+                <p id="total-spent" class="text-md font-semibold text-slate-700 mb-2"></p>
+                <div id="meal-records" class="space-y-3"></div>
+                <div id="add-divider-wrapper" class="mt-4 flex justify-center">
+                    <button id="add-day-divider-btn" class="w-full sm:w-auto bg-sky-100 text-sky-600 font-semibold py-2.5 px-6 rounded-lg shadow-sm hover:bg-sky-200 active:bg-sky-300 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2">
+                        <i class="fas fa-plus"></i> Add Day Divider
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-debt" class="page p-4 md:p-6 hidden">
+            <div class="bg-white rounded-xl shadow-xl p-5 sm:p-6 space-y-6 max-w-4xl mx-auto">
+                <h2 id="debt-title" class="text-xl sm:text-2xl font-bold text-slate-700 mb-3 flex items-center gap-2">
+                    <span class="text-2xl sm:text-3xl">🤝</span>Debt Settlement
+                </h2>
+                <div class="overflow-x-auto rounded-lg shadow-sm border border-slate-200">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-100">
+                            <tr>
+                                <th class="py-3 px-2 md:px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Buddy</th>
+                                <th id="debt-paid-header" class="py-3 px-2 md:px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Paid</th>
+                                <th id="debt-owed-header" class="py-3 px-2 md:px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Owed</th>
+                                <th id="debt-net-header" class="py-3 px-2 md:px-4 text-slate-600 font-semibold uppercase text-xs tracking-wider">Net Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="debt-table" class="divide-y divide-slate-200"></tbody>
+                    </table>
+                </div>
+
+                <!-- Individual Adjustments moved here -->
+                <div class="mt-6 space-y-4">
+                    <h3 class="text-xl sm:text-2xl font-bold text-slate-700 flex items-center gap-2">
+                        <span class="text-2xl sm:text-3xl">💱</span>Individual Adjustments
+                    </h3>
+                    <div class="bg-slate-50 p-4 rounded-lg shadow-inner space-y-3">
+                        <div>
+                            <label for="adjustment-name" class="block text-sm font-semibold text-slate-600 mb-1.5">Adjustment Name / Description</label>
+                            <input type="text" id="adjustment-name" class="w-full h-11 bg-white p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., Shared SIM card or Extra luggage">
+                        </div>
+
+                        <div>
+                            <label for="adjustment-debtor" class="block text-sm font-semibold text-slate-600 mb-1.5">Who Pays?</label>
+                            <select id="adjustment-debtor" class="w-full h-11 bg-white p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow">
+                                <option value="">Select Payer</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="adjustment-creditor" class="block text-sm font-semibold text-slate-600 mb-1.5">Who Receives?</label>
+                            <select id="adjustment-creditor" class="w-full h-11 bg-white p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow">
+                                <option value="">Select Receiver</option>
+                            </select>
+                        </div>
+
+                        <!-- Calculator Section -->
+                        <div>
+                            <!-- FIXED: Changed <label> to <div> to resolve console error -->
+                            <div class="block text-sm font-semibold text-slate-600 mb-1.5">Calculator (optional, press 'Enter' to solve)</div>
+                            <div class="relative">
+                                <div id="calculator-input" contenteditable="true" data-placeholder="e.g., 8 + 28" class="w-full bg-white p-2.5 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow"></div>
+                                <button id="clear-calculator-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Clear calculator input">
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="adjustment-amount" class="block text-sm font-semibold text-slate-600 mb-1.5">Amount</label>
+                            <div class="flex gap-2">
+                                <select id="adjustment-currency" class="p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow bg-white shrink-0">
+                                    <option value="HKD">🇭🇰 HKD</option>
+                                    <option value="CNY">🇨🇳 CNY</option>
+                                    <option value="GBP">🇬🇧 GBP</option>
+                                    <option value="JPY">🇯🇵 JPY</option>
+                                    <option value="THB">🇹🇭 THB</option>
+                                    <option value="TWD">🇹🇼 TWD</option>
+                                    <option value="KRW">🇰🇷 KRW</option>
+                                    <option value="SGD">🇸🇬 SGD</option>
+                                    <option value="USD">🇺🇸 USD</option>
+                                    <option value="EUR">🇪🇺 EUR</option>
+                                    <option value="AUD">🇦🇺 AUD</option>
+                                    <option value="CAD">🇨🇦 CAD</option>
+                                    <option value="NZD">🇳🇿 NZD</option>
+                                    <option value="CHF">🇨🇭 CHF</option>
+                                    <option value="MYR">🇲🇾 MYR</option>
+                                    <option value="VND">🇻🇳 VND</option>
+                                    <option value="PHP">🇵🇭 PHP</option>
+                                    <option value="IDR">🇮🇩 IDR</option>
+                                </select>
+                                <input type="number" inputmode="decimal" id="adjustment-amount" class="w-full h-11 bg-white p-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-shadow placeholder-slate-400" placeholder="e.g., 50.00" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <button id="add-adjustment-btn" class="w-full bg-indigo-500 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-indigo-600 active:bg-indigo-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2">
+                            <span class="text-lg">➕</span>Add Adjustment
+                        </button>
+                    </div>
+                    <div id="current-adjustments" class="space-y-2">
+                        <p class="text-slate-500 text-center py-2">No individual adjustments yet.</p>
+                    </div>
+                </div>
+
+                <!-- Settlement Plan container remains here -->
+                <div id="settlement-plan-container" class="mt-4">
+                     <h3 class="text-md font-semibold text-slate-600 mb-2">Settlement Plan:</h3>
+                     <div id="settlement-plan" class="text-sm space-y-1"></div>
+                </div>
+
+                <button id="copy-whatsapp" class="w-full bg-green-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-green-600 active:bg-green-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
+                    <span class="text-lg">📱</span>Copy Data to WhatsApp
+                </button>
+                <button id="reset" class="w-full bg-rose-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-rose-600 active:bg-rose-700 transform hover:scale-105 active:scale-95 transition-all duration-150 ease-in-out flex items-center justify-center gap-2 mt-4">
+                    <span class="text-lg">♻️</span>Reset Trip Data
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Error/Success message container -->
+    <div id="error-container" class="fixed top-40 left-1/2 -translate-x-1/2 transform z-[201] w-[90%] md:w-auto max-w-[90%] pointer-events-none">
+         <p id="error" class="bg-red-100 text-red-700 border border-red-300 p-3 rounded-lg text-sm shadow-lg opacity-0 transition-opacity duration-300"></p>
+    </div>
+
+    <!-- Trip Switcher Modal -->
+    <div id="trip-switcher-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[200] p-4 transition-opacity duration-300 opacity-0">
+        <div id="trip-switcher-modal-content" class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full space-y-4 transform scale-95 transition-all duration-300">
+            <h2 class="text-lg font-bold text-slate-800 flex justify-between items-center">
+                <span>Your Trips</span>
+                <button id="close-modal-icon-btn" class="text-slate-500 hover:text-slate-700 text-xl" aria-label="Close trip switcher modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </h2>
+            <div id="trip-list-menu" class="max-h-60 overflow-y-auto space-y-2"></div>
+            <button id="create-new-trip-btn" class="w-full mt-2 bg-emerald-500 text-white font-semibold py-2.5 px-6 rounded-lg shadow-md hover:bg-emerald-600 active:bg-emerald-700">
+                Create New Trip
+            </button>
+            <button id="close-trip-switcher-btn" class="w-full mt-2 bg-slate-200 text-slate-700 font-medium py-2.5 px-6 rounded-lg hover:bg-slate-300">
+                Cancel
+            </button>
+            <div id="logged-in-info" class="text-center text-sm text-slate-600 mt-4 py-2 border-t border-slate-200 pt-4 hidden">
+                Logged in as: <span id="logged-in-email" class="font-semibold text-slate-800"></span>
+                <a href="#" id="logout-link" class="font-semibold text-sky-600 hover:underline ml-2">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Universal Modern Prompt/Confirmation Modal -->
+    <div id="universal-prompt-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[200] p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white rounded-xl shadow-xl p-6 sm:p-8 space-y-6 w-full max-w-sm transform scale-95 transition-all duration-300">
+            <h3 class="text-xl font-bold text-center text-slate-700 flex items-center justify-center gap-2" id="modal-prompt-title"></h3>
+            <p class="text-slate-600 text-center text-sm" id="modal-prompt-message"></p>
+            <div class="relative">
+                <input type="text" id="modal-prompt-input" class="w-full p-2.5 pr-10 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-shadow" placeholder="Enter name here" required>
+                <button id="modal-clear-input-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none" aria-label="Clear input">
+                    <i class="fas fa-times-circle"></i>
+                </button>
+            </div>
+            <div class="flex justify-end gap-3 mt-4">
+                <button id="modal-cancel-btn" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium transition-colors">Cancel</button>
+                <button id="modal-confirm-btn" class="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 font-medium transition-colors">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Rate Modal -->
+    <div id="custom-rate-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[200] p-4 transition-opacity duration-300 opacity-0">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm transform scale-95 transition-all duration-300">
+            <h3 class="text-xl font-bold text-slate-700 mb-5 flex items-center gap-2">
+                <span>💱</span> Set Custom Exchange Rate
+            </h3>
+            
+            <div class="space-y-5">
+                <!-- UPDATED LAYOUT SECTION -->
+                <div class="flex items-end gap-3">
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Foreign Currency</label>
+                        <select id="custom-rate-source" class="w-full h-11 p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-sky-500 font-medium text-slate-700">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                    
+                    <!-- Arrow aligned to inputs -->
+                    <div class="pb-2 text-slate-400 text-xl font-bold">→</div>
+                    
+                    <div class="flex-1">
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Trip Currency</label>
+                        <input type="text" id="custom-rate-target" class="w-full h-11 p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-100 text-slate-500 font-bold text-center cursor-not-allowed focus:outline-none" readonly>
+                    </div>
+                </div>
+                <!-- END UPDATED LAYOUT SECTION -->
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Exchange Rate</label>
+                    <div class="flex gap-2">
+                        <!-- Input Field -->
+                        <input type="number" id="custom-rate-input" step="0.000001" 
+                               class="flex-1 min-w-0 p-3 border-2 border-sky-500 rounded-lg text-lg font-mono text-center focus:outline-none placeholder-slate-300 shadow-sm" 
+                               placeholder="e.g. 0.0491">
+                        
+                        <!-- UPDATED: Standard Solid Button Style -->
+                        <button id="fetch-live-rate-btn" 
+                                class="bg-sky-500 text-white font-semibold px-5 rounded-lg shadow-md hover:bg-sky-600 active:bg-sky-700 transform hover:scale-105 active:scale-95 transition-all shrink-0 flex items-center gap-2" 
+                                title="Use Current Market Rate">
+                            <i class="fas fa-magic"></i> Get Rate
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2 text-center">
+                        Example: JPY to HKD → enter <span class="font-mono font-bold text-sky-600">0.0491</span>
+                    </p>
+                </div>
+
+                <div class="bg-sky-50 p-4 rounded-lg border border-sky-100 text-center">
+                    <p class="text-xs text-sky-600 font-semibold uppercase tracking-wide mb-1">Calculation Preview</p>
+                    <p id="custom-rate-preview" class="text-slate-700 font-medium text-sm">
+                        Enter a rate above to see preview
+                    </p>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button id="close-custom-rate-btn" class="flex-1 py-2.5 bg-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-300 transition-colors">Cancel</button>
+                    <button id="save-custom-rate-btn" class="flex-1 py-2.5 bg-emerald-500 text-white rounded-lg font-bold hover:bg-emerald-600 shadow-md transition-colors">Apply Rate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex flex-col items-center justify-center z-[202] transition-opacity duration-300 opacity-0 hidden">
+        <div class="flex flex-col items-center justify-center bg-white rounded-lg p-8 shadow-xl">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+            <p class="text-slate-700 text-lg font-semibold" id="loading-text">Please wait while we log you in...</p>
+        </div>
+    </div>
+
+
+    <nav id="app-nav" class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-[0_-4px_10px_rgba(0,0,0,0.05)] flex justify-around items-stretch h-20 z-40 border-t border-slate-200/80 hidden">
+        <button class="nav-btn flex-1 flex flex-col items-center justify-center text-slate-600 hover:text-sky-500 transition-colors py-2 focus:outline-none" data-page="page-buddies">
+            <span class="text-2xl">👥</span>
+            <span class="text-xs mt-1">Buddies</span>
+        </button>
+        <button class="nav-btn flex-1 flex flex-col items-center justify-center text-slate-600 hover:text-sky-500 transition-colors py-2 focus:outline-none" data-page="page-expense">
+            <span class="text-2xl">💸</span>
+            <span class="text-xs mt-1">Expense</span>
+        </button>
+        <button class="nav-btn flex-1 flex flex-col items-center justify-center text-slate-600 hover:text-sky-500 transition-colors py-2 focus:outline-none" data-page="page-summary">
+            <span class="text-2xl">📊</span>
+            <span class="text-xs mt-1">Summary</span>
+        </button>
+        <button class="nav-btn flex-1 flex flex-col items-center justify-center text-slate-600 hover:text-sky-500 transition-colors py-2 focus:outline-none" data-page="page-debt">
+            <span class="text-2xl">🤝</span>
+            <span class="text-xs mt-1">Debt</span>
+        </button>
+    </nav>
+
+    <!-- Link to external JavaScript file, now as a module -->
+    <script type="module" src="script.js" defer></script>
+</body>
+</html>
+
